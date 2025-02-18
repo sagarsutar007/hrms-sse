@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yono games details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ebecec;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header {
+            background-color: #e51c23;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .warning {
+            width: 100%;
+
+        }
+
+        .warning_image {
+            width: 100%;
+
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .game-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .game-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin-bottom: -1px;
+            border: 1px solid rgb(241, 241, 241);
+
+        }
+
+        .game-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+        }
+
+        .game-info {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .game-info h3 {
+            font-size: 1em;
+            margin: 0;
+        }
+
+        .game-info p {
+            margin: 5px 0 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .download-btn {
+            background-color: rgb(223, 11, 11);
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .download-btn:hover {
+            background-color: darkred;
+        }
+
+        .footer-warning {
+            background-color: yellow;
+            color: red;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9em;
+        }
+
+        .footer {
+            background-color: #800000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .footer .social-icons {
+            margin: 10px 0;
+        }
+
+        .footer .social-icons a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .footer .links {
+            margin: 10px 0;
+        }
+
+        .footer .links a {
+            margin: 5 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.9em;
+            background-color: blue;
+            padding: 6px 20px;
+            border-radius: 5px;
+        }
+
+        .footer p {
+            margin-top: 10px;
+            font-size: 0.8em;
+        }
+
+        #ontnar_div {
+            width: 400px;
+            background-color: white;
+        }
+
+
+
+
+        /* header  */
+        #logo_image_div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #logo_image {
+            width: 50px;
+            height: 50px;
+
+        }
+
+        #brand_name {
+            font-size: 16px;
+            font-family: Verdana, Geneva, Tahoma, sans-seriff;
+            font-weight: bold;
+            margin-left: 6px;
+        }
+
+        .header_social_icons {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgb(255, 255, 255);
+            border-radius: 4px;
+            margin: 10px;
+            background-color: red;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+
+        #top_3_game_div {
+            display: flex;
+            width: 100%;
+            margin-top: -30px;
+            justify-content: space-between;
+        }
+
+        .top_3_game_image {
+            width: 140px;
+            height: 140px;
+        }
+
+        .top_3_game_card_div {
+            padding: 10px;
+        }
+
+        .SECURE_p {
+            color: green;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .top_3_title {
+            font-size: 16px;
+            margin-bottom: 0px;
+        }
+
+        .top_3_details_div {
+            margin-top: -15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        @media (max-width: 480px) {
+
+
+
+            #logo_image {
+                width: 40px;
+                height: 40px;
+
+            }
+
+            #brand_name {
+                font-size: 14px;
+                margin-left: 6px;
+            }
+
+            .header_social_icons {
+                width: 25px;
+                height: 25px;
+                margin: 5px;
+                ;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="contnar_div" style="width: 500px;
+            background-color: white;">
+
+
+
+        <div class="header">
+            <div id="logo_image_div">
+                <img id="logo_image"
+                    src="data:image/jpeg;base64,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"
+                    alt="MKMbet">
+                <h1 id="brand_name">ALLYONOGAME.COM</h1>
+            </div>
+            <div id="logo_image_div">
+                <div class="header_social_icons">
+                    <i class="fa-brands fa-telegram"></i>
+                </div>
+                <div class="header_social_icons">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </div>
+                <div class="header_social_icons">
+                    <i class="fa-brands fa-android"></i>
+                </div>
+            </div>
+
+
+
+        </div>
+        <div class="warning">
+            <img class="warning_image"
+                src="https://allyonogame.com/wp-content/uploads/2024/05/all-rummy-app-alert-banner_cleanup1.jpg" alt="">
+        </div>
+
+        <div id="top_3_game_div">
+            <div class="top_3_game_card_div">
+                <img class="top_3_game_image" src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg"
+                    alt="">
+                <div class="top_3_details_div">
+                    <h3 class="top_3_title">Yono Arcade APK</h3>
+                    <p class="SECURE_p"> <i class="fa-solid fa-square-check"></i> 100% SECURE</p>
+                    <button class="download-btn"><i class="fa-solid fa-cloud-arrow-down"></i> Download</button>
+                </div>
+
+            </div>
+            <div class="top_3_game_card_div" style="margin-top: -20px;">
+                <img class="top_3_game_image" src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg"
+                    alt="">
+                <div class="top_3_details_div">
+                    <h3 class="top_3_title">567 Slots APK</h3>
+                    <p class="SECURE_p"> <i class="fa-solid fa-square-check"></i> 100% SECURE</p>
+                    <button class="download-btn"><i class="fa-solid fa-cloud-arrow-down"></i> Download</button>
+                </div>
+
+
+            </div>
+            <div class="top_3_game_card_div">
+                <img class="top_3_game_image" src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg"
+                    alt="">
+                <div class="top_3_details_div">
+                    <h3 class="top_3_title">Yono 777 APK</h3>
+                    <p class="SECURE_p"> <i class="fa-solid fa-square-check"></i> 100% SECURE</p>
+                    <button class="download-btn"><i class="fa-solid fa-cloud-arrow-down"></i> Download</button>
+                </div>
+
+
+            </div>
+
+        </div>
+        <style>
+            #warning_div {
+                padding: 0px;
+                background-color: yellow;
+                border: 1px dotted red;
+                color: green;
+                font-size: 10px;
+                font-weight: 600;
+            }
+
+            .game_counts {
+                font-size: 23px;
+                color: rgb(179, 177, 177);
+                padding-right: 20px;
+                padding-left: 10px;
+                font-weight: 600;
+            }
+        </style>
+
+        <div id="warning_div">
+
+            <marquee behavior="scroll" direction="left">सूचना :- इस सभी एप्लीकेशन के अंदर वित्तीय जोखिम शामिल है तो
+                कृपया इस बात का ध्यान रखते हुए स्वयं के रिस्क पर खेलें ! और इसके अंदर अपने पैसे को जोड़ने से बचें, वरना
+                इसमें आप लोगों का नुकसान हो सकता है,</marquee>
+
+        </div>
+
+        <div class="content">
+            <ul class="game-list">
+                <li class="game-item">
+                    <span class="game_counts">9</span>
+                    <img src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg" alt="MKMbet">
+                    <div class="game-info">
+                        <h3 id="list_title">ICIC Games APK</h3>
+                        <p><span style="font-weight: bold; color: black;">⤓</span><span
+                                class="downloade_number">10M+</span> <span class="bonous_amount">| Bonus Rs.8-20</span>
+                            <br> <span class="minimum_wid_amount">Min. Withdrawal ₹100/-</span>
+                        </p>
+                    </div>
+                    <button class="download-btn"><i class="fa-solid fa-circle-down"></i> Download</button>
+                </li>
+                <li class="game-item">
+                    <span class="game_counts">9</span>
+                    <img src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg" alt="MKMbet">
+                    <div class="game-info">
+                        <h3 id="list_title">ICIC Games APK</h3>
+                        <p><span style="font-weight: bold; color: black;">⤓</span><span
+                                class="downloade_number">10M+</span> <span class="bonous_amount">| Bonus Rs.8-20</span>
+                            <br> <span class="minimum_wid_amount">Min. Withdrawal ₹100/-</span>
+                        </p>
+                    </div>
+                    <button class="download-btn"><i class="fa-solid fa-circle-down"></i> Download</button>
+                </li>
+                <li class="game-item">
+                    <span class="game_counts">9</span>
+                    <img src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg" alt="MKMbet">
+                    <div class="game-info">
+                        <h3 id="list_title">ICIC Games APK</h3>
+                        <p><span style="font-weight: bold; color: black;">⤓</span><span
+                                class="downloade_number">10M+</span> <span class="bonous_amount">| Bonus Rs.8-20</span>
+                            <br> <span class="minimum_wid_amount">Min. Withdrawal ₹100/-</span>
+                        </p>
+                    </div>
+                    <button class="download-btn"><i class="fa-solid fa-circle-down"></i> Download</button>
+                </li>
+                <li class="game-item">
+                    <span class="game_counts">9</span>
+                    <img src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg" alt="MKMbet">
+                    <div class="game-info">
+                        <h3 id="list_title">ICIC Games APK</h3>
+                        <p><span style="font-weight: bold; color: black;">⤓</span><span
+                                class="downloade_number">10M+</span> <span class="bonous_amount">| Bonus Rs.8-20</span>
+                            <br> <span class="minimum_wid_amount">Min. Withdrawal ₹100/-</span>
+                        </p>
+                    </div>
+                    <button class="download-btn"><i class="fa-solid fa-circle-down"></i> Download</button>
+                </li>
+                <li class="game-item">
+                    <span class="game_counts">9</span>
+                    <img src="https://allyonogame.com/wp-content/uploads/2024/05/567-Slots-APK.jpg" alt="MKMbet">
+                    <div class="game-info">
+                        <h3 id="list_title">ICIC Games APK</h3>
+                        <p><span style="font-weight: bold; color: black;">⤓</span><span
+                                class="downloade_number">10M+</span> <span class="bonous_amount">| Bonus Rs.8-20</span>
+                            <br> <span class="minimum_wid_amount">Min. Withdrawal ₹100/-</span>
+                        </p>
+                    </div>
+                    <button class="download-btn"><i class="fa-solid fa-circle-down"></i> Download</button>
+                </li>
+
+                <style>
+                    #list_title {
+                        font-size: 18px;
+                        font-family: Arial, Helvetica, sans-serif;
+
+                    }
+
+                    #list_title {
+                        font-size: 18px;
+                        font-family: Arial, Helvetica, sans-serif;
+
+                    }
+
+                    .downloade_number {
+                        color: rgb(248, 180, 33);
+                    }
+
+                    .bonous_amount {
+                        font-weight: 600;
+                        color: rgb(189, 189, 189);
+                        font-size: 12px;
+                    }
+
+                    .minimum_wid_amount {
+                        color: rgb(13, 161, 13);
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+                </style>
+
+            </ul>
+        </div>
+
+        <div class="footer-warning">
+            सूचना: इस गेम को केवल मनोरंजन के लिए खेलें और अपने जोखिम पर खेलें।
+        </div>
+
+        <style>
+            .size {
+                width: 40px;
+                height: 40px;
+            }
+        </style>
+
+        <div class="footer">
+
+            <div id="logo_image_div">
+                <div class="header_social_icons size" style="background-color: rgb(92, 199, 92);">
+
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="header_social_icons size" style="background-color: rgb(38, 175, 199);">
+                    <i class="fa-brands fa-telegram"></i>
+                </div>
+                <div class="header_social_icons size" style="background-color: rgb(41, 113, 221);">
+                    <i class="fa-brands fa-facebook"></i>
+                </div>
+                <div class="header_social_icons size" style="background-color: rgb(25, 209, 209);">
+                    <i class="fa-brands fa-twitter"></i>
+                </div>
+                <div class="header_social_icons size">
+                    <i class="fa-brands fa-youtube"></i>
+                </div>
+
+            </div>
+            <div style="background-color: white; padding: 0.5px;">
+
+            </div>
+            <style>
+                #footer_menu_div {
+                    display: flex;
+                    justify-content: space-around;
+
+                }
+            </style>
+
+            <div class="links">
+                <div id="footer_menu_div">
+                    <a href="#"><i class="fa-solid fa-user"></i> About Us</a>
+                    <a href="#"><i class="fa-solid fa-phone-flip"></i> Contact Us</a>
+                    <a href="#"><i class="fa-solid fa-info"></i> Disclaimer</a>
+                </div>
+
+                <div id="footer_menu_div" style="margin-top: 20px;">
+                    <a href="#"><i class="fa-solid fa-address-card"></i> Terms & Conditions</a>
+                    <a href="#"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a>
+
+                </div>
+
+
+            </div>
+            <div style="background-color: white; padding: 0.5px;">
+
+            </div>
+            <p style="font-size: 18px;">Copyright © yonogamesdetails.com All Rights Reserved</p>
+        </div>
+    </div>
+</body>
+
+</html>
