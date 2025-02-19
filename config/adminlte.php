@@ -64,11 +64,11 @@ return [
     */
 
     'logo' => '<b>Shri Sai Electricals</b>',
-    // 'logo_img' => 'images/logo.png',
-    // 'logo_img_class' => 'brand-image img-circle elevation-3',
-    // 'logo_img_xl' => null,
-    // 'logo_img_xl_class' => 'brand-image-xs',
-    // 'logo_img_alt' => 'Admin Logo',
+    'logo_img' => 'images/logo.png',
+    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo_img_xl' => null,
+    'logo_img_xl_class' => 'brand-image-xs',
+    'logo_img_alt' => 'Admin Logo',
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
             'path' => 'images/logo.png',
             'alt' => 'Auth Logo',
@@ -113,7 +113,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'images/logo.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -136,9 +136,9 @@ return [
     'usermenu_enabled' => true,
     'usermenu_header' => false,
     'usermenu_header_class' => 'bg-primary',
-    'usermenu_image' => false,
-    'usermenu_desc' => false,
-    'usermenu_profile_url' => false,
+    'usermenu_image' => true,
+    'usermenu_desc' => true,
+    'usermenu_profile_url' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -154,8 +154,8 @@ return [
 
     'layout_topnav' => null,
     'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => null,
+    'layout_fixed_sidebar' => true,
+    'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
 
@@ -299,100 +299,141 @@ return [
     */
 
     'menu' => [
-        // Navbar items:
-        [
-            'type' => 'navbar-search',
-            'text' => 'search',
-            'topnav_right' => true,
-        ],
-        [
-            'type' => 'fullscreen-widget',
-            'topnav_right' => true,
-        ],
 
-        // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],
-        [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
-        ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
-        ['header' => 'account_settings'],
-        [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
+    // Navbar items (top navigation)
+    [
+        'type' => 'fullscreen-widget',
+        'topnav_right' => true,
+    ],
+    [
+        'text' => 'Logout',
+        'url' => 'logout',
+        'icon' => 'fas fa-sign-out-alt',
+        'topnav_right' => true, // Place in the top right navbar
+    ],
+
+    // Sidebar Header
+    [
+        'text' => 'Shri Sai Electricals',
+        'icon' => true, // No icon for the header
+    ],
+
+    // Sidebar Items
+    [
+        'text' => 'Dashboard',
+        'icon' => 'fas fa-tachometer-alt',
+        'url' => '/',
+    ],
+    [
+        'text' => 'Employees',
+        'icon' => 'fas fa-users',
+        'url' => '/employees',
+    ],
+    [
+        'text' => 'Punched Attendance',
+        'icon' => 'fas fa-clock',
+        'url' => 'admin/punched-attendance',
+    ],
+    [
+        'text' => 'Attendance',
+        'icon' => 'fas fa-calendar-check',
+        'url' => 'admin/attendance',
+    ],
+    [
+        'text' => 'Add Employee',
+        'icon' => 'fas fa-user-plus',
+        'url' => 'registration',
+    ],
+    [
+        'text' => 'Salary Calculations',
+        'icon' => 'fas fa-calculator',
+        'url' => 'admin/salary-calculations',
+    ],
+    [
+        'text' => 'Reports',
+        'icon' => 'fas fa-chart-bar',
+        'submenu' => [
+            [
+                'text' => 'Report 1',
+                'icon' => 'fas fa-file-alt',
+                'url' => 'admin/reports/report1',
+            ],
+            [
+                'text' => 'Leave',
+                'icon' => 'fas fa-user-times',
+                'url' => 'admin/reports/leave',
+            ],
+            [
+                'text' => 'Absent List',
+                'icon' => 'fas fa-user-minus',
+                'url' => 'admin/reports/absent-list',
+            ],
+            [
+                'text' => 'Present List',
+                'icon' => 'fas fa-user-check',
+                'url' => 'admin/reports/present-list',
+            ],
+            [
+                'text' => 'Late Comers List',
+                'icon' => 'fas fa-clock',
+                'url' => 'admin/reports/late-comers-list',
+            ],
+            [
+                'text' => '100% Attendance List',
+                'icon' => 'fas fa-check-circle',
+                'url' => 'admin/reports/full-attendance-list',
+            ],
+            [
+                'text' => 'Top 10 Present List',
+                'icon' => 'fas fa-list-ol',
+                'url' => 'admin/reports/top-present-list',
+            ],
+            [
+                'text' => 'Association Time',
+                'icon' => 'fas fa-user-clock',
+                'url' => 'admin/reports/association-time',
+            ],
+            [
+                'text' => 'Total Salary Report',
+                'icon' => 'fas fa-file-invoice-dollar',
+                'url' => 'admin/reports/total-salary-report',
+            ],
+            [
+                'text' => 'Total Salary Summary',
+                'icon' => 'fas fa-file-invoice',
+                'url' => 'admin/reports/total-salary-summary',
             ],
         ],
-        ['header' => 'labels'],
-        [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
-        ],
-        [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
-            'url' => '#',
-        ],
     ],
+    [
+        'text' => 'Download ID Cards',
+        'icon' => 'fas fa-id-card',
+        'url' => 'admin/download-id-cards',
+    ],
+    [
+        'text' => 'Holidays',
+        'icon' => 'fas fa-calendar-day',
+        'url' => 'admin/holidays',
+    ],
+    [
+        'text' => 'Swap Day',
+        'icon' => 'fas fa-exchange-alt',
+        'url' => 'admin/swap-day',
+    ],
+    [
+        'text' => 'Calendar',
+        'icon' => 'fas fa-calendar',
+        'url' => 'admin/calendar',
+    ],
+    [
+        'text' => 'Super Admin Settings',
+        'icon' => 'fas fa-cogs',
+        'url' => 'admin/super-admin-settings',
+    ],
+],
+
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -430,7 +471,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -465,7 +506,7 @@ return [
             ],
         ],
         'Chartjs' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -475,7 +516,7 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -498,6 +539,22 @@ return [
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
                 ],
             ],
+        ],
+        'FontAwesome' => [
+        'active' => true,
+        'files' => [
+            [
+                'type' => 'css',
+                'asset' => false,
+                'location' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css',
+            ],
+        ],
+    ],
+    ],
+
+    'assets' => [
+        'css' => [
+            'css/custom.css', // This will include your custom CSS
         ],
     ],
 

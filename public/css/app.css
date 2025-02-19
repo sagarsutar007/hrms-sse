@@ -1,0 +1,51 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+  
+}
+#heder_div{
+    height: 60px;
+    
+  
+box-shadow:  -5px -5px 4px #5a5a5a,
+             5px 5px 4px #ffffff;
+          z-index: 1;
+          border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+#content_div{
+    width:calc(100vw - 70px);
+    height: 100vh ;
+    overflow-y: scroll;
+    
+}
+
+
+
+#Home_page_mane_div{
+    width: 100vw;
+    height:calc(100vh - 70px)  ;
+    background-color: rgba(255, 255, 255, 0.897);
+    display: flex;
+    
+}
+.chat_div{
+    display: flex;
+    height: 400px;
+    margin: 20px;
+    width: 100vw;
+  
+}
+
+
+#myChart{
+    width: 300px;
+    height: 100%;
+}
+
+
+

@@ -1,0 +1,12 @@
+/* Fix Sidebar */
+.main-sidebar {
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Make Content Scrollable */
+.content-wrapper {
+    overflow-y: auto;
+    max-height: 100vh;
+}

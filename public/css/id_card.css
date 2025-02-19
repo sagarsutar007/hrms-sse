@@ -1,0 +1,93 @@
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+:root{
+    --id_card_top_color:gray;
+    --id_card_h3_color:gray;
+    --id_card_border_color:gray;
+}
+
+
+#id_main_Div {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    background-color: rgba(208, 208, 208, 0.758);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    padding-top: 20px;
+
+}
+
+#id_inner_Div {
+    width: 192px;
+    height: 336px;
+    background-color: white;
+    border-radius: 10px;
+
+}
+
+.image_mane_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#tag_space {
+    padding: 6px 20px;
+    background: rgb(255, 255, 255);
+    width: 60px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+}
+
+#id_card_div_1 {
+
+    height: 42%;
+    width: 100%;
+    background-color: var(--id_card_top_color);
+    border-radius: 10px 10px 0px 0px;
+    padding: 15px;
+}
+
+#company_name_h2 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+
+
+#id_image_div {
+
+    width: 100px;
+    height: 100px;
+
+}
+
+#id_card_image {
+
+    width: 100px;
+    height: 100px;
+    box-shadow:
+        0 0 0 6px hsl(0, 0%, 50%),
+        0 0 0 12px var(--id_card_border_color);
+}
+
+#name_h2 {
+    margin-top: 40px;
+}
+
+#emp_type_h3 {
+    background-color: var(--id_card_h3_color);
+    color: white;
+    width: 100%;
+    text-align: center;
+    margin: 10px 0px;
+    padding: 2px;
+
+}

@@ -1,0 +1,78 @@
+/* pagination css */
+.pagination {
+    display: inline-block;
+  }
+  
+  .pagination p {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    cursor: pointer;
+   
+  }
+  
+  .pagination p.active {
+    background-color: blue;
+    color: white;
+    border: 1px solid blue;
+  }
+
+  .true{
+    background-color: rgb(121, 121, 206);
+    color: white;
+    border: 1px solid #ddd;
+  }
+  .false{
+
+  }
+  
+  .pagination a:hover:not(.active) {background-color: #ddd;}
+
+
+
+
+
+
+/* border css */
+ table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+   width: 100%;
+   text-align: center;
+  }
+  
+  td, th {
+    border: 1px solid #c0c0c0;
+    font-size: 16px;
+    padding: 7px 10px;
+    text-wrap: nowrap;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #eeeeee;
+  }
+
+
+  .in_time_p{
+    width: 100px;
+    padding:5px 10px; border-right:1px solid gray; 
+  }
+
+  .out_time_p{
+    width: 100px;
+    padding:5px 10px; border-right:1px solid gray; 
+  }
+  .total_hr_p{
+    width: 100px;
+    padding:5px 10px; border-right:1px solid gray; 
+  }
+  .total_min_p{
+    width: 70px;
+    padding:5px 10px; border-right:1px solid gray;
+  }
+  .ot{
+    border-right:none;
+  }

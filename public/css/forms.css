@@ -1,0 +1,63 @@
+.full_width_div {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.315);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9;
+}
+
+.form_inner_div {
+    padding-left: 20px;
+    background: #ffffff;
+  
+   
+    width: 720px;
+}
+
+.form_header_div {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.274);
+}
+
+.cancle_p {
+    font-size: large;
+    color: red;
+    cursor: pointer;
+}
+
+.input {
+    padding: 6px 10px;
+    border: 1px solid gray;
+
+}
+
+.input_lable_p {
+    margin-top: 15px;
+    margin-bottom: 1px;
+}
+.submit_btn {
+    border-radius: 5px;
+background: #ffffff;
+border: 1px solid rgb(202, 202, 202);
+    color: blue;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.submit_btn:hover {
+    background-color: navy;
+    color: white;
+    cursor: pointer;
+}
+
+#Holidays_form_div {
+    display: none;
+}

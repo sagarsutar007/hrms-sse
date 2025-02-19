@@ -1,0 +1,35 @@
+.chart_main_div {
+
+    padding: 20px;
+    display: flex;
+    height: 400px;
+    
+}
+
+.chart_inner_div {
+    width: 60%;
+    height: 100%;
+    box-shadow: 2px 2px 2px #c5c5c5,
+        -2px -2px 2px #fbfbfb;
+    margin: 10px;
+    padding: 10px;
+
+
+}
+
+.chart_inner_div_2 {
+    width: 30%;
+    height: 100%;
+    box-shadow: 2px 2px 2px #c5c5c5,
+        -2px -2px 2px #fbfbfb;
+    margin: 10px;
+    padding: 10px;
+}
+.chart_inner_div_3,  .chart_inner_div_4 ,.chart_inner_div_5{
+    width: 29.5%;
+    height: 100%;
+    box-shadow: 2px 2px 2px #c5c5c5,
+        -2px -2px 2px #fbfbfb;
+    margin: 10px;
+    padding: 10px;
+}

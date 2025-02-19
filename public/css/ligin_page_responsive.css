@@ -1,0 +1,46 @@
+@media only screen and (max-width: 768px) {
+    #brand_div {
+      display: none;
+    }
+    #login_main_div {
+        padding: 20px;
+    }
+  }
+
+  @media only screen and (max-width: 468px) {
+   
+    #login_main_div {
+      margin: 0px;
+      width: 100vw;
+      border-radius: 0px;
+    }
+
+    #counting_div {
+      
+        padding: 0px;
+        margin: 0px;
+     
+    }
+  }
+
+  @media only screen and (max-width: 358px) {
+    #counting_div {
+      
+        padding: 0px;
+        margin: 0px;
+        padding-left: 20px;
+    }
+    .input {
+
+        width: 90vw;
+       margin-left: 30px;
+    }
+
+    .mar_left{
+        margin-left: 30px;
+    }
+
+    #sign_in_btn {
+        width:90%;
+    }
+  }
