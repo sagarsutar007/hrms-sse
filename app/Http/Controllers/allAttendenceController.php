@@ -24,7 +24,7 @@ class allAttendenceController extends Controller
             ->with('users', $users);
     }
 
-    public function search_attendence(Request $setch_req)
+    public function search_attandance(Request $setch_req)
     {
         $inputSValue = $setch_req->search_val;
         $role = session()->get('role');
@@ -58,7 +58,7 @@ history.back();
 
     }
 
-    
+
     public function delete_swap_day_api(Request $delete_req)
     {
         $id = $delete_req->id;
@@ -95,15 +95,15 @@ history.back();
         $users_qur = DB::table('all_users')->get();
 
 
-      
+
 
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -126,11 +126,11 @@ public function all_swap_day_list_api(Request $req){
         $users_qur = DB::table('all_users')->get();
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -152,17 +152,17 @@ public function all_attandence_short_api(Request $req){
             ->paginate($req->limit);
 
         $users_qur = DB::table('all_users')->get();
-        
 
-      
+
+
 
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -186,17 +186,17 @@ public function all_swap_day_list_short_api(Request $req){
             ->paginate($req->limit);
 
         $users_qur = DB::table('all_users')->get();
-        
 
-      
+
+
 
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -226,11 +226,11 @@ public function all_attandence_search_api(Request $req){
         $users_qur = DB::table('all_users')->get();
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -261,11 +261,11 @@ public function all_swap_day_list_search_api(Request $req){
         $users_qur = DB::table('all_users')->get();
     $arr = array(
       'status'=>'true',
-      'message' => 'data Found',  
+      'message' => 'data Found',
       'attandence_data'=> $users_attandence_data,
       'all_users'=> $users_qur,
       'role'=> $role
-       ); 
+       );
     echo json_encode($arr);
 
 
@@ -280,7 +280,7 @@ public function insertAttendanceForAll(Request $request)
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         $empID = $request->employeeID;
-        
+
         if (!$startDate || !$endDate) {
             return response()->json([
                 'status' => 'error',
@@ -289,9 +289,9 @@ public function insertAttendanceForAll(Request $request)
         }
 
         try {
-            
+
              $this->insertAttendanceRecords($empID, $startDate, $endDate);
-             
+
             //$employees = DB::table('all_users')->select('Employee_id')->get();
 
             //foreach ($employees as $employee) {
@@ -313,11 +313,11 @@ public function insertAttendanceForAll(Request $request)
     private function insertAttendanceRecords($employeeId, $startDate, $endDate)
     {
         $currentDate = $startDate;
-    
+
         while (strtotime($currentDate) <= strtotime($endDate)) {
             $dayOfWeek = date('w', strtotime($currentDate)); // 0 = Sunday
-    
-            
+
+
                 //  $timeSlots = [
                 //     [32400, 1800], // Near 09:00 AM
                 //     [43200, 1800], // Near 12:00 PM
@@ -329,28 +329,28 @@ public function insertAttendanceForAll(Request $request)
                     [32400, 1800], // Near 09:00 AM
                     [61200, 1800]  // Near 06:00 PM
                 ];
-                 
-    
+
+
                 foreach ($timeSlots as $slot) {
                     $attendanceTimes = [
                         $this->generateRandomTime($slot[0], $slot[1]),
                         $this->generateRandomTime($slot[0], $slot[1]),
                     ];
-    
+
                     foreach ($attendanceTimes as $attendanceTime) {
                         // Call the method using $this->insert_api222()
                         $this->insert_api222($employeeId, $attendanceTime, $currentDate, 1);
                     }
                 }
-            
-    
+
+
             // Increment the date
             $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
         }
     }
 
 
-    
+
     public function all_attandance_detail_with_let_api()
     {
         $sql = "CALL `GetShitWiseCurrentDateData`()";
@@ -360,7 +360,7 @@ public function insertAttendanceForAll(Request $request)
         return response()->json($attandance_summary_result);
     }
 
-      
+
     public function Get_Employee_Type_Wise_Current_Date_Data_api()
     {
         $sql = "CALL `GetEmployeeTypeWiseCurrentDateData`();";
@@ -375,21 +375,21 @@ public function insertAttendanceForAll(Request $request)
         $sql = "select distinct d.Department_name as Department , e.EmpTypeName, sh.Shift_Name, sh.Shift_Start_Time, sh.Shift_hours,   u.f_name,u.m_name, u.l_name, a.Employee_id, a.in_time, a.attandence_Date from all_attandencetable a \n"
 
         . "inner join all_users u on a.Employee_id = u.Employee_id\n"
-    
+
         . "inner join shift_master sh on u.shift_time = sh.id\n"
-    
+
         . "inner join shift__employee_type_master as e on u.employee_type = e.id\n"
         . "INNER JOIN department_master d ON u.Department = d.id\n"
-    
+
         . "where a.attandence_Date = CURRENT_DATE AND a.in_time > DATE_ADD(sh.Shift_Start_Time, INTERVAL 5 MINUTE)\n"
-    
+
         . "order by u.f_name, u.m_name, u.l_name, u.Employee_id;";
         // Execute the stored procedure and get the result set
         $attandance_summary_result = DB::select($sql);
         // Return the result as a JSON response
         return response()->json($attandance_summary_result);
     }
-   
+
     public function daily_ot_hrs_api()
     {
 
@@ -399,18 +399,18 @@ public function insertAttendanceForAll(Request $request)
         // Return the result as a JSON response
         return response()->json($daily_ot_hrs_result);
     }
-    
 
 
-    
-    
-    
+
+
+
+
     private function generateRandomTime($startSeconds, $rangeSeconds)
     {
         $randomSeconds = $startSeconds + rand(0, $rangeSeconds);
         return gmdate('H:i:s', $randomSeconds);
     }
-    
+
     public function insert_api222($employeeId, $attendanceTime, $attendanceDate, $inserterId)
     {
         DB::table('attendance_info')->insertOrIgnore([
@@ -423,8 +423,8 @@ public function insertAttendanceForAll(Request $request)
             'updated_at' => now(),
         ]);
     }
-    
 
-  
+
+
 
 }

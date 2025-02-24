@@ -332,12 +332,12 @@ return [
     [
         'text' => 'Punched Attendance',
         'icon' => 'fas fa-clock',
-        'url' => 'admin/punched-attendance',
+        'url' => '/all-attendance-p',
     ],
     [
         'text' => 'Attendance',
         'icon' => 'fas fa-calendar-check',
-        'url' => 'admin/attendance',
+        'url' => '/all-attendance',
     ],
     [
         'text' => 'Add Employee',
@@ -347,7 +347,7 @@ return [
     [
         'text' => 'Salary Calculations',
         'icon' => 'fas fa-calculator',
-        'url' => 'admin/salary-calculations',
+        'url' => '/salary-calculations',
     ],
     [
         'text' => 'Reports',
@@ -356,64 +356,64 @@ return [
             [
                 'text' => 'Report 1',
                 'icon' => 'fas fa-file-alt',
-                'url' => 'admin/reports/report1',
+                'url' => '/report-1',
             ],
             [
                 'text' => 'Leave',
                 'icon' => 'fas fa-user-times',
-                'url' => 'admin/reports/leave',
+                'url' => '/total-leave',
             ],
             [
                 'text' => 'Absent List',
                 'icon' => 'fas fa-user-minus',
-                'url' => 'admin/reports/absent-list',
+                'url' => '/Absent-List',
             ],
             [
                 'text' => 'Present List',
                 'icon' => 'fas fa-user-check',
-                'url' => 'admin/reports/present-list',
+                'url' => '/Present-List',
             ],
             [
                 'text' => 'Late Comers List',
                 'icon' => 'fas fa-clock',
-                'url' => 'admin/reports/late-comers-list',
+                'url' => '/Let-Commers-List',
             ],
             [
                 'text' => '100% Attendance List',
                 'icon' => 'fas fa-check-circle',
-                'url' => 'admin/reports/full-attendance-list',
+                'url' => '/attandance-100%-list',
             ],
             [
                 'text' => 'Top 10 Present List',
                 'icon' => 'fas fa-list-ol',
-                'url' => 'admin/reports/top-present-list',
+                'url' => '/attandance-100%-top-10-list',
             ],
             [
                 'text' => 'Association Time',
                 'icon' => 'fas fa-user-clock',
-                'url' => 'admin/reports/association-time',
+                'url' => '/association-time',
             ],
             [
                 'text' => 'Total Salary Report',
                 'icon' => 'fas fa-file-invoice-dollar',
-                'url' => 'admin/reports/total-salary-report',
+                'url' => '/total-salary',
             ],
             [
                 'text' => 'Total Salary Summary',
                 'icon' => 'fas fa-file-invoice',
-                'url' => 'admin/reports/total-salary-summary',
+                'url' => '/total_salary_summary',
             ],
         ],
     ],
     [
         'text' => 'Download ID Cards',
         'icon' => 'fas fa-id-card',
-        'url' => 'admin/download-id-cards',
+        'url' => '/downloade-Id-cards',
     ],
     [
         'text' => 'Holidays',
         'icon' => 'fas fa-calendar-day',
-        'url' => 'admin/holidays',
+        'url' => '/all-holidays',
     ],
     [
         'text' => 'Swap Day',
