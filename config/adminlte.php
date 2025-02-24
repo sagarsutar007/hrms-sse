@@ -340,11 +340,6 @@ return [
         'url' => '/all-attendance',
     ],
     [
-        'text' => 'Add Employee',
-        'icon' => 'fas fa-user-plus',
-        'url' => 'registration',
-    ],
-    [
         'text' => 'Salary Calculations',
         'icon' => 'fas fa-calculator',
         'url' => '/salary-calculations',
@@ -418,17 +413,17 @@ return [
     [
         'text' => 'Swap Day',
         'icon' => 'fas fa-exchange-alt',
-        'url' => 'admin/swap-day',
+        'url' => '/swipe-list',
     ],
     [
         'text' => 'Calendar',
         'icon' => 'fas fa-calendar',
-        'url' => 'admin/calendar',
+        'url' => '/calendar',
     ],
     [
         'text' => 'Super Admin Settings',
         'icon' => 'fas fa-cogs',
-        'url' => 'admin/super-admin-settings',
+        'url' => '/super-admin-settings',
     ],
 ],
 
