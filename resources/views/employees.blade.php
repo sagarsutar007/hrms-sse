@@ -100,7 +100,7 @@
                         <td>1</td>
                         <td>
                             <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-warning btn-sm" onclick="window.location.href='/user-details'"><i class="fas fa-edit"></i></button>
                             <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
                         </td>
                     </tr>

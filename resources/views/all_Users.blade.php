@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header d-flex justify-content-end align-items-center">
+    <div class="card-header d-flex align-items-center">
         <div>
             <button class="btn btn-secondary" id="exportExcel">Excel</button>
             <button class="btn btn-secondary" id="exportPDF">PDF</button>
@@ -18,12 +18,13 @@
                 <div class="dropdown-menu" id="columnVisibility"></div>
             </div>
         </div>
-        <div>
+        <div class="ml-auto"> <!-- Added ml-auto to push this div to the right -->
             <button class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">
                 <i class="fas fa-user-plus"></i> Add New User
             </button>
         </div>
     </div>
+
     <div class="card-body">
         <table id="userTable" class="table table-bordered table-striped">
             <thead>
