@@ -7,185 +7,128 @@
 @endsection
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <div class="row">
-            <div class="col-md-12">
-                <button class="btn btn-success">Excel</button>
-                <button class="btn btn-danger">PDF</button>
-                <button class="btn btn-secondary">Print</button>
-                <div class="btn-group">
-                    <button class="btn btn-dark dropdown-toggle" data-toggle="dropdown">Column visibility</button>
-                    <div class="dropdown-menu"></div>
+<div class="row">
+    <div class="col-12">
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">All Leave</h3>
+                <div class="card-tools">
+                    <a class="btn btn-light btn-sm" href=""><i class="fa fa-plus text-secondary"></i> Add New</a>
+                    <a class="btn btn-light btn-sm" href=""><i class="fas fa-file-import text-secondary"></i> Bulk Upload</a>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <table id="leaveTable" class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Sr. No.</th>
-                    <th>Name</th>
-                    <th>Employee ID</th>
-                    <th>Leave Type</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Description</th>
-                    <th>Remarks by Approver</th>
-                    <th>Department</th>
-                    <th>Status</th>
-                    <th>Half Day</th>
-                    <th>Total Days</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>John Doe</td>
-                    <td>21</td>
-                    <td>Sick Leave</td>
-                    <td>2025-01-01</td>
-                    <td>2025-01-05</td>
-                    <td>fgfffmf</td>
-                    <td>nn</td>
-                    <td>Maintenance</td>
-                    <td>Approved</td>
-                    <td>No</td>
-                    <td>5</td>
-                    <td>
-                        <button class="btn btn-info btn-sm view-leave" data-toggle="modal" data-target="#leaveModal" data-name="John Doe" data-employee="21" data-leave="Sick Leave" data-start="2025-01-01" data-end="2025-01-05" data-description="fgfffmf" data-remarks="nn" data-status="Approved" data-total="5"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-warning btn-sm edit-leave"><i class="fas fa-edit" data-toggle="modal" data-target="#editLeaveModal" data-name="John Doe" data-employee="21" data-leave="Sick Leave" data-start="2025-01-01" data-end="2025-01-05" data-description="fgfffmf" data-remarks="nn" data-status="Approved" data-total="5"></i></button>
-
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Leave Details Modal -->
-<div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="leaveModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="leaveModalLabel">Leave Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="leaveTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Name <span onclick="sortData('Name')"><i class="fa-solid fa-sort"></i></span></th>
+                                <th>Employee ID <span onclick="sortData('Employee_id')"><i class="fa-solid fa-sort"></i></span></th>
+                                <th>Leave Type <span onclick="sortData('Leave_Type')"><i class="fa-solid fa-sort"></i></span></th>
+                                <th>Start Date <span onclick="sortData('Start_Date')"><i class="fa-solid fa-sort"></i></span></th>
+                                <th>End Date</th>
+                                <th>Description</th>
+                                <th>Remarks by Approver</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Half Day</th>
+                                <th>Total Days</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Name:</label> <input type="text" class="form-control" id="leaveName" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Employee ID:</label> <input type="text" class="form-control" id="leaveEmployee" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Leave Type:</label> <input type="text" class="form-control" id="leaveType" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Start Date:</label> <input type="text" class="form-control" id="leaveStart" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>End Date:</label> <input type="text" class="form-control" id="leaveEnd" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Description:</label> <input type="text" class="form-control" id="leaveDescription" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Remarks by Approver:</label> <input type="text" class="form-control" id="leaveRemarks" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Status:</label> <input type="text" class="form-control" id="leaveStatus" readonly></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group"><label>Total Days:</label> <input type="text" class="form-control" id="leaveTotal" readonly></div>
-                        </div>
-                    </div>
-                </form>
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination pagination-sm justify-content-end" id="pagination_div">
+                        <!-- Pagination will be inserted here dynamically -->
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
 </div>
+
+<!-- View Leave Modal -->
+<x-adminlte-modal id="leaveModal" title="Leave Details" theme="primary" icon="fas fa-info-circle" size="lg">
+    <div class="row">
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveName" label="Name" id="leaveName" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveEmployee" label="Employee ID" id="leaveEmployee" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveType" label="Leave Type" id="leaveType" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveStart" label="Start Date" id="leaveStart" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveEnd" label="End Date" id="leaveEnd" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveDescription" label="Description" id="leaveDescription" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveRemarks" label="Remarks by Approver" id="leaveRemarks" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveStatus" label="Status" id="leaveStatus" readonly />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="leaveTotal" label="Total Days" id="leaveTotal" readonly />
+        </div>
+    </div>
+    <x-slot name="footerSlot">
+        <x-adminlte-button class="btn btn-secondary" label="Close" data-dismiss="modal" />
+    </x-slot>
+</x-adminlte-modal>
 
 <!-- Edit Leave Modal -->
-<div class="modal fade" id="editLeaveModal" tabindex="-1" role="dialog" aria-labelledby="editLeaveModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Leave</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Leave Type *</label>
-                                <input type="text" class="form-control" id="editLeaveType">
-                            </div>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-center mt-2">
-                            <label class="mr-2 mb-0">Half Day:</label>
-                            <input type="checkbox" id="editHalfDay" class="ml-2" style="transform: scale(1.5);">
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Start Date *</label>
-                                <input type="date" class="form-control" id="editStartDate">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>End Date *</label>
-                                <input type="date" class="form-control" id="editEndDate">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Total Days *</label>
-                                <input type="text" class="form-control" id="editTotalDays">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Description *</label>
-                                <input type="text" class="form-control" id="editDescription">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Remarks by Approver *</label>
-                                <input type="text" class="form-control" id="editRemarks">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Status *</label>
-                                <select class="form-control" id="editStatus">
-                                    <option>Approved</option>
-                                    <option>Rejected</option>
-                                    <option>Pending</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12 text-center">
-                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                        </div>
-                    </div>
-                </form>
-
-
-            </div>
+<x-adminlte-modal id="editLeaveModal" title="Edit Leave" theme="warning" icon="fas fa-edit" size="lg">
+    <div class="row">
+        <div class="col-md-6">
+            <x-adminlte-input name="editLeaveType" label="Leave Type" id="editLeaveType" />
+        </div>
+        <div class="col-md-6 d-flex align-items-center mt-2">
+            <label class="mr-2 mb-0">Half Day:</label>
+            <input type="checkbox" id="editHalfDay" class="ml-2" style="transform: scale(1.5);">
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="editStartDate" label="Start Date" id="editStartDate" type="date" />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="editEndDate" label="End Date" id="editEndDate" type="date" />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="editTotalDays" label="Total Days" id="editTotalDays" />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="editDescription" label="Description" id="editDescription" />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-input name="editRemarks" label="Remarks by Approver" id="editRemarks" />
+        </div>
+        <div class="col-md-6">
+            <x-adminlte-select name="editStatus" label="Status" id="editStatus">
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Pending">Pending</option>
+            </x-adminlte-select>
         </div>
     </div>
-</div>
+    <x-slot name="footerSlot">
+        <x-adminlte-button class="btn btn-primary" label="Update" onclick="submitLeaveEdit()" />
+        <x-adminlte-button class="btn btn-secondary" label="Close" data-dismiss="modal" />
+    </x-slot>
+</x-adminlte-modal>
+
 @endsection
 
 @section('css')
@@ -196,30 +139,211 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#leaveTable').DataTable();
+       $(document).ready(function() {
+    // Initialize DataTable
+    var leaveTable = $('#leaveTable').DataTable({
+        "responsive": true,
+        "lengthChange": true,
+        "autoWidth": false,
+        "paging": true,
+        "info": true,
+        "searching": true,
+        "ordering": true,
+        "dom": 'lBfrtip',
+        "buttons": [
+            {
+                extend: 'excel',
+                exportOptions: {
+                    columns: ':visible:not(:last-child)'
+                }
+            },
+            {
+                extend: 'pdf',
+                exportOptions: {
+                    columns: ':visible:not(:last-child)'
+                }
+            },
+            {
+                extend: 'print',
+                exportOptions: {
+                    columns: ':visible:not(:last-child)'
+                }
+            },
+            'colvis',
+        ],
+        "language": {
+            "lengthMenu": "_MENU_"
+        }
+    });
 
-            $(".view-leave").click(function () {
-            $("#leaveName").val($(this).data("name"));
-            $("#leaveEmployee").val($(this).data("employee"));
-            $("#leaveType").val($(this).data("leave"));
-            $("#leaveStart").val($(this).data("start"));
-            $("#leaveEnd").val($(this).data("end"));
-            $("#leaveDescription").val($(this).data("description"));
-            $("#leaveRemarks").val($(this).data("remarks"));
-            $("#leaveStatus").val($(this).data("status"));
-            $("#leaveTotal").val($(this).data("total"));
-        });
+    // Initial load of data
+    attendance_data_set("{{ route('search_leave') }}");
 
-        $(".edit-leave").click(function () {
-            $("#editLeaveType").val($(this).data("leave"));
-            $("#editStartDate").val($(this).data("start"));
-            $("#editEndDate").val($(this).data("end"));
-            $("#editTotalDays").val($(this).data("total"));
-            $("#editDescription").val($(this).data("description"));
-            $("#editRemarks").val($(this).data("remarks"));
-            $("#editStatus").val($(this).data("status"));
+    // Search functionality
+    $('#searchInput').on('keyup', function() {
+        attendance_data_set("{{ route('search_leave') }}");
+    });
+
+    function viewLeaveDetails(id) {
+    $.ajax({
+        type: "GET",
+        url: "{{ url('/leave-view/') }}/" + id,
+        dataType: "json",
+        success: function(response) {
+            var r_data = response.data;
+
+            // Populate the "View Leave Details" modal fields
+            $("#leaveName").val(r_data.Name);
+            $("#leaveEmployee").val(r_data.Employee_id);
+            $("#leaveType").val(r_data.Leave_Type_name);
+            $("#leaveStart").val(r_data.Start_Date);
+            $("#leaveEnd").val(r_data.End_Date);
+            $("#leaveDescription").val(r_data.Description);
+            $("#leaveRemarks").val(r_data.Remarks_by_Approve);
+            $("#leaveStatus").val(r_data.Status);
+            $("#leaveTotal").val(r_data.Total_Days);
+
+            // Open the modal
+            $("#leaveModal").modal("show");
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+}
+
+function editLeaveDetails(id) {
+    $.ajax({
+        type: "GET",
+        url: "{{ url('/leave-edit/') }}/" + id,
+        dataType: "json",
+        success: function(response) {
+            var r_data = response.data;
+
+            // Populate the "Edit Leave" modal fields
+            $("#editLeaveType").val(r_data.Leave_Type_name);
+            $("#editHalfDay").prop("checked", r_data.Half_Day);
+            $("#editStartDate").val(r_data.Start_Date);
+            $("#editEndDate").val(r_data.End_Date);
+            $("#editTotalDays").val(r_data.Total_Days);
+            $("#editDescription").val(r_data.Description);
+            $("#editRemarks").val(r_data.Remarks_by_Approve);
+            $("#editStatus").val(r_data.Status);
+
+            // Open the modal
+            $("#editLeaveModal").modal("show");
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+}
+
+});
+
+$(document).ready(function () {
+    var limit = 50;
+    var sortClickCounts = {
+        'Name': 1,
+        'Employee_id': 1,
+        'Leave_Type': 1,
+        'Start_Date': 1
+    };
+
+    loadData();
+
+    function loadData(url = "{{ url('/all-leaves-api') }}/" + limit) {
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                renderTable(response.all_users.data);
+                renderPagination(response.pagination);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
         });
+    }
+
+    function renderTable(data) {
+        var tableBody = $("#leaveTable tbody");
+        tableBody.empty();
+
+        if (data.length === 0) {
+            tableBody.append(`<tr><td colspan="13" class="text-center">No data available</td></tr>`);
+            return;
+        }
+
+        var rowIndex = 1;
+
+        $.each(data, function (index, user) {
+            var halfDayText = user.Half_Day ? "Yes" : "";
+            var row = `<tr>
+                <td>${rowIndex++}</td>
+                <td>${user.Name}</td>
+                <td>${user.Employee_id}</td>
+                <td>${user.leave_Name}</td>
+                <td>${user.Start_Date}</td>
+                <td>${user.End_Date}</td>
+                <td>${user.Description}</td>
+                <td>${user.Remarks_by_Approve}</td>
+                <td>${user.Department_name}</td>
+                <td>${user.Status}</td>
+                <td>${halfDayText}</td>
+                <td>${user.Total_Days}</td>
+                <td>
+                    <button onclick="viewLeaveDetails(${user.id})" class="btn btn-sm btn-info">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button onclick="editLeaveDetails(${user.id})" class="btn btn-sm btn-primary">
+                        <i class="fa-solid fa-pencil"></i>
+                    </button>
+
+                </td>
+            </tr>`;
+            tableBody.append(row);
         });
+    }
+
+    function renderPagination(pagination) {
+        var paginationDiv = $("#pagination_div");
+        paginationDiv.empty();
+
+        if (!pagination) return;
+
+        for (var i = 1; i <= pagination.total_pages; i++) {
+            var activeClass = i === pagination.current_page ? "active" : "";
+            paginationDiv.append(`<li class="page-item ${activeClass}"><a class="page-link page-btn" data-page="${i}">${i}</a></li>`);
+        }
+    }
+
+    $("#pagination_div").on("click", ".page-btn", function () {
+        var page = $(this).data("page");
+        loadData("{{ url('/all-leaves-api') }}/" + limit + "?page=" + page);
+    });
+
+    function sortData(column) {
+        let method = (sortClickCounts[column] % 2 === 0) ? 'asc' : 'desc';
+        sortClickCounts[column]++;
+        loadData("{{ url('/all-leaves-short-api') }}/" + limit + "/" + column + "/" + method);
+    }
+
+    $("#search_btn").on("click", function (event) {
+        event.preventDefault();
+        var searchQuery = $("#search_input").val();
+        loadData("{{ url('/all-leaves-search-api') }}/" + limit + "/" + searchQuery);
+    });
+
+    $("#limit_inputt").on("change", function () {
+        limit = $(this).val();
+        loadData("{{ url('/all-leaves-api') }}/" + limit);
+    });
+});
+
+
+
+
     </script>
 @endsection

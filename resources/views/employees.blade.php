@@ -10,15 +10,12 @@
 
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-end align-items-center">
             <div class="btn-group">
-                <button class="btn btn-secondary me-2"><i class="fas fa-download"></i> Download ID Cards</button>
-                <button class="btn btn-primary me-2" data-toggle="modal" data-target="#addEmployeeModal"><i class="fas fa-plus"></i> Add New Employee</button>
-                <button class="btn btn-success me-2" data-toggle="modal" data-target="#bulkUploadModal"><i class="fas fa-upload"></i> Bulk Upload</button>
+                <button class="btn btn-secondary me-2" onclick="collectSelectedIds()"><i class="fas fa-download"></i> Download ID Cards</button>
+                <button class="btn btn-primary me-2" onclick="location.href='{{url('/registration')}}'"><i class="fas fa-plus"></i> Add New Employee</button>
+                <button class="btn btn-success me-2" data-toggle="modal" data-target="#bulkUploadModal" onclick="open_bulk_uplaode()"><i class="fas fa-upload"></i> Bulk Upload</button>
                 <button class="btn btn-danger me-2"><i class="fas fa-trash"></i> Bulk Delete</button>
-            </div>
-            <div class="ml-auto">
-                <input type="text" id="searchBox" class="form-control" placeholder="Search Employee...">
             </div>
         </div>
 
@@ -41,68 +38,6 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="checkbox"></td>
-                        <td>John Doe</td>
-                        <td>1001</td>
-                        <td>9876543210</td>
-                        <td>Full Time</td>
-                        <td>Employee</td>
-                        <td>Sunday</td>
-                        <td>Production</td>
-                        <td>1</td>
-                        <td>
-                            <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>Jane Smith</td>
-                        <td>1002</td>
-                        <td>9876543211</td>
-                        <td>Casual</td>
-                        <td>Employee</td>
-                        <td>Sunday</td>
-                        <td>Quality</td>
-                        <td>1</td>
-                        <td>
-                            <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>Michael Johnson</td>
-                        <td>1003</td>
-                        <td>9876543212</td>
-                        <td>Daily Wages</td>
-                        <td>Employee</td>
-                        <td>Sunday</td>
-                        <td>Production</td>
-                        <td>1</td>
-                        <td>
-                            <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>Emily Davis</td>
-                        <td>1004</td>
-                        <td>9876543213</td>
-                        <td>Full Time</td>
-                        <td>Employee</td>
-                        <td>Sunday</td>
-                        <td>Store</td>
-                        <td>1</td>
-                        <td>
-                            <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm" onclick="window.location.href='/user-details'"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -111,212 +46,6 @@
     </div>
 </div>
 
-<x-adminlte-modal id="addEmployeeModal" title="Add Employee" theme="primary" size="lg" v-centered scrollable>
-    <form action="{{ route('add_user') }}" method="POST">
-        @csrf
-        <div class="row">
-
-            <!-- First Name -->
-            <div class="col-md-4">
-                <x-adminlte-input name="first_name" label="First Name*" placeholder="First Name" required>
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-user"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Middle Name -->
-            <div class="col-md-4">
-                <x-adminlte-input name="middle_name" label="Middle Name" placeholder="Middle Name">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-user"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Last Name -->
-            <div class="col-md-4">
-                <x-adminlte-input name="last_name" label="Last Name*" placeholder="Last Name" required>
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-user"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Mobile Number -->
-            <div class="col-md-4">
-                <x-adminlte-input name="mobile" label="Mobile Number" placeholder="Mobile Number">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-phone"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Email -->
-            <div class="col-md-4">
-                <x-adminlte-input name="email" label="Email" type="email" placeholder="Email Address">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-envelope"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Date of Birth -->
-            <div class="col-md-4">
-                <x-adminlte-input name="dob" label="Date Of Birth" type="date">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-calendar"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Aadhaar -->
-            <div class="col-md-4">
-                <x-adminlte-input name="aadhaar" label="Aadhaar" placeholder="Aadhaar">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-id-card"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Voter ID -->
-            <div class="col-md-4">
-                <x-adminlte-input name="voter_id" label="Voter ID" placeholder="Voter ID">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-id-card"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- PAN Number -->
-            <div class="col-md-4">
-                <x-adminlte-input name="pan_number" label="Pan Number" placeholder="Pan Number">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-id-card"></i></div>
-                    </x-slot>
-                </x-adminlte-input>
-            </div>
-
-            <!-- Ration Card -->
-            <div class="col-md-4">
-                <x-adminlte-input name="ration_card" label="Ration Card" placeholder="Ration Card" />
-            </div>
-
-            <!-- Highest Qualification -->
-            <div class="col-md-4">
-                <x-adminlte-input name="highest_qualification" label="Highest Qualification" placeholder="Enter qualification" />
-            </div>
-
-            <!-- Login Enabled -->
-            <div class="col-md-4">
-                <x-adminlte-select name="login_enabled" label="Login Enabled">
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Current Address -->
-            <div class="col-md-6">
-                <x-adminlte-textarea name="current_address" label="Current Address" placeholder="Enter address">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-map-marker-alt"></i></div>
-                    </x-slot>
-                </x-adminlte-textarea>
-            </div>
-
-            <!-- Permanent Address -->
-            <div class="col-md-6">
-                <x-adminlte-textarea name="permanent_address" label="Permanent Address" placeholder="Enter address">
-                    <x-slot name="prependSlot">
-                        <div class="input-group-text"><i class="fas fa-map-marker-alt"></i></div>
-                    </x-slot>
-                </x-adminlte-textarea>
-            </div>
-
-            <!-- Gender -->
-            <div class="col-md-4">
-                <x-adminlte-select name="gender" label="Gender">
-                    <option>Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Marital Status -->
-            <div class="col-md-4">
-                <x-adminlte-select name="marital_status" label="Marital Status">
-                    <option>Select Marital Status</option>
-                    <option value="single">Single</option>
-                    <option value="married">Married</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Employee Type -->
-            <div class="col-md-4">
-                <x-adminlte-select name="employee_type" label="Employee Type*" required>
-                    <option>Select Employee Type</option>
-                    <option value="permanent">Permanent</option>
-                    <option value="contract">Contract</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Employee Role -->
-            <div class="col-md-4">
-                <x-adminlte-select name="employee_role" label="Employee Role*" required>
-                    <option>Select Employee Role</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Shift -->
-            <div class="col-md-4">
-                <x-adminlte-select name="shift" label="Shift*" required>
-                    <option>Select Shift</option>
-                </x-adminlte-select>
-            </div>
-
-            <!-- Salary -->
-            <div class="col-md-4">
-                <x-adminlte-input name="salary" label="Salary*" placeholder="Enter salary" required />
-            </div>
-
-            <!-- Bank Details -->
-            <div class="col-md-4">
-                <x-adminlte-input name="account_number" label="Account Number" placeholder="Account Number"/>
-            </div>
-
-            <div class="col-md-4">
-                <x-adminlte-input name="bank_holder_name" label="Bank Holder Name" placeholder="Bank Holder Name"/>
-            </div>
-
-            <div class="col-md-4">
-                <x-adminlte-input name="bank_name" label="Bank Name" placeholder="Bank Name"/>
-            </div>
-
-            <div class="col-md-4">
-                <x-adminlte-input name="ifsc_code" label="IFSC Code" placeholder="IFSC Code"/>
-            </div>
-
-            <!-- Date of Joining -->
-            <div class="col-md-4">
-                <x-adminlte-input name="doj" label="Date Of Joining*" type="date" required />
-            </div>
-
-            <!-- Department -->
-            <div class="col-md-4">
-                <x-adminlte-select name="department" label="Department*" required>
-                    <option>Select Department</option>
-                </x-adminlte-select>
-            </div>
-
-        </div>
-
-        <!-- Submit Button -->
-        <div class="d-flex justify-content-end mt-3">
-            <x-adminlte-button type="submit" label="Add Employee" theme="primary"/>
-        </div>
-    </form>
-</x-adminlte-modal>
 
 <x-adminlte-modal id="bulkUploadModal" title="Import Users" theme="primary" size="md" v-centered>
     <form action="{{ route('bulk_uoploade_request') }}" method="POST" enctype="multipart/form-data">
@@ -349,22 +78,125 @@
 @endsection
 
 @section('js')
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#employeeTable').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-        });
+        $(document).ready(function() {
+    $('#employeeTable').DataTable({
+        dom: "<'row'<'col-sm-12'B>>" +
+             "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+             "<'row'<'col-sm-12'tr>>" +
+             "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                className: 'btn btn-success mb-3'
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fas fa-file-pdf"></i> Export to PDF',
+                className: 'btn btn-danger mb-3'
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Print',
+                className: 'btn btn-primary mb-3'
+            },
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-columns"></i> Column Visibility',
+                className: 'btn btn-secondary dropdown-toggle mb-3',
+                columnText: function(dt, idx, title) {
+                    return title;
+                },
+                init: function(api, node, config) {
+                    $(node).removeClass('dt-button').addClass('dropdown-toggle');
+                }
+            }
+        ],
+        responsive: true,
+        autoWidth: false
+    });
+});
+
 
         // Search functionality
         $('#searchBox').on('keyup', function () {
             $('#employeeTable').DataTable().search($(this).val()).draw();
         });
     });
+
+    function collectSelectedIds() {
+        // Collect all checked checkboxes
+        const checkboxes = document.querySelectorAll('input[name="delet_ids"]:checked');
+        let ids = Array.from(checkboxes).map(cb => cb.value);
+
+        // Convert the IDs array into a comma-separated string
+        const searchInput = ids.join(',');
+        location.href = "{{url('downloade-selected-id-cards/')}}/" + searchInput;
+
+    }
+
+    function attendance_data_set(url_input) {
+    $.ajax({
+        url: url_input,
+        type: "GET",
+        dataType: "json",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        success: function(response) {
+            console.log("Response:", response); // Debugging
+
+            var all_users_data = response.all_users.data;
+            var role_number = $("#role_number").val();
+            var table_body = $("#employeeTable tbody");
+            table_body.empty();
+
+            all_users_data.forEach(all_users_data => {
+                if (all_users_data.role >= role_number) {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" class="checkbox_ids" value="${all_users_data.id}"></td>
+                            <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
+                            <td>${all_users_data.Employee_id}</td>
+                            <td>${all_users_data.mobile_number}</td>
+                            <td>${all_users_data.EmpTypeName}</td>
+                            <td>${all_users_data.roles}</td>
+                            <td>${all_users_data.Weekly_Off}</td>
+                            <td>${all_users_data.Department_name}</td>
+                            <td>${all_users_data.Gate_Off}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-warning btn-sm" onclick="window.location.href='/user-details/${user.id}'"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    table_body.append(row);
+                }
+            });
+
+            // Handle pagination
+            var pagination_html = "";
+            response.all_users.links.forEach((element, index) => {
+                pagination_html += `<p data-page='${element.url}' class="${element.active ? 'active' : ''} page-btn">${element.label}</p>`;
+            });
+
+            $("#pagination_div").html(pagination_html);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
 </script>
 @endsection

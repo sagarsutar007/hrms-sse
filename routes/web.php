@@ -24,39 +24,39 @@ use App\Http\Controllers\holiday_master_controller;
 use App\Http\Controllers\attendance;
 
 route::get('/', [roughtController::class,'dashboard'])->name('dashboard');
-Route::get('/absent-employee-list/{date?}', [RoughtController::class, 'absent_employee_list'])->name('absent_employee_list');
-Route::get('/present-employee-list/{date?}', [RoughtController::class, 'present_employee_list'])->name('present_employee_list');
-Route::get('/let-Commers-list/{date?}', [RoughtController::class, 'Let_commers_list'])->name('Let_commers_list');
-Route::get('/attandance_100_list_api/{date?}', [RoughtController::class, 'attandance_100_list_api'])->name('attandance_100_list_api');
-Route::get('/attandance_100_top_10_list_api/{date?}', [RoughtController::class, 'attandance_100_top_10_list_api'])->name('attandance_100_top_10_list_api');
-Route::get('/association_time_api', [RoughtController::class, 'association_time_api'])->name('association_time_api');
-Route::get('/top-10-present-list/{date?}', [RoughtController::class, 'top_10_present_list'])->name('top_10_present_list');
-Route::get('/Default-Absentees-By-Month/{date?}', [RoughtController::class, 'Default_Absentees_By_Month'])->name('Default_Absentees_By_Month');
-Route::get('/totall-salary-amount/{date?}', [RoughtController::class, 'totall_salary_amount'])->name('totall_salary_amount');
-Route::get('/totall-salary-amount_department_wise/{date?}', [RoughtController::class, 'totall_salary_amount_department_wise'])->name('totall_salary_amount_department_wise');
-Route::get('/totall-salary-amount_role_wise/{date?}', [RoughtController::class, 'totall_salary_amount_role_wise'])->name('totall_salary_amount_role_wise');
-Route::get('/totall-salary-amount-employ-type-wise/{date?}', [RoughtController::class, 'totall_salary_amount_employ_wise'])->name('totall_salary_amount_employ_wise');
+Route::get('/absent-employee-list/{date?}', [roughtController::class, 'absent_employee_list'])->name('absent_employee_list');
+Route::get('/present-employee-list/{date?}', [roughtController::class, 'present_employee_list'])->name('present_employee_list');
+Route::get('/let-Commers-list/{date?}', [roughtController::class, 'Let_commers_list'])->name('Let_commers_list');
+Route::get('/attandance_100_list_api/{date?}', [roughtController::class, 'attandance_100_list_api'])->name('attandance_100_list_api');
+Route::get('/attandance_100_top_10_list_api/{date?}', [roughtController::class, 'attandance_100_top_10_list_api'])->name('attandance_100_top_10_list_api');
+Route::get('/association_time_api', [roughtController::class, 'association_time_api'])->name('association_time_api');
+Route::get('/top-10-present-list/{date?}', [roughtController::class, 'top_10_present_list'])->name('top_10_present_list');
+Route::get('/Default-Absentees-By-Month/{date?}', [roughtController::class, 'Default_Absentees_By_Month'])->name('Default_Absentees_By_Month');
+Route::get('/totall-salary-amount/{date?}', [roughtController::class, 'totall_salary_amount'])->name('totall_salary_amount');
+Route::get('/totall-salary-amount_department_wise/{date?}', [roughtController::class, 'totall_salary_amount_department_wise'])->name('totall_salary_amount_department_wise');
+Route::get('/totall-salary-amount_role_wise/{date?}', [roughtController::class, 'totall_salary_amount_role_wise'])->name('totall_salary_amount_role_wise');
+Route::get('/totall-salary-amount-employ-type-wise/{date?}', [roughtController::class, 'totall_salary_amount_employ_wise'])->name('totall_salary_amount_employ_wise');
 
 //
-Route::get('/totall-salary-amount_year/{year?}', [RoughtController::class, 'totall_salary_amount_year'])->name('totall_salary_amount_year');
-Route::get('/totall-salary-amount_department_wise_year/{year?}', [RoughtController::class, 'totall_salary_amount_department_wise_year'])->name('totall_salary_amount_department_wise_year');
-Route::get('/totall-salary-amount_role_wise_year/{year?}', [RoughtController::class, 'totall_salary_amount_role_wise_year'])->name('totall_salary_amount_role_wise_year');
-Route::get('/totall-salary-amount-employ-type-wise_year/{year?}', [RoughtController::class, 'totall_salary_amount_employ_wise_year'])->name('totall_salary_amount_employ_wise_year');
+Route::get('/totall-salary-amount_year/{year?}', [roughtController::class, 'totall_salary_amount_year'])->name('totall_salary_amount_year');
+Route::get('/totall-salary-amount_department_wise_year/{year?}', [roughtController::class, 'totall_salary_amount_department_wise_year'])->name('totall_salary_amount_department_wise_year');
+Route::get('/totall-salary-amount_role_wise_year/{year?}', [roughtController::class, 'totall_salary_amount_role_wise_year'])->name('totall_salary_amount_role_wise_year');
+Route::get('/totall-salary-amount-employ-type-wise_year/{year?}', [roughtController::class, 'totall_salary_amount_employ_wise_year'])->name('totall_salary_amount_employ_wise_year');
 
 
 
 
-Route::get('/company_lable_data/{date?}', [RoughtController::class, 'company_lable_data'])->name('company_lable_data');
+Route::get('/company_lable_data/{date?}', [roughtController::class, 'company_lable_data'])->name('company_lable_data');
 
-Route::get('/role_lable_data/{date?}', [RoughtController::class, 'role_lable_data'])->name('role_lable_data');
+Route::get('/role_lable_data/{date?}', [roughtController::class, 'role_lable_data'])->name('role_lable_data');
 
-Route::get('/department_lable_data/{date?}', [RoughtController::class, 'department_lable_data'])->name('department_lable_data');
+Route::get('/department_lable_data/{date?}', [roughtController::class, 'department_lable_data'])->name('department_lable_data');
 
-Route::get('/emptype_type_lable_data/{date?}', [RoughtController::class, 'emptype_type_lable_data'])->name('emptype_type_lable_data');
+Route::get('/emptype_type_lable_data/{date?}', [roughtController::class, 'emptype_type_lable_data'])->name('emptype_type_lable_data');
 
 
-Route::get('/company_data_all_parms/{year}/{month}/{role}/{department}/{emp_type}', [RoughtController::class, 'company_data_all_parms'])->name('company_data_all_parms');
-Route::get('/company_data_all_parms_2/{date}/{role}/{department}/{emp_type}', [RoughtController::class, 'company_data_all_parms_2'])->name('company_data_all_parms_2');
+Route::get('/company_data_all_parms/{year}/{month}/{role}/{department}/{emp_type}', [roughtController::class, 'company_data_all_parms'])->name('company_data_all_parms');
+Route::get('/company_data_all_parms_2/{date}/{role}/{department}/{emp_type}', [roughtController::class, 'company_data_all_parms_2'])->name('company_data_all_parms_2');
 
 
 

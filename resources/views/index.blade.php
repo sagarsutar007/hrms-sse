@@ -9,49 +9,51 @@
 @section('content')
 
 <div class="row">
-    <!-- Employees Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-purple">
-            <div class="inner">
-                <h3>22</h3>
-                <p>Employees</p>
+    @if ($view_home_page_options == 1)
+        <!-- Employees Card -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-purple">
+                <div class="inner">
+                    <h3>{{$employee_number}}</h3>
+                    <p>Employees</p>
+                </div>
+                <a href="{{url('employees')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <a href="#" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
 
-    <!-- Attendance Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-orange">
-            <div class="inner">
-                <h3>P: 0 A: 22</h3>
-                <p>Attendance</p>
+        <!-- Attendance Card -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h3>P:{{$Present_number}} A:{{$Absent_number}}</h3>
+                    <p>Attendance</p>
+                </div>
+                <a href="{{url('all-attendance')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <a href="#" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
 
-    <!-- Total Leave Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-green">
-            <div class="inner">
-                <h3>0</h3>
-                <p>Total Leave</p>
+        <!-- Total Leave Card -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h3>{{$leave_number}}</h3>
+                    <p>Total Leave</p>
+                </div>
+                <a href="{{url('total-leave')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <a href="#" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
 
-    <!-- Late Entry Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-blue">
-            <div class="inner">
-                <h3>0</h3>
-                <p>Late Entry</p>
+        <!-- Late Entry Card -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{$LatePunch}}</h3>
+                    <p>Late Entry</p>
+                </div>
+                <a href="{{url('all-attendance')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <a href="#" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
+    @endif
 </div>
 
 <!-- Tables in col-md-6 -->
@@ -343,5 +345,9 @@
     createPieChart('dailyWagesChart', 0, 0, 0, 1);
     createPieChart('fullTimeChart', 0, 0, 0, 7);
     createPieChart('staffChart', 0, 0, 0, 5);
+
+
+
+
 </script>
 @endsection

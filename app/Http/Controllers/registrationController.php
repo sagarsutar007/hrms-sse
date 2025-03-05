@@ -182,7 +182,7 @@ public function Add_Users(Request $add){
 
     if($add->Password == $add->Conform_Password){
         if ($add->User_role == "") {
-            return response()->json(['success' => true, 'message' => 'Please Select User Role']); 
+            return response()->json(['success' => true, 'message' => 'Please Select User Role']);
         }else{
 
             if($add->Add_Users_input_id =="" || $add->Add_Users_input_id ==null){
@@ -198,7 +198,7 @@ public function Add_Users(Request $add){
                      'role' =>$add->User_role,
                     'created_at' => now(),
                     'updated_at' => now(),
-            
+
                 ]);
 
                 if($users){
@@ -229,11 +229,11 @@ public function Add_Users(Request $add){
             }
 
 
-        
+
 
     }
 }else{
-    return response()->json(['success' => true, 'message' => 'Password And Conform Password Are Not Same']); 
+    return response()->json(['success' => true, 'message' => 'Password And Conform Password Are Not Same']);
 }
 }
 
@@ -294,13 +294,13 @@ public function Add_Users(Request $add){
                  'pan_number' => $Pan_number,
                  'salary' => $Salary,
                  'shift_time' => $shift,
-            
+
                  'role' =>$role,
                  'employee_type' =>$emp_type,
                  'created_by' => $created_by ,
                  'updated_by' => $created_by ,
                  'Department' => $department_master ,
-                 
+
                  'can_login' =>$login_Status ,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -329,35 +329,35 @@ public function Add_Users(Request $add){
 
                 $users = DB::table('user_permissions')
                 ->insertOrIgnore([
-                   
+
                     'Employee_id' => $Employee_id,
-                    'Add_User' => 1, 
-                    'Update_User'=> 1, 
-                    'Delete_User'=> 1, 
+                    'Add_User' => 1,
+                    'Update_User'=> 1,
+                    'Delete_User'=> 1,
                     'Add_General_Informations'=> 1,
-                     'Update_General_Informations'=> 1, 
-                     'Delete_General_Informations'=> 1, 
+                     'Update_General_Informations'=> 1,
+                     'Delete_General_Informations'=> 1,
                      'Update_Set_Salary'=> 1,
                       'Delete_Set_Salary'=> 1,
                        'Update_Leave'=> 1,
-                        'Delete_Leave'=> 1, 
-                        'Add_Attendance'=> 1, 
-                        'Update_Attendance'=> 1, 
+                        'Delete_Leave'=> 1,
+                        'Add_Attendance'=> 1,
+                        'Update_Attendance'=> 1,
                         'Add_Core_HR'=> 1,
-                         'Update_Core_HR'=> 1, 
-                         'Delete_Core_HR'=> 1, 
-                         'Add_Project_Task'=> 1, 
+                         'Update_Core_HR'=> 1,
+                         'Delete_Core_HR'=> 1,
+                         'Add_Project_Task'=> 1,
                          'Update_Project_Task'=> 1,
                           'Delete_Project_Task'=> 1,
-                           'Add_Payslip'=> 1, 
+                           'Add_Payslip'=> 1,
                            'Update_Payslip'=> 1,
                             'Delete_Payslip'=> 1,
-                             'created_at'=> 1, 
-                             'updated_at'=> 1, 
+                             'created_at'=> 1,
+                             'updated_at'=> 1,
                              'Add_Set_Salary'=> 1,
                               'Add_Leave'=> 1,
-                               'Delete_Attendance'=> 1 
-                               
+                               'Delete_Attendance'=> 1
+
                 ]);
 
 
@@ -366,61 +366,86 @@ public function Add_Users(Request $add){
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
 .pupup_reg_div {
     width: 100vw;
     height: 100vh;
-
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #e4e3e3a6;
+    background: rgba(0, 0, 0, 0.3); /* Darker background for better visibility */
+    z-index: 1050; /* Ensure it appears above other elements */
 }
 
 .pupup_Inner_reg_div {
-    width: 300px;
-    height: 250px;
-    padding: 20px;
-    display: flex;
-
-
+    width: 350px;
+    padding: 20px 0px;
     background: white;
-    flex-direction: column;
-    border-radius: 4px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* AdminLTE card-like shadow */
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-p {
-    margin-top: 7px;
+.pupup_Inner_reg_div h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #28a745; /* Success Green */
 }
 
-button {
-    margin-top: 10px;
-    padding: 7px;
+.pupup_Inner_reg_div p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #333;
 }
 
-h2 {
-    margin: 4px;
+.pupup_Inner_reg_div hr {
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.pupup_Inner_reg_div button {
+    width: 100px;
+    padding: 10px;
+    font-size: 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pupup_Inner_reg_div button:hover {
+    background: #007bff; /* Darker red on hover */
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 </style>
+
 <div class="pupup_reg_div">
     <div class="pupup_Inner_reg_div">
-        <h2 style="text-align: center">congratulations</h2>
+        <h2>Congratulations</h2>
         <hr>
-        <p><b>Name : </b><?php echo $F_name . " " . $M_name . " ". $L_name ?></p>
-        <p><b>Email :</b> <?php echo $Email_ID ?></p>
-        <p><b>Mobile :</b> <?php echo $mobile_number ?></p>
-        <p><b>User ID :</b> <?php echo $Employee_id  ?> </p>
-        <p><b>Password : </b> <?php echo $Password ?></p>
+        <p><b>Name:</b> <?php echo $F_name . " " . $M_name . " " . $L_name; ?></p>
+        <p><b>Email:</b> <?php echo $Email_ID; ?></p>
+        <p><b>Mobile:</b> <?php echo $mobile_number; ?></p>
+        <p><b>User ID:</b> <?php echo $Employee_id; ?></p>
+        <p><b>Password:</b> <?php echo $Password; ?></p>
         <button onclick="history.back();">Close</button>
-
     </div>
-
 </div>
+
 
 
 
@@ -429,7 +454,7 @@ h2 {
 
 
 
-               
+
             }else{
                 ?>
 <script>
@@ -439,7 +464,7 @@ history.back()
 <?php
             }
 
-       
+
 
     }
 
