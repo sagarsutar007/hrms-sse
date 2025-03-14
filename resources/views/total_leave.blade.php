@@ -12,9 +12,16 @@
         <div class="card mt-3">
             <div class="card-header">
                 <h3 class="card-title">All Leave</h3>
-                <div class="card-tools">
-                    <a class="btn btn-light btn-sm" href=""><i class="fa fa-plus text-secondary"></i> Add New</a>
-                    <a class="btn btn-light btn-sm" href=""><i class="fas fa-file-import text-secondary"></i> Bulk Upload</a>
+                <div class="float-right">
+                    <button class="btn btn-sm btn-success" id="exportExcel">
+                        <i class="fas fa-file-excel mr-1"></i> Excel
+                    </button>
+                    <button class="btn btn-sm btn-danger" id="exportPdf">
+                        <i class="fas fa-file-pdf mr-1"></i> PDF
+                    </button>
+                    <button class="btn btn-sm btn-primary" id="printTable">
+                        <i class="fas fa-print mr-1"></i> Print
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -23,10 +30,10 @@
                         <thead>
                             <tr>
                                 <th>Sr. No.</th>
-                                <th>Name <span onclick="sortData('Name')"><i class="fa-solid fa-sort"></i></span></th>
-                                <th>Employee ID <span onclick="sortData('Employee_id')"><i class="fa-solid fa-sort"></i></span></th>
-                                <th>Leave Type <span onclick="sortData('Leave_Type')"><i class="fa-solid fa-sort"></i></span></th>
-                                <th>Start Date <span onclick="sortData('Start_Date')"><i class="fa-solid fa-sort"></i></span></th>
+                                <th>Name <span onclick="sortData('Name')"></span></th>
+                                <th>Employee ID <span onclick="sortData('Employee_id')"></span></th>
+                                <th>Leave Type <span onclick="sortData('Leave_Type')"></span></th>
+                                <th>Start Date <span onclick="sortData('Start_Date')"></span></th>
                                 <th>End Date</th>
                                 <th>Description</th>
                                 <th>Remarks by Approver</th>
@@ -46,7 +53,6 @@
             <div class="card-footer">
                 <nav>
                     <ul class="pagination pagination-sm justify-content-end" id="pagination_div">
-                        <!-- Pagination will be inserted here dynamically -->
                     </ul>
                 </nav>
             </div>
@@ -90,260 +96,217 @@
     </x-slot>
 </x-adminlte-modal>
 
-<!-- Edit Leave Modal -->
-<x-adminlte-modal id="editLeaveModal" title="Edit Leave" theme="warning" icon="fas fa-edit" size="lg">
-    <div class="row">
-        <div class="col-md-6">
-            <x-adminlte-input name="editLeaveType" label="Leave Type" id="editLeaveType" />
-        </div>
-        <div class="col-md-6 d-flex align-items-center mt-2">
-            <label class="mr-2 mb-0">Half Day:</label>
-            <input type="checkbox" id="editHalfDay" class="ml-2" style="transform: scale(1.5);">
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-input name="editStartDate" label="Start Date" id="editStartDate" type="date" />
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-input name="editEndDate" label="End Date" id="editEndDate" type="date" />
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-input name="editTotalDays" label="Total Days" id="editTotalDays" />
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-input name="editDescription" label="Description" id="editDescription" />
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-input name="editRemarks" label="Remarks by Approver" id="editRemarks" />
-        </div>
-        <div class="col-md-6">
-            <x-adminlte-select name="editStatus" label="Status" id="editStatus">
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Pending">Pending</option>
-            </x-adminlte-select>
-        </div>
-    </div>
-    <x-slot name="footerSlot">
-        <x-adminlte-button class="btn btn-primary" label="Update" onclick="submitLeaveEdit()" />
-        <x-adminlte-button class="btn btn-secondary" label="Close" data-dismiss="modal" />
-    </x-slot>
-</x-adminlte-modal>
-
 @endsection
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
 @endsection
 
 @section('js')
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
     <script>
-       $(document).ready(function() {
-    // Initialize DataTable
-    var leaveTable = $('#leaveTable').DataTable({
-        "responsive": true,
-        "lengthChange": true,
-        "autoWidth": false,
-        "paging": true,
-        "info": true,
-        "searching": true,
-        "ordering": true,
-        "dom": 'lBfrtip',
-        "buttons": [
-            {
-                extend: 'excel',
-                exportOptions: {
-                    columns: ':visible:not(:last-child)'
+        // Global functions to handle view and edit actions
+        function viewLeaveDetails(id) {
+            $.ajax({
+                type: "GET",
+                url: "{{ url('/leave-view/') }}/" + id,
+                dataType: "json",
+                success: function(response) {
+                    var r_data = response.data;
+
+                    // Populate the "View Leave Details" modal fields
+                    $("#leaveName").val(r_data.Name);
+                    $("#leaveEmployee").val(r_data.Employee_id);
+                    $("#leaveType").val(r_data.Leave_Type_name);
+                    $("#leaveStart").val(r_data.Start_Date);
+                    $("#leaveEnd").val(r_data.End_Date);
+                    $("#leaveDescription").val(r_data.Description);
+                    $("#leaveRemarks").val(r_data.Remarks_by_Approve);
+                    $("#leaveStatus").val(r_data.Status);
+                    $("#leaveTotal").val(r_data.Total_Days);
+
+                    // Open the modal
+                    $("#leaveModal").modal("show");
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    alert("Error loading leave details. Please try again.");
                 }
-            },
-            {
-                extend: 'pdf',
-                exportOptions: {
-                    columns: ':visible:not(:last-child)'
+            });
+        }
+
+        function editLeaveDetails(id) {
+            window.location.href = "{{ url('/edit-leave/') }}/" + id;
+        }
+
+        $(document).ready(function() {
+            // Initialize DataTable
+            var leaveTable = $('#leaveTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "paging": true,
+                "info": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "lengthMenu": "_MENU_"
                 }
-            },
-            {
-                extend: 'print',
-                exportOptions: {
-                    columns: ':visible:not(:last-child)'
-                }
-            },
-            'colvis',
-        ],
-        "language": {
-            "lengthMenu": "_MENU_"
-        }
-    });
+            });
 
-    // Initial load of data
-    attendance_data_set("{{ route('search_leave') }}");
+            // Create custom export buttons
+            var buttons = new $.fn.dataTable.Buttons(leaveTable, {
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        title: 'All Leave Data',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        },
+                        className: 'hidden'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        title: 'All Leave Data',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        },
+                        className: 'hidden'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        title: 'All Leave Data',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        },
+                        className: 'hidden'
+                    }
+                ]
+            });
 
-    // Search functionality
-    $('#searchInput').on('keyup', function() {
-        attendance_data_set("{{ route('search_leave') }}");
-    });
+            // Export button event handlers
+            $('#exportExcel').on('click', function() {
+                buttons.exportData(0);
+            });
 
-    function viewLeaveDetails(id) {
-    $.ajax({
-        type: "GET",
-        url: "{{ url('/leave-view/') }}/" + id,
-        dataType: "json",
-        success: function(response) {
-            var r_data = response.data;
+            $('#exportPdf').on('click', function() {
+                buttons.exportData(1);
+            });
 
-            // Populate the "View Leave Details" modal fields
-            $("#leaveName").val(r_data.Name);
-            $("#leaveEmployee").val(r_data.Employee_id);
-            $("#leaveType").val(r_data.Leave_Type_name);
-            $("#leaveStart").val(r_data.Start_Date);
-            $("#leaveEnd").val(r_data.End_Date);
-            $("#leaveDescription").val(r_data.Description);
-            $("#leaveRemarks").val(r_data.Remarks_by_Approve);
-            $("#leaveStatus").val(r_data.Status);
-            $("#leaveTotal").val(r_data.Total_Days);
+            $('#printTable').on('click', function() {
+                buttons.exportData(2);
+            });
 
-            // Open the modal
-            $("#leaveModal").modal("show");
-        },
-        error: function(xhr) {
-            console.log(xhr.responseText);
-        }
-    });
-}
+            var limit = 50;
+            var sortClickCounts = {
+                'Name': 1,
+                'Employee_id': 1,
+                'Leave_Type': 1,
+                'Start_Date': 1
+            };
 
-function editLeaveDetails(id) {
-    $.ajax({
-        type: "GET",
-        url: "{{ url('/leave-edit/') }}/" + id,
-        dataType: "json",
-        success: function(response) {
-            var r_data = response.data;
+            loadData();
 
-            // Populate the "Edit Leave" modal fields
-            $("#editLeaveType").val(r_data.Leave_Type_name);
-            $("#editHalfDay").prop("checked", r_data.Half_Day);
-            $("#editStartDate").val(r_data.Start_Date);
-            $("#editEndDate").val(r_data.End_Date);
-            $("#editTotalDays").val(r_data.Total_Days);
-            $("#editDescription").val(r_data.Description);
-            $("#editRemarks").val(r_data.Remarks_by_Approve);
-            $("#editStatus").val(r_data.Status);
-
-            // Open the modal
-            $("#editLeaveModal").modal("show");
-        },
-        error: function(xhr) {
-            console.log(xhr.responseText);
-        }
-    });
-}
-
-});
-
-$(document).ready(function () {
-    var limit = 50;
-    var sortClickCounts = {
-        'Name': 1,
-        'Employee_id': 1,
-        'Leave_Type': 1,
-        'Start_Date': 1
-    };
-
-    loadData();
-
-    function loadData(url = "{{ url('/all-leaves-api') }}/" + limit) {
-        $.ajax({
-            url: url,
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-                renderTable(response.all_users.data);
-                renderPagination(response.pagination);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching data:", error);
+            function loadData(url = "{{ url('/all-leaves-api') }}/" + limit) {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        renderTable(response.all_users.data);
+                        renderPagination(response.pagination);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
             }
+
+            function renderTable(data) {
+                var tableBody = $("#leaveTable tbody");
+                tableBody.empty();
+
+                if (data.length === 0) {
+                    tableBody.append(`<tr><td colspan="13" class="text-center">No data available</td></tr>`);
+                    return;
+                }
+
+                var rowIndex = 1;
+
+                $.each(data, function (index, user) {
+                    var halfDayText = user.Half_Day ? "Yes" : "";
+                    var row = `<tr>
+                        <td>${rowIndex++}</td>
+                        <td>${user.Name}</td>
+                        <td>${user.Employee_id}</td>
+                        <td>${user.leave_Name}</td>
+                        <td>${user.Start_Date}</td>
+                        <td>${user.End_Date}</td>
+                        <td>${user.Description}</td>
+                        <td>${user.Remarks_by_Approve}</td>
+                        <td>${user.Department_name}</td>
+                        <td>${user.Status}</td>
+                        <td>${halfDayText}</td>
+                        <td>${user.Total_Days}</td>
+                        <td>
+                            <button onclick="viewLeaveDetails(${user.id})" class="btn btn-sm btn-info">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                            <button onclick="editLeaveDetails(${user.id})" class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                    tableBody.append(row);
+                });
+            }
+
+            function renderPagination(pagination) {
+                var paginationDiv = $("#pagination_div");
+                paginationDiv.empty();
+
+                if (!pagination) return;
+
+                for (var i = 1; i <= pagination.total_pages; i++) {
+                    var activeClass = i === pagination.current_page ? "active" : "";
+                    paginationDiv.append(`<li class="page-item ${activeClass}"><a class="page-link page-btn" data-page="${i}">${i}</a></li>`);
+                }
+            }
+
+            $("#pagination_div").on("click", ".page-btn", function () {
+                var page = $(this).data("page");
+                loadData("{{ url('/all-leaves-api') }}/" + limit + "?page=" + page);
+            });
+
+            window.sortData = function(column) {
+                let method = (sortClickCounts[column] % 2 === 0) ? 'asc' : 'desc';
+                sortClickCounts[column]++;
+                loadData("{{ url('/all-leaves-short-api') }}/" + limit + "/" + column + "/" + method);
+            };
+
+            $("#search_btn").on("click", function (event) {
+                event.preventDefault();
+                var searchQuery = $("#search_input").val();
+                loadData("{{ url('/all-leaves-search-api') }}/" + limit + "/" + searchQuery);
+            });
+
+            $("#limit_inputt").on("change", function () {
+                limit = $(this).val();
+                loadData("{{ url('/all-leaves-api') }}/" + limit);
+            });
         });
-    }
-
-    function renderTable(data) {
-        var tableBody = $("#leaveTable tbody");
-        tableBody.empty();
-
-        if (data.length === 0) {
-            tableBody.append(`<tr><td colspan="13" class="text-center">No data available</td></tr>`);
-            return;
-        }
-
-        var rowIndex = 1;
-
-        $.each(data, function (index, user) {
-            var halfDayText = user.Half_Day ? "Yes" : "";
-            var row = `<tr>
-                <td>${rowIndex++}</td>
-                <td>${user.Name}</td>
-                <td>${user.Employee_id}</td>
-                <td>${user.leave_Name}</td>
-                <td>${user.Start_Date}</td>
-                <td>${user.End_Date}</td>
-                <td>${user.Description}</td>
-                <td>${user.Remarks_by_Approve}</td>
-                <td>${user.Department_name}</td>
-                <td>${user.Status}</td>
-                <td>${halfDayText}</td>
-                <td>${user.Total_Days}</td>
-                <td>
-                    <button onclick="viewLeaveDetails(${user.id})" class="btn btn-sm btn-info">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
-                    <button onclick="editLeaveDetails(${user.id})" class="btn btn-sm btn-primary">
-                        <i class="fa-solid fa-pencil"></i>
-                    </button>
-
-                </td>
-            </tr>`;
-            tableBody.append(row);
-        });
-    }
-
-    function renderPagination(pagination) {
-        var paginationDiv = $("#pagination_div");
-        paginationDiv.empty();
-
-        if (!pagination) return;
-
-        for (var i = 1; i <= pagination.total_pages; i++) {
-            var activeClass = i === pagination.current_page ? "active" : "";
-            paginationDiv.append(`<li class="page-item ${activeClass}"><a class="page-link page-btn" data-page="${i}">${i}</a></li>`);
-        }
-    }
-
-    $("#pagination_div").on("click", ".page-btn", function () {
-        var page = $(this).data("page");
-        loadData("{{ url('/all-leaves-api') }}/" + limit + "?page=" + page);
-    });
-
-    function sortData(column) {
-        let method = (sortClickCounts[column] % 2 === 0) ? 'asc' : 'desc';
-        sortClickCounts[column]++;
-        loadData("{{ url('/all-leaves-short-api') }}/" + limit + "/" + column + "/" + method);
-    }
-
-    $("#search_btn").on("click", function (event) {
-        event.preventDefault();
-        var searchQuery = $("#search_input").val();
-        loadData("{{ url('/all-leaves-search-api') }}/" + limit + "/" + searchQuery);
-    });
-
-    $("#limit_inputt").on("change", function () {
-        limit = $(this).val();
-        loadData("{{ url('/all-leaves-api') }}/" + limit);
-    });
-});
-
-
-
-
     </script>
 @endsection

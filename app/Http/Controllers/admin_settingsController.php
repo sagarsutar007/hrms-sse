@@ -8,7 +8,7 @@ class admin_settingsController extends Controller
  public function super_admin_settings() {
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
-        if(isset( $EmployeesID)){ 
+        if(isset( $EmployeesID)){
 
           $roler_permissions = DB::table('roler_permissions')
           ->get();
@@ -39,9 +39,9 @@ $leave_type_master = DB::table('leave_type_master')
 
 
 
- 
 
-          
+
+
          return view("super_admin_settings_view")
          ->with('roler_permissions',$roler_permissions)
          ->with('shift_master',$shift_master)
@@ -54,12 +54,12 @@ $leave_type_master = DB::table('leave_type_master')
         }else{
           return redirect()->route('login');
         }
-    } 
+    }
 
 
 
-    
-    
+
+
 
 
 
@@ -91,8 +91,8 @@ history.back();
   }else{
   return redirect()->route('login');
 }
-  }   
-  
+  }
+
   public function HR_settings() {
     $EmployeesID = session()->get('EmployeeID');
     $role = session()->get('role');
@@ -102,7 +102,7 @@ history.back();
     }else{
       return redirect()->route('login');
     }
-} 
+}
 
 
 public function delete_role(Request $req) {
@@ -122,9 +122,9 @@ history.back()
 
 //roler_permissions
 $roler_permissions_qr = DB::table('roler_permissions')
-                    
+
 ->where('role_name',$role)
-->get();  
+->get();
 $add_shift = 0;
 foreach($roler_permissions_qr as $roler_p){
     $add_shift = $roler_p->Delete_Role ;
@@ -144,8 +144,8 @@ history.back();
 
 
 
-  
-  
+
+
 
    if($deleteQuri){
     ?>
@@ -188,7 +188,7 @@ alert("Department deleted successfully.")
 history.back()
 </script>
 <?php
-    
+
   } else {
       // Return a not found JSON response
       ?>
@@ -197,7 +197,7 @@ alert("Department not found or already deleted.")
 history.back()
 </script>
 <?php
-     
+
   }
 }
 
@@ -218,13 +218,13 @@ history.back()
 
 
  //roler_permissions
-    
-    
-    
+
+
+
  $roler_permissions_qr = DB::table('roler_permissions')
-                    
+
  ->where('role_name',$role)
- ->get();  
+ ->get();
  $add_shift = 0;
  foreach($roler_permissions_qr as $roler_p){
      $add_shift = $roler_p->Delete_Employee_Type ;
@@ -242,8 +242,8 @@ history.back();
 <?php
 }
 
-  
-  
+
+
 
    if($deleteQuri){
     ?>
@@ -288,9 +288,9 @@ history.back()
 
 //roler_permissions
 $roler_permissions_qr = DB::table('roler_permissions')
-                    
+
 ->where('role_name',$role)
-->get();  
+->get();
 $add_shift = 0;
 foreach($roler_permissions_qr as $roler_p){
     $add_shift = $roler_p->Delete_Shift ;
@@ -309,7 +309,7 @@ history.back();
 }
 
 
-  
+
 
    if($deleteQuri){
     ?>
@@ -344,7 +344,7 @@ public function delete_any_data(Request $req) {
   $EmployeesID = session()->get('EmployeeID');
   $role = session()->get('role');
   if(isset( $EmployeesID)){
-  
+
   $deleteQuri =  DB::table($req->table_name)->where('id', $req->id)->delete();
 
    if($deleteQuri){
@@ -410,11 +410,11 @@ public function edit_shift(Request $req) {
     $shift_Data = DB::table('shift_master')
     ->where('id',$req->id)
     ->get();
-    
+
 //roler_permissions
-$roler_permissions_qr = DB::table('roler_permissions')                  
+$roler_permissions_qr = DB::table('roler_permissions')
 ->where('role_name',$role)
-->get();  
+->get();
 $Edit_Shift = 0;
 foreach($roler_permissions_qr as $roler_p){
     $Edit_Shift = $roler_p->Edit_Shift ;
@@ -442,12 +442,12 @@ public function update_employee_type(Request $req) {
   $EmployeesID = session()->get('EmployeeID');
   $role = session()->get('role');
 
- 
+
   if(isset( $EmployeesID)){
 //roler_permissions
-$roler_permissions_qr = DB::table('roler_permissions')                  
+$roler_permissions_qr = DB::table('roler_permissions')
 ->where('role_name',$role)
-->get();  
+->get();
 $Edit_Shift = 0;
 foreach($roler_permissions_qr as $roler_p){
     $Edit_Shift = $roler_p->Edit_Employee_Type ;
@@ -457,15 +457,15 @@ if($Edit_Shift == 1){
 
 
 
-    $update_emp_tyoe = DB::table('shift__employee_type_master') 
-    ->where('id', $req->id) 
-     ->update( [ 
-     'EmpTypeName' =>$req->emp_type, 
-     'Daily_Wages' =>$req->Daily_Wages, 
-     'Eligible_for_OverTime' => $req->Eligible_for_OverTime, 
-     'updated_by' =>$EmployeesID, 
-     'updated_at' => now(), 
-    ]); 
+    $update_emp_tyoe = DB::table('shift__employee_type_master')
+    ->where('id', $req->id)
+     ->update( [
+     'EmpTypeName' =>$req->emp_type,
+     'Daily_Wages' =>$req->Daily_Wages,
+     'Eligible_for_OverTime' => $req->Eligible_for_OverTime,
+     'updated_by' =>$EmployeesID,
+     'updated_at' => now(),
+    ]);
   }else{
     ?>
 <script>
@@ -500,9 +500,9 @@ public function update_role(Request $req) {
   $role = session()->get('role');
   if(isset( $EmployeesID)){
 //roler_permissions
-$roler_permissions_qr = DB::table('roler_permissions')                  
+$roler_permissions_qr = DB::table('roler_permissions')
 ->where('role_name',$role)
-->get();  
+->get();
 $Edit_Role = 0;
 foreach($roler_permissions_qr as $roler_p){
     $Edit_Role = $roler_p->Edit_Role ;
@@ -510,13 +510,13 @@ foreach($roler_permissions_qr as $roler_p){
 }
 if($Edit_Role == 1){
 
-    $update_roles = DB::table('role_masrer') 
-    ->where('id', $req->id) 
-     ->update( [ 
-     'roles' =>$req->role_inp, 
-     'updated_by' =>$EmployeesID, 
-     'updated_at' => now(), 
-    ]); 
+    $update_roles = DB::table('role_masrer')
+    ->where('id', $req->id)
+     ->update( [
+     'roles' =>$req->role_inp,
+     'updated_by' =>$EmployeesID,
+     'updated_at' => now(),
+    ]);
   }else{
     ?>
 <script>
@@ -541,7 +541,7 @@ history.back();
 </script>
 <?php
     }
-   
+
    }else{
      return redirect()->route('login');
    }
@@ -551,9 +551,9 @@ public function update_shift(Request $req) {
   $role = session()->get('role');
   if(isset( $EmployeesID)){
 //roler_permissions
-$roler_permissions_qr = DB::table('roler_permissions')                  
+$roler_permissions_qr = DB::table('roler_permissions')
 ->where('role_name',$role)
-->get();  
+->get();
 $Edit_Shift = 0;
 foreach($roler_permissions_qr as $roler_p){
     $Edit_Shift = $roler_p->Edit_Shift ;
@@ -561,18 +561,18 @@ foreach($roler_permissions_qr as $roler_p){
 }
 if($Edit_Shift == 1){
 
-    $update_shift = DB::table('shift_master') 
-    ->where('id', $req->id) 
-     ->update( [ 
-     'Shift_Start_Time' =>$req->Shift_Start_Time, 
-     'Shift_End_Time' =>$req->Shift_End_Time, 
-     'Lunch_Start_Time' =>$req->Lunch_Start_Time, 
-     'Lunch_end_Time' =>$req->Lunch_end_Time, 
-     'Shift_Name' =>$req->Shift_Name, 
-     'Shift_hours' =>$req->Shift_hours, 
-     'updated_by' =>$EmployeesID, 
-     'updated_at' => now(), 
-    ]); 
+    $update_shift = DB::table('shift_master')
+    ->where('id', $req->id)
+     ->update( [
+     'Shift_Start_Time' =>$req->Shift_Start_Time,
+     'Shift_End_Time' =>$req->Shift_End_Time,
+     'Lunch_Start_Time' =>$req->Lunch_Start_Time,
+     'Lunch_end_Time' =>$req->Lunch_end_Time,
+     'Shift_Name' =>$req->Shift_Name,
+     'Shift_hours' =>$req->Shift_hours,
+     'updated_by' =>$EmployeesID,
+     'updated_at' => now(),
+    ]);
   }else{
     ?>
 <script>

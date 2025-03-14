@@ -1,247 +1,260 @@
-<!-- resources/views/salary/index.blade.php -->
 @extends('adminlte::page')
 
-@section('title', 'Punch Card')
+@section('title', 'Punch Cards')
 
 @section('content_header')
-    <h1>Punch Card</h1>
+    <h1>Punch Cards</h1>
 @stop
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <div class="row align-items-center justify-content-end">
-            <!-- Print Punch Cards Button -->
-            <div class="col-auto">
-                <button type="button" class="btn btn-success" id="print-punch-cards">
-                    <i class="fas fa-print"></i> Print Punch Cards
-                </button>
-            </div>
-
-            <!-- Select All & Deselect All Buttons -->
-            <div class="col-auto">
-                <button type="button" class="btn btn-primary mx-1" id="select-all">
-                    <i class="fas fa-check-double"></i> Select All
-                </button>
-                <button type="button" class="btn btn-danger mx-1" id="deselect-all">
-                    <i class="fas fa-times-circle"></i> Deselect All
-                </button>
-            </div>
-
-            <!-- Search Input -->
-            <div class="col-auto">
-                <input type="text" id="search" class="form-control" placeholder="Search..." style="width: 200px;">
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="card-body" style="max-height: 1000px; overflow-y: auto; overflow-x: auto; white-space: nowrap;">
-        <div class="cards-container">
-            @foreach(['GUDDU', 'RAJKUMAR'] as $employee)
-            <div class="card-stack">
-                <div class="stacked-card"></div>
-                <div class="stacked-card"></div>
-                <div class="stacked-card"></div>
-
-                <div class="main-card">
-                    <div class="punch-card-header">
-                        <input type="checkbox" class="card-checkbox">
-
-                        <h2>Punch Card</h2>
-                        <div class="image-container">
-                            <img src="https://i.pinimg.com/originals/f2/d0/ac/f2d0ac079588297a2bd818a4c061ec71.jpg" alt="Employee Photo" class="employee-image">
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="employee-name">{{ $employee }}</div>
-                        <div class="employee-type">Employee</div>
-                        <div class="qr-container">
-                            <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*A9YcoX1YxBUsTg7p-P6GBQ.png" alt="QR Code" class="qr-code">
-                        </div>
-                    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Manage Punch Cards</h3>
+                <div>
+                    <button id="selectAllButton" class="btn btn-sm btn-secondary">Select All</button>
+                    <button id="deselectAllButton" class="btn btn-sm btn-secondary">Deselect All</button>
+                    <button id="printButton" class="btn btn-sm btn-primary">Print Selected Cards</button>
                 </div>
             </div>
-            @endforeach
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form action="{{route('limit_for_daownload_id')}}" method="post" class="form-inline">
+                        @csrf
+                        <div class="input-group">
+                            <input type="search" name="search_input" class="form-control" placeholder="Search by name or mobile number" required>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="container-fluid" id="cardContainer">
+                <div class="row">
+                    @if(isset($user_data) && !empty($user_data))
+                        @foreach($user_data as $index => $user)
+                            <div class="col-lg-2 col-md-3 col-sm-4 mb-3">
+                                <div class="punch-card">
+                                    <input type="checkbox" class="card-checkbox position-absolute">
+                                    <div class="punch-card-header">
+                                        <div class="header-line"></div>
+                                        <div class="text-center text-white">
+                                            <h6 class="mb-1">Punch Card</h6>
+                                            <img src="{{asset('/storage')}}/{{ $user->photo_name }}" class="profile-img" alt="Profile">
+                                        </div>
+                                    </div>
+
+                                    <div class="punch-card-body">
+                                        <div class="text-center">
+                                            <div class="employee-name">{{ $user->f_name }} {{ $user->m_name }} {{ $user->l_name }}</div>
+                                            <div class="employee-role">Employee</div>
+                                            <div class="qr-code-container" id="qrcode{{ $index }}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="col-12 text-center">
+                            <p>No records found</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
 @stop
 
 @section('css')
-<style>
- .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-}
+    <style>
+        /* Punch Card Styles */
+        .punch-card {
+            width: 100%;
+            max-width: 180px;
+            height: 260px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: white;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-.card-stack {
-    position: relative;
-    width: 2in;
-    margin: 20px;
-}
+        .card-checkbox {
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            transform: scale(1.2);
+        }
 
-.stacked-card {
-    position: absolute;
-    width: 2in;
-    height: 3.5in; /* Increased height */
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+        .punch-card-header {
+            background-color: #808080;
+            height: 90px;
+            position: relative;
+            padding: 10px;
+        }
 
-.stacked-card:nth-child(1) { transform: translate(-6px, -6px); }
-.stacked-card:nth-child(2) { transform: translate(-4px, -4px); }
-.stacked-card:nth-child(3) { transform: translate(-2px, -2px); }
+        .header-line {
+            width: 50px;
+            height: 5px;
+            background-color: white;
+            border-radius: 5px;
+            margin: 5px auto;
+        }
 
-.main-card {
-    position: relative;
-    width: 2in;
-    height: 3.5in; /* Increased height */
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 4;
-}
+        .profile-img {
+            width: 25px;
+            height: 25px;
+            margin: 5px auto;
+            display: block;
+        }
 
-.punch-card-header {
-    height: 35%; /* Reduced header height percentage */
-    background: gray;
-    border-radius: 8px 8px 0 0;
-    padding: 15px;
-    position: relative;
-}
+        .punch-card-body {
+            padding: 10px;
+        }
 
-.id-tag {
-    background: white;
-    padding: 5px 15px;
-    border-radius: 15px;
-    display: inline-block;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.8rem;
-}
+        .employee-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
 
-.card-checkbox {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    transform: scale(1.2);
-}
+        .employee-role {
+            background-color: #808080;
+            color: white;
+            padding: 3px 0;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
 
-.punch-card-header h2 {
-    color: white;
-    font-size: 1rem;
-    margin-top: 20px;
-    text-align: center;
-}
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.image-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
+        .qr-code-container img {
+            max-width: 100%;
+            height: auto;
+        }
 
-.employee-image {
-    width: 80px;
-    height: 80px;
-    border: 4px solid rgba(255,255,255,0.2);
-    background: white;
-    object-fit: cover;
-}
+        /* Print Styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
 
-.card-body {
-    position: relative;
-    height: 65%; /* Increased body height percentage */
-    padding: 15px 0;
-}
+            body * {
+                visibility: hidden;
+            }
 
-.employee-name {
-    text-align: center;
-    font-weight: bold;
-    margin: 15px 0;
-    font-size: 1rem;
-}
+            .printable, .printable * {
+                visibility: visible;
+            }
 
-.employee-type {
-    background: gray;
-    color: white;
-    text-align: center;
-    padding: 2px 0;
-    font-size: 0.8rem;
-    margin: 10px 0;
-}
+            .printable {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
 
-.qr-container {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-}
+            .printable .punch-card {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
 
-.qr-code {
-    width: 100px;
-    height: 100px;
-    background: white;
-    padding: 5px;
-    border: 1px solid #ddd;
-}
+            /* Force background colors to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
 
-@media print {
-    .card-stack {
-        page-break-inside: avoid;
-    }
-
-    .stacked-card {
-        display: none;
-    }
-}
-</style>
+            .punch-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
 @stop
 
 @section('js')
+    <!-- QR Code Library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        $(function () {
+            // Generate QR codes for each card
+            @if(isset($user_data) && !empty($user_data))
+                @foreach($user_data as $index => $user)
+                    new QRCode(document.getElementById("qrcode{{ $index }}"), {
+                        text: "{{ url('/login') }}/{{ $user->Employee_id }}",
+                        width: 80,
+                        height: 80,
+                    });
+                @endforeach
+            @endif
 
-<script>
-$(document).ready(function() {
-    var table = $('#salary-table').DataTable({
-        "pageLength": 5,
-        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-        "ordering": true,
-        "searching": false,
-        "responsive": true,
-        "buttons": [],
-        "columnDefs": [
-            {
-                "targets": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-                "orderable": false
-            }
-        ]
-    });
+            // Select/Deselect all cards
+            $('#selectAllButton').click(function() {
+                $('.card-checkbox').prop('checked', true);
+            });
 
-    $('#select-all').click(function() {
-        $('.card-checkbox').prop('checked', true);
-    });
+            $('#deselectAllButton').click(function() {
+                $('.card-checkbox').prop('checked', false);
+            });
 
-    $('#deselect-all').click(function() {
-        $('.card-checkbox').prop('checked', false);
-    });
+            // Print selected cards
+            $('#printButton').click(function() {
+                const selectedCards = Array.from(document.querySelectorAll('.card-checkbox:checked'))
+                    .map(checkbox => checkbox.closest('.punch-card'));
 
-    $('#print-cards').click(function() {
-        if (!$('.card-checkbox:checked').length) {
-            alert('Please select at least one employee');
-            return;
-        }
-        window.print();
-    });
-});
-</script>
+                if (selectedCards.length === 0) {
+                    alert('Please select at least one card to print.');
+                    return;
+                }
+
+                // Create a temporary container for printable content
+                const printableArea = document.createElement('div');
+                printableArea.className = 'printable';
+
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'container-fluid';
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+
+                // Add cards to grid
+                selectedCards.forEach(card => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-2 mb-3';
+
+                    const cardClone = card.cloneNode(true);
+                    cardClone.querySelector('.card-checkbox').remove();
+
+                    colDiv.appendChild(cardClone);
+                    rowDiv.appendChild(colDiv);
+                });
+
+                pageDiv.appendChild(rowDiv);
+                printableArea.appendChild(pageDiv);
+                document.body.appendChild(printableArea);
+
+                // Trigger print
+                window.print();
+
+                // Clean up
+                document.body.removeChild(printableArea);
+            });
+        });
+    </script>
 @stop
