@@ -7,103 +7,263 @@
 @stop
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <div class="row align-items-end">
-            <div class="col-md-2">
-                <label for="holiday_date"><i class="fas fa-calendar-alt"></i> Holiday Date</label>
-                <div class="input-group">
-                    <input type="text" class="form-control datepicker" id="holiday_date" placeholder="dd-mm-yyyy">
-                    <div class="input-group-append">
-                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="card-title">Manage Swap Dates</h3>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-success" id="save_swap_holiday_btn">
+                                <i class="fa-regular fa-floppy-disk"></i> Save Swap Holiday
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <label for="swap_date"><i class="fas fa-exchange-alt"></i> Swap Date</label>
-                <div class="input-group">
-                    <input type="text" class="form-control datepicker" id="swap_date" placeholder="dd-mm-yyyy">
-                    <div class="input-group-append">
-                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                <div class="card-body">
+                    <div class="row mb-3 d-none">
+                        <div class="col-md-6">
+                            <div class="form-group mt-4">
+                                <input type="text" value="{{ session('role_number') }}" id="role_number" hidden>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="holiday_date_input">Holiday Date</label>
+                                <input type="date" name="holiday_date" id="holiday_date_input" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="swap_date_input">Swap Date</label>
+                                <input type="date" name="swap_date" id="swap_date_input" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label for="Public_Holiday">Public Holiday</label>
+                                <select name="Public_Holiday" id="Public_Holiday" class="form-control">
+                                    <option value="1" id="yes_opt">Yes</option>
+                                    <option value="0" id="no_opt">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="message_input">Message</label>
+                                <input type="text" name="message" id="message_input" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="result">
+                                <div class="text-center" id="loading" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <p>Loading data...</p>
+                                </div>
+
+                                <div id="data-container">
+                                    <table id="employees_table" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" name="" id="sellect_all_ids" onchange="sellect_all()"></th>
+                                                <th>Name</th>
+                                                <th>Employee ID</th>
+                                                <th>Shift Time</th>
+                                                <th>Employee Type</th>
+                                                <th>Role</th>
+                                                <th>Weekly Off</th>
+                                                <th>Department</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data will be filled by AJAX -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <label for="public_holiday"><i class="fas fa-check-circle"></i> Public Holiday</label>
-                <select class="form-control" id="public_holiday">
-                    <option>Yes</option>
-                    <option>No</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label for="message"><i class="fas fa-comment"></i> Message</label>
-                <input type="text" class="form-control" id="message">
-            </div>
-            <div class="col-md-2 text-right mt-3">
-                <button class="btn btn-success" id="saveSwapHoliday"><i class="fas fa-save"></i> Save Swap Holiday</button>
             </div>
         </div>
-    </div>
-
-    <div class="card-body">
-        <!-- Hidden input for role number -->
-        <input type="hidden" id="role_number" value="1">
-
-        <table id="swapTable" class="table table-striped table-bordered nowrap" style="width:100%">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="select_all"></th>
-                    <th>Name</th>
-                    <th>Employee ID</th>
-                    <th>Shift Time</th>
-                    <th>Employee Type</th>
-                    <th>Role</th>
-                    <th>Weekly Off</th>
-                    <th>Department</th>
-                </tr>
-            </thead>
-            <tbody id="result">
-                <!-- Table data will be loaded here -->
-            </tbody>
-        </table>
     </div>
 </div>
 @stop
 
+@section('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+@stop
+
 @section('js')
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
 <script>
-    $(document).ready(function () {
-        // Initialize DataTable with responsiveness
-        var table = $('#swapTable').DataTable({
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "responsive": true
+    var public_holiday = '';
+    var public_holiday_date = '';
+    var select_date_day = '';
+    var employeesTable;
+
+    $(document).ready(function() {
+        // Initialize DataTable with empty data
+        employeesTable = $('#employees_table').DataTable({
+            processing: true,
+            pageLength: 50,
+            columns: [
+                { data: 'checkbox', orderable: false, searchable: false },
+                { data: 'name', name: 'name' },
+                { data: 'employee_id', name: 'employee_id' },
+                { data: 'shift', name: 'shift' },
+                { data: 'type', name: 'type' },
+                { data: 'role', name: 'role' },
+                { data: 'weekly_off', name: 'weekly_off' },
+                { data: 'department', name: 'department' },
+                { data: 'actions', orderable: false, searchable: false }
+            ],
+            language: {
+                lengthMenu: "Show _MENU_ entries",
+                search: "Search:",
+                zeroRecords: "No matching records found",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)"
+            }
         });
 
-        // Initialize Datepicker
-        $('.datepicker').datepicker({
-            format: 'dd-mm-yyyy',
-            autoclose: true,
-            todayHighlight: true
+        // Load initial data
+        load_data();
+
+        $('#holiday_date_input').on('change', function() {
+            const dateInput = $(this).val();
+            if (dateInput) {
+                const date = new Date(dateInput);
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const dayOfWeek = days[date.getDay()];
+                $('#dayDisplay').text(`${dayOfWeek}`);
+                var url_input = '{{ url('/all-holiday-search-api/10') }}/' + dateInput;
+                $.ajax({
+                    url: url_input,
+                    type: "GET",
+                    dataType: "json",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    success: function(response) {
+                        console.log("Holiday search Response:", response);
+                        var holiday = response.all_users.data;
+
+                        if (holiday != '') {
+                            $("#yes_opt").attr("selected", "selected");
+                            $("#no_opt").removeAttr("selected");
+                            public_holiday = 'No';
+
+                            page_url = "{{ url('/show-all-employees-api') }}";
+                            attendance_data_set(page_url);
+                        } else {
+                            $("#yes_opt").removeAttr("selected");
+                            $("#no_opt").attr("selected", "selected");
+                            public_holiday = 'Yes';
+
+                            page_url = "{{ url('/show-all-employees-api') }}/" + dayOfWeek;
+                            attendance_data_set(page_url);
+                        }
+                        public_holiday_date = dateInput;
+                        select_date_day = dayOfWeek;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Holiday search Error:", error);
+                        console.error("Status:", status);
+                        console.error("XHR Object:", xhr);
+                        show_error("Error loading holiday data");
+                    }
+                });
+            }
         });
 
-        // Call function to fetch data
-        attendance_data_set('/api/get-employees');
+        $('#save_swap_holiday_btn').click(function(e) {
+            var swap_date = $('#swap_date_input').val();
+            var holiday_date = $('#holiday_date_input').val();
+            var Public_Holiday = $('#Public_Holiday').val();
+            var message_inpu = $('#message_input').val();
+            var all_ids = [];
 
-        // Handle select all checkbox
-        $("#select_all").change(function() {
-            $(".checkbox_ids").prop('checked', $(this).prop('checked'));
-        });
+            $('input:checkbox[name=delet_ids]:checked').each(function() {
+                all_ids.push($(this).val());
+            });
 
-        // Save Swap Holiday button click event
-        $("#saveSwapHoliday").click(function() {
-            saveSwapHoliday();
+            if (holiday_date == "" || all_ids.length == 0) {
+                if (holiday_date == "") {
+                    show_error("Please Enter Holiday Date");
+                } else {
+                    show_error("Please select Employee");
+                }
+            } else {
+                $.ajax({
+                    url: "{{ route('add_holiday') }}",
+                    type: "POST",
+                    data: {
+                        holiday_date: holiday_date,
+                        Public_Holiday: Public_Holiday,
+                        message_inpu: message_inpu,
+                        swap_date: swap_date,
+                        ids: all_ids,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        show_success(response.success);
+                        setTimeout(() => {
+                            location.reload();
+                        }, 3000);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Save holiday Error:", error);
+                        show_error("Error saving holiday data");
+                    }
+                });
+            }
         });
     });
 
+    function sellect_all() {
+        const checkAllCheckbox = document.getElementById("sellect_all_ids");
+        const itemCheckboxes = document.querySelectorAll(".checkbox_ids");
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.checked = checkAllCheckbox.checked;
+        });
+    }
+
+    function load_data() {
+        show_loading(true);
+        $.ajax({
+            url: "{{ url('/all-employees-api') }}/50",
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                show_loading(false);
+                populate_datatable(response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load Error:", error);
+                show_loading(false);
+                show_error("Error loading data. Please try again.");
+            }
+        });
+    }
+
     function attendance_data_set(url_input) {
+        show_loading(true);
         $.ajax({
             url: url_input,
             type: "GET",
@@ -112,128 +272,64 @@
                 "Content-Type": "application/json"
             },
             success: function(response) {
-                console.log("Response:", response);
-
-                // Clear existing table rows
-                $("#result").empty();
-
-                var all_users_data = response.all_users.data;
-                var role_number = $("#role_number").val() || 0;
-
-                // Add rows to the table
-                all_users_data.forEach(function(user) {
-                    if (user.role >= role_number) {
-                        $("#result").append(`
-                            <tr id="employee_id${user.id}">
-                                <td><input type="checkbox" name="delet_ids" class="checkbox_ids" value="${user.Employee_id}"></td>
-                                <td>${user.f_name} ${user.m_name} ${user.l_name}</td>
-                                <td>${user.Employee_id}</td>
-                                <td>${user.Shift_Name}</td>
-                                <td>${user.EmpTypeName}</td>
-                                <td>${user.roles}</td>
-                                <td>${user.Weekly_Off}</td>
-                                <td>${user.Department_name}</td>
-                            </tr>
-                        `);
-                    }
-                });
-
-                // Refresh the DataTable
-                $('#swapTable').DataTable().destroy();
-                $('#swapTable').DataTable({
-                    "paging": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "responsive": true
-                });
+                show_loading(false);
+                populate_datatable(response);
             },
             error: function(xhr, status, error) {
-                console.error("Error fetching data:", error);
-                $("#result").html('<tr><td colspan="8" class="text-center">Error loading data. Please try again.</td></tr>');
+                console.error("Data load Error:", error);
+                show_loading(false);
+                show_error("Error loading data. Please try again.");
             }
         });
     }
 
-    function saveSwapHoliday() {
-        // Get selected employee IDs
-        var selectedEmployees = [];
-        $('.checkbox_ids:checked').each(function() {
-            selectedEmployees.push($(this).val());
-        });
-
-        // Get form data
-        var holidayDate = $('#holiday_date').val();
-        var swapDate = $('#swap_date').val();
-        var isPublicHoliday = $('#public_holiday').val();
-        var message = $('#message').val();
-
-        // Validate inputs
-        if (!holidayDate || !swapDate) {
-            alert("Please select both holiday date and swap date.");
+    function populate_datatable(response) {
+        if (!response || !response.all_users || !response.all_users.data) {
+            employeesTable.clear().draw();
             return;
         }
 
-        if (selectedEmployees.length === 0) {
-            alert("Please select at least one employee.");
-            return;
-        }
+        var all_users_data = response.all_users.data;
+        var role_number = $("#role_number").val();
+        var tableData = [];
 
-        // Send data to server
-        $.ajax({
-            url: '/api/save-swap-holiday',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                holiday_date: holidayDate,
-                swap_date: swapDate,
-                public_holiday: isPublicHoliday,
-                message: message,
-                employee_ids: selectedEmployees
-            }),
-            success: function(response) {
-                alert("Swap holiday saved successfully!");
-                // Reset form
-                $('#holiday_date').val('');
-                $('#swap_date').val('');
-                $('#message').val('');
-                $('.checkbox_ids').prop('checked', false);
-                $('#select_all').prop('checked', false);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error saving swap holiday:", error);
-                alert("Error saving swap holiday. Please try again.");
+        all_users_data.forEach(user => {
+            if (user.role >= role_number) {
+                tableData.push({
+                    checkbox: `<input type="checkbox" name="delet_ids" class="checkbox_ids" value="${user.Employee_id}">`,
+                    name: `${user.f_name} ${user.m_name} ${user.l_name}`,
+                    employee_id: user.Employee_id,
+                    shift: user.Shift_Name,
+                    type: user.EmpTypeName,
+                    role: user.roles,
+                    weekly_off: user.Weekly_Off,
+                    department: user.Department_name,
+                    actions: ''
+                });
             }
         });
+
+        // Clear the table and add new data
+        employeesTable.clear();
+        employeesTable.rows.add(tableData).draw();
     }
 
-    // Sort function for table columns
-    function short_data(column) {
-        // Toggle sort direction
-        var currentDir = $("#" + column + "_span").attr("data-sort") || "asc";
-        var newDir = currentDir === "asc" ? "desc" : "asc";
-
-        // Update sort icon
-        $("#" + column + "_span").attr("data-sort", newDir);
-
-        // Sort the DataTable
-        var table = $('#swapTable').DataTable();
-        var columnIndex = 0;
-
-        // Determine column index
-        switch(column) {
-            case 'f_name':
-                columnIndex = 1;
-                break;
-            case 'Employee_id':
-                columnIndex = 2;
-                break;
-            default:
-                columnIndex = 1;
+    function show_loading(show) {
+        if (show) {
+            $('#loading').show();
+            $('#data-container').hide();
+        } else {
+            $('#loading').hide();
+            $('#data-container').show();
         }
+    }
 
-        table.order([columnIndex, newDir]).draw();
+    function show_error(message) {
+        toastr.error(message);
+    }
+
+    function show_success(message) {
+        toastr.success(message);
     }
 </script>
 @stop

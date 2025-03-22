@@ -1,33 +1,99 @@
 @extends('adminlte::page')
 
-@section('title', 'Employee List')
+@section('title', 'Employee Management')
 
 @section('content_header')
-    <h1>All Employee List</h1>
-@endsection
+    <h1>Employee Management</h1>
+@stop
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
+    <style>
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btns a {
+            font-size: 16px;
+        }
+        .dt-buttons .btn {
+            margin-right: 5px;
+        }
+        #bulk-upload-modal .modal-body {
+            padding: 20px;
+        }
+        .btn-action {
+            margin-right: 5px;
+        }
+        #employee-view-modal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        #employee-view-modal .employee-info {
+            margin-bottom: 15px;
+        }
+        #employee-view-modal .info-label {
+            font-weight: bold;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+@stop
 
 @section('content')
-
-<div class="container-fluid">
-    <div class="card">
-        <div class="card-header d-flex justify-content-end align-items-center">
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group">
-                <button class="btn btn-secondary me-2" onclick="collectSelectedIds()"><i class="fas fa-download"></i> Download ID Cards</button>
-                <button class="btn btn-primary me-2" onclick="location.href='{{url('/registration')}}'"><i class="fas fa-plus"></i> Add New Employee</button>
-                <button class="btn btn-success me-2" data-toggle="modal" data-target="#bulkUploadModal" onclick="open_bulk_uplaode()"><i class="fas fa-upload"></i> Bulk Upload</button>
-                <button class="btn btn-danger me-2"><i class="fas fa-trash"></i> Bulk Delete</button>
+                <button type="button" class="btn btn-info" id="exportExcel">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn btn-danger" id="exportPDF">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button type="button" class="btn btn-secondary" id="printTable">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-action" id="download-selected">
+                    <i class="fas fa-download"></i> Download ID Cards
+                </button>
+                <a href="{{ url('/registration') }}" class="btn btn-success btn-action">
+                    <i class="fas fa-plus"></i> Add New
+                </a>
+                <button type="button" class="btn btn-info btn-action" data-toggle="modal" data-target="#bulk-upload-modal">
+                    <i class="fas fa-upload"></i> Bulk Upload
+                </button>
+                <button type="button" class="btn btn-danger btn-action" id="bulk-delete">
+                    <i class="fas fa-trash"></i> Bulk Delete
+                </button>
             </div>
         </div>
-
-
-        <div class="card-body">
-            <table id="employeeTable" class="table table-bordered table-striped">
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="employees-table" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th><input type="checkbox"></th>
+                        <th><input type="checkbox" id="select-all"></th>
                         <th>Name</th>
                         <th>Employee ID</th>
                         <th>Mobile Number</th>
+                        <th>Email Id</th>
+                        <th>Aadhar Number</th>
+                        <th>Pan Number</th>
+                        <th>Date of birth</th>
+                        <th>Current Address</th>
+                        <th>Permanent Address</th>
+                        <th>Gender</th>
+                        <th>Marital Status</th>
+                        <th>DOJ</th>
+                        <th>Highest Qualification</th>
+                        <th>Salary</th>
+                        <th>Shift Time</th>
                         <th>Employee Type</th>
                         <th>Role</th>
                         <th>Weekly Off</th>
@@ -37,166 +103,618 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    </tr>
+                    <!-- Data will be loaded via AJAX -->
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
-
-<x-adminlte-modal id="bulkUploadModal" title="Import Users" theme="primary" size="md" v-centered>
-    <form action="{{ route('bulk_uoploade_request') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="text-center">
-            <!-- File Input -->
-            <x-adminlte-input-file name="user_file" label="Choose File" placeholder="No file chosen">
-                <x-slot name="prependSlot">
-                    <div class="input-group-text"><i class="fas fa-file-upload"></i></div>
-                </x-slot>
-            </x-adminlte-input-file>
+<!-- Bulk Upload Modal -->
+<div class="modal fade" id="bulk-upload-modal" tabindex="-1" role="dialog" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkUploadModalLabel">Import Users</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('bulk_uoploade_request') }}" method="POST" enctype="multipart/form-data" id="bulk-upload-form">
+                    @csrf
+                    <div class="form-group">
+                        <label>Select CSV File</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="csv_file" accept=".csv" required id="csv-file">
+                            <label class="custom-file-label" for="csv-file">Choose file</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <a href="{{ url('/sample.csv') }}" class="btn btn-success btn-block">
+                            <i class="fas fa-download"></i> Download XLS Format
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">Upload</button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="d-flex flex-column gap-2 mt-3">
-            <!-- Upload Button -->
-            <x-adminlte-button type="submit" label="Upload" theme="dark" class="btn-block"/>
+<!-- Employee View Modal -->
+<div class="modal fade" id="employee-view-modal" tabindex="-1" role="dialog" aria-labelledby="employeeViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="employeeViewModalLabel">Employee Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="spinner-border text-primary" role="status" id="employee-loading">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div id="employee-details" class="row" style="display: none;">
+                    <!-- Personal Information -->
+                    <div class="col-md-12 mb-3">
+                        <h4 class="border-bottom pb-2">Personal Information</h4>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Name:</div>
+                        <div id="employee-name"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Employee ID:</div>
+                        <div id="employee-id"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Date of Birth:</div>
+                        <div id="employee-dob"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Gender:</div>
+                        <div id="employee-gender"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Marital Status:</div>
+                        <div id="employee-marital-status"></div>
+                    </div>
 
-            <!-- Download Template Button -->
-            <a href="{{url('/sample.csv')}}" class="btn btn-success btn-block">
-                <i class="fas fa-file-excel"></i> Download XLS Format
-            </a>
+                    <!-- Contact Information -->
+                    <div class="col-md-12 mt-3 mb-3">
+                        <h4 class="border-bottom pb-2">Contact Information</h4>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Mobile Number:</div>
+                        <div id="employee-mobile"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Email:</div>
+                        <div id="employee-email"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Current Address:</div>
+                        <div id="employee-current-address"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Permanent Address:</div>
+                        <div id="employee-permanent-address"></div>
+                    </div>
 
-            <!-- Cancel Button -->
-            <x-adminlte-button label="Cancel" theme="danger" data-dismiss="modal" class="btn-block"/>
+                    <!-- Official Information -->
+                    <div class="col-md-12 mt-3 mb-3">
+                        <h4 class="border-bottom pb-2">Official Information</h4>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Department:</div>
+                        <div id="employee-department"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Role:</div>
+                        <div id="employee-role"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Date of Joining:</div>
+                        <div id="employee-doj"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Salary:</div>
+                        <div id="employee-salary"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Employee Type:</div>
+                        <div id="employee-type"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Shift Time:</div>
+                        <div id="employee-shift"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Weekly Off:</div>
+                        <div id="employee-weekly-off"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Gate Off:</div>
+                        <div id="employee-gate-off"></div>
+                    </div>
+
+                    <!-- Legal Information -->
+                    <div class="col-md-12 mt-3 mb-3">
+                        <h4 class="border-bottom pb-2">Legal Information</h4>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Aadhaar Number:</div>
+                        <div id="employee-aadhaar"></div>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">PAN Number:</div>
+                        <div id="employee-pan"></div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="col-md-12 mt-3 mb-3">
+                        <h4 class="border-bottom pb-2">Education</h4>
+                    </div>
+                    <div class="col-md-6 employee-info">
+                        <div class="info-label">Highest Qualification:</div>
+                        <div id="employee-qualification"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-warning" id="edit-employee-btn">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                </a>
+                <a href="#" class="btn btn-success" id="download-id-card-btn">
+                    <i class="fas fa-download"></i> Download ID Card
+                </a>
+            </div>
         </div>
-    </form>
-</x-adminlte-modal>
-
-
-@endsection
+    </div>
+</div>
+@stop
 
 @section('js')
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $(document).ready(function() {
-    $('#employeeTable').DataTable({
-        dom: "<'row'<'col-sm-12'B>>" +
-             "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
-             "<'row'<'col-sm-12'tr>>" +
-             "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                className: 'btn btn-success mb-3'
+    $(function() {
+        // Initialize DataTable
+        var table = $('#employees-table').DataTable({
+            processing: true,
+            ajax: {
+                url: "{{ url('/all-employees-api') }}/" + 50, // Default limit of 50
+                type: "GET",
+                dataSrc: function(response) {
+                    // Transform the API response to DataTables format
+                    var role_number = $("#role_number").val() || 0;
+                    var data = [];
+
+                    if (response.all_users && response.all_users.data) {
+                        response.all_users.data.forEach(function(user) {
+                            if (user.role >= role_number) {
+                                // Create the checkbox cell
+                                var checkboxCell = '<input type="checkbox" class="employee-checkbox" value="' + user.id + '">';
+
+                                // Create the name cell by combining first, middle and last name
+                                var nameCell = user.f_name + ' ' + (user.m_name || '') + ' ' + (user.l_name || '');
+
+                                // Create the actions cell with view opening modal
+                                var actionsCell = '<div class="action-btns">' +
+                                    '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
+                                    '<i class="fas fa-eye"></i></a> ' +
+                                    '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
+                                    '<i class="fas fa-pencil-alt"></i></a> ' +
+                                    '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
+                                    '<i class="fas fa-download"></i></a>' +
+                                    '</div>';
+
+                                // Push the formatted row data
+                                data.push({
+                                    checkbox: checkboxCell,
+                                    name: nameCell,
+                                    Employee_id: user.Employee_id,
+                                    mobile_number: user.mobile_number,
+                                    email: user.email,
+                                    aadhaar_number: user.aadhaar_number,
+                                    pan_number: user.pan_number,
+                                    dob: user.dob,
+                                    current_address: user.current_address,
+                                    permanent_address: user.permanent_address,
+                                    gender: user.gender,
+                                    marital_status: user.marital_status,
+                                    DOJ: user.DOJ,
+                                    highest_qualification: user.highest_qualification,
+                                    salary: user.salary,
+                                    Shift_Name: user.Shift_Name,
+                                    EmpTypeName: user.EmpTypeName,
+                                    roles: user.roles,
+                                    Weekly_Off: user.Weekly_Off,
+                                    Department_name: user.Department_name,
+                                    Gate_Off: user.Gate_Off,
+                                    actions: actionsCell,
+                                    userData: user
+                                });
+                            }
+                        });
+                    }
+
+                    console.log("Processed data for DataTable:", data);
+                    return data;
+                }
             },
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="fas fa-file-pdf"></i> Export to PDF',
-                className: 'btn btn-danger mb-3'
-            },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i> Print',
-                className: 'btn btn-primary mb-3'
-            },
-            {
-                extend: 'colvis',
-                text: '<i class="fas fa-columns"></i> Column Visibility',
-                className: 'btn btn-secondary dropdown-toggle mb-3',
-                columnText: function(dt, idx, title) {
-                    return title;
-                },
-                init: function(api, node, config) {
-                    $(node).removeClass('dt-button').addClass('dropdown-toggle');
+            columns: [
+                {data: 'checkbox', orderable: false, searchable: false},
+                {data: 'name'},
+                {data: 'Employee_id'},
+                {data: 'mobile_number'},
+                {data: 'email'},
+                {data: 'aadhaar_number'},
+                {data: 'pan_number'},
+                {data: 'dob'},
+                {data: 'current_address'},
+                {data: 'permanent_address'},
+                {data: 'gender'},
+                {data: 'marital_status'},
+                {data: 'DOJ'},
+                {data: 'highest_qualification'},
+                {data: 'salary', render: function(data) {
+                    return '₹' + data;
+                }},
+                {data: 'Shift_Name'},
+                {data: 'EmpTypeName'},
+                {data: 'roles'},
+                {data: 'Weekly_Off'},
+                {data: 'Department_name'},
+                {data: 'Gate_Off'},
+                {data: 'actions', orderable: false, searchable: false}
+            ],
+            dom: 'lBfrtip',
+            buttons: [
+                'colvis',
+            ],
+            order: [[1, 'asc']],
+            responsive: true,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+            fixedHeader: true,
+            pagingType: 'full_numbers',
+            language: {
+                paginate: {
+                    previous: 'Previous',
+                    next: 'Next'
                 }
             }
-        ],
-        responsive: true,
-        autoWidth: false
-    });
-});
+        });
 
+        // Handle view employee click (open modal)
+        $('#employees-table').on('click', '.view-employee', function() {
+            var employeeId = $(this).data('id');
+            var tableData = table.rows().data().toArray();
+            var employeeData = null;
 
-        // Search functionality
-        $('#searchBox').on('keyup', function () {
-            $('#employeeTable').DataTable().search($(this).val()).draw();
+            // Find the employee data from our DataTable
+            for (var i = 0; i < tableData.length; i++) {
+                if (tableData[i].userData && tableData[i].userData.id == employeeId) {
+                    employeeData = tableData[i].userData;
+                    break;
+                }
+            }
+
+            // Show loading spinner
+            $('#employee-loading').show();
+            $('#employee-details').hide();
+
+            if (employeeData) {
+                populateEmployeeModal(employeeData);
+            } else {
+                // Fallback to AJAX call if we don't have the data
+                $.ajax({
+                    url: "{{ url('/get-employee-details') }}/" + employeeId,
+                    type: "GET",
+                    success: function(response) {
+                        populateEmployeeModal(response.employee);
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load employee details.'
+                        });
+                        $('#employee-loading').hide();
+                    }
+                });
+            }
+
+            // Set the edit and download buttons
+            $('#edit-employee-btn').attr('href', 'user-details/' + employeeId);
+            $('#download-id-card-btn').attr('href', 'dounloade-user-id-catd/' + employeeId);
+
+            // Show the modal
+            $('#employee-view-modal').modal('show');
+        });
+
+        // Function to populate employee modal with data
+        function populateEmployeeModal(employee) {
+            // Populate all fields
+            $('#employee-name').text((employee.f_name || '') + ' ' + (employee.m_name || '') + ' ' + (employee.l_name || ''));
+            $('#employee-id').text(employee.Employee_id || '');
+            $('#employee-dob').text(employee.dob || '');
+            $('#employee-gender').text(employee.gender || '');
+            $('#employee-marital-status').text(employee.marital_status || '');
+            $('#employee-mobile').text(employee.mobile_number || '');
+            $('#employee-email').text(employee.email || '');
+            $('#employee-current-address').text(employee.current_address || '');
+            $('#employee-permanent-address').text(employee.permanent_address || '');
+            $('#employee-department').text(employee.Department_name || '');
+            $('#employee-role').text(employee.roles || '');
+            $('#employee-doj').text(employee.DOJ || '');
+            $('#employee-salary').text('₹' + (employee.salary || ''));
+            $('#employee-type').text(employee.EmpTypeName || '');
+            $('#employee-shift').text(employee.Shift_Name || '');
+            $('#employee-weekly-off').text(employee.Weekly_Off || '');
+            $('#employee-gate-off').text(employee.Gate_Off || '');
+            $('#employee-aadhaar').text(employee.aadhaar_number || '');
+            $('#employee-pan').text(employee.pan_number || '');
+            $('#employee-qualification').text(employee.highest_qualification || '');
+
+            // Hide loading, show details
+            $('#employee-loading').hide();
+            $('#employee-details').show();
+        }
+
+        // Add CSS to ensure proper styling and fixed headers
+        $('head').append(`
+            <style>
+                /* Fixed header and navigation styles */
+                .dataTables_wrapper {
+                    position: relative;
+                }
+
+                .dataTables_scrollHead {
+                    position: sticky !important;
+                    top: 0;
+                    z-index: 10;
+                    background-color: #fff;
+                    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+                }
+
+                .dataTables_paginate {
+                    float: right !important;
+                    margin-top: 10px !important;
+                }
+
+                .dataTables_info {
+                    padding-top: 10px !important;
+                }
+
+                .pagination {
+                    justify-content: flex-end !important;
+                }
+
+                /* Table navigation controls */
+                .table-nav-controls {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                    padding: 8px 0;
+                    background-color: #f8f9fa;
+                    border-radius: 4px;
+                }
+
+                .table-nav-controls button {
+                    padding: 6px 12px;
+                    margin: 0 5px;
+                    background-color: #fff;
+                    border: 1px solid #dee2e6;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }
+
+                .table-nav-controls button:hover {
+                    background-color: #e9ecef;
+                }
+
+                .table-nav-controls button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                /* Responsive table container */
+                .table-responsive {
+                    position: relative;
+                    overflow-x: hidden !important; /* Hide default horizontal scrollbar */
+                }
+
+                /* Visible columns indicator */
+                .columns-indicator {
+                    margin-left: 10px;
+                    font-size: 0.9em;
+                    color: #6c757d;
+                }
+            </style>
+        `);
+
+        // Add navigation buttons above the table
+        var $tableContainer = $('#employees-table').closest('.table-responsive');
+        $tableContainer.before(`
+            <div class="table-nav-controls">
+                <div>
+                    <button id="prev-columns" disabled>Previous Columns</button>
+                    <button id="next-columns">Next Columns</button>
+                    <span class="columns-indicator">Showing columns 1-6 of 22</span>
+                </div>
+                <div>
+                    <button id="show-essential">Essential Columns</button>
+                    <button id="show-all">All Columns</button>
+                </div>
+            </div>
+        `);
+
+        // Set up column groups for navigation
+        var visibleColumns = 6; // Number of columns to show at once
+        var totalColumns = table.columns().nodes().length;
+        var currentPosition = 0;
+
+        // Update columns indicator
+        function updateColumnsIndicator() {
+            var start = currentPosition + 1;
+            var end = Math.min(currentPosition + visibleColumns, totalColumns);
+            $('.columns-indicator').text('Showing columns ' + start + '-' + end + ' of ' + totalColumns);
+
+            // Enable/disable navigation buttons
+            $('#prev-columns').prop('disabled', currentPosition === 0);
+            $('#next-columns').prop('disabled', currentPosition + visibleColumns >= totalColumns);
+        }
+
+        // Navigate to previous columns
+        $('#prev-columns').on('click', function() {
+            if (currentPosition > 0) {
+                currentPosition = Math.max(0, currentPosition - visibleColumns);
+                navigateToColumn(currentPosition);
+                updateColumnsIndicator();
+            }
+        });
+
+        // Navigate to next columns
+        $('#next-columns').on('click', function() {
+            if (currentPosition + visibleColumns < totalColumns) {
+                currentPosition = Math.min(totalColumns - visibleColumns, currentPosition + visibleColumns);
+                navigateToColumn(currentPosition);
+                updateColumnsIndicator();
+            }
+        });
+
+        // Function to navigate to a specific column position
+        function navigateToColumn(position) {
+            // Get the DataTables scrolling wrapper
+            var $scrollBody = $('.dataTables_scrollBody');
+
+            // Calculate position to scroll to (column width * position)
+            var columnWidth = $scrollBody.find('table').find('th').eq(position).outerWidth();
+            var scrollPos = columnWidth * position;
+
+            // Animate scroll to new position
+            $scrollBody.animate({ scrollLeft: scrollPos }, 300);
+        }
+
+        // Show only essential columns
+        $('#show-essential').on('click', function() {
+            table.columns().visible(false);
+            var essentialColumns = [0, 1, 2, 3, 4, 14, 19, 21]; // Checkbox, Name, ID, Mobile, Email, Salary, Department, Actions
+            essentialColumns.forEach(function(colIdx) {
+                table.column(colIdx).visible(true);
+            });
+
+            currentPosition = 0;
+            updateColumnsIndicator();
+        });
+
+        // Show all columns
+        $('#show-all').on('click', function() {
+            table.columns().visible(true);
+            updateColumnsIndicator();
+        });
+
+        // Handle select all checkbox
+        $('#select-all').on('click', function() {
+            $('.employee-checkbox').prop('checked', $(this).prop('checked'));
+        });
+
+        // Download selected ID cards
+        $('#download-selected').on('click', function() {
+            let selectedIds = [];
+            $('.employee-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length > 0) {
+                window.location.href = "{{ url('downloade-selected-id-cards') }}/" + selectedIds.join(',');
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No employees selected',
+                    text: 'Please select at least one employee to download ID cards.'
+                });
+            }
+        });
+
+        // Bulk delete
+        $('#bulk-delete').on('click', function() {
+            let selectedIds = [];
+            $('.employee-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length > 0) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete them!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('delete_employee') }}",
+                            type: "POST",
+                            data: {
+                                ids: selectedIds,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.success,
+                                    'success'
+                                );
+                                table.ajax.reload();
+                            }
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No employees selected',
+                    text: 'Please select at least one employee to delete.'
+                });
+            }
+        });
+
+        // Show filename in custom file input
+        $(document).on('change', '.custom-file-input', function() {
+            let fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').addClass("selected").html(fileName);
+        });
+
+        $('#exportExcel').on('click', function() {
+            table.button('.buttons-excel').trigger();
+        });
+
+        // Export to PDF button
+        $('#exportPDF').on('click', function() {
+            table.button('.buttons-pdf').trigger();
+        });
+
+        // Print table button
+        $('#printTable').on('click', function() {
+            table.button('.buttons-print').trigger();
         });
     });
-
-    function collectSelectedIds() {
-        // Collect all checked checkboxes
-        const checkboxes = document.querySelectorAll('input[name="delet_ids"]:checked');
-        let ids = Array.from(checkboxes).map(cb => cb.value);
-
-        // Convert the IDs array into a comma-separated string
-        const searchInput = ids.join(',');
-        location.href = "{{url('downloade-selected-id-cards/')}}/" + searchInput;
-
-    }
-
-    function attendance_data_set(url_input) {
-    $.ajax({
-        url: url_input,
-        type: "GET",
-        dataType: "json",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        success: function(response) {
-            console.log("Response:", response); // Debugging
-
-            var all_users_data = response.all_users.data;
-            var role_number = $("#role_number").val();
-            var table_body = $("#employeeTable tbody");
-            table_body.empty();
-
-            all_users_data.forEach(all_users_data => {
-                if (all_users_data.role >= role_number) {
-                    var row = `
-                        <tr>
-                            <td><input type="checkbox" class="checkbox_ids" value="${all_users_data.id}"></td>
-                            <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                            <td>${all_users_data.Employee_id}</td>
-                            <td>${all_users_data.mobile_number}</td>
-                            <td>${all_users_data.EmpTypeName}</td>
-                            <td>${all_users_data.roles}</td>
-                            <td>${all_users_data.Weekly_Off}</td>
-                            <td>${all_users_data.Department_name}</td>
-                            <td>${all_users_data.Gate_Off}</td>
-                            <td>
-                                <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-warning btn-sm" onclick="window.location.href='/user-details/${user.id}'"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-primary btn-sm"><i class="fas fa-download"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    table_body.append(row);
-                }
-            });
-
-            // Handle pagination
-            var pagination_html = "";
-            response.all_users.links.forEach((element, index) => {
-                pagination_html += `<p data-page='${element.url}' class="${element.active ? 'active' : ''} page-btn">${element.label}</p>`;
-            });
-
-            $("#pagination_div").html(pagination_html);
-        },
-        error: function(xhr, status, error) {
-            console.error("Error:", error);
-        }
-    });
-}
-
 </script>
-@endsection
+@stop
