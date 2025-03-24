@@ -389,6 +389,7 @@ public function edit_employee_type(Request $req) {
      return redirect()->route('login');
    }
 }
+
 public function edit_role(Request $req) {
   $EmployeesID = session()->get('EmployeeID');
   $role = session()->get('role');

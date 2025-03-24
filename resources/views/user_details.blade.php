@@ -45,8 +45,8 @@
             <div class="card-header p-2">
                 <ul class="nav nav-pills">
                     <li class="nav-item"><a class="nav-link active" href="#personal" data-toggle="tab"><i class="fas fa-user mr-1"></i>Personal</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#employment" data-toggle="tab"><i class="fas fa-briefcase mr-1"></i>Employment</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#salary" data-toggle="tab"><i class="fas fa-money-bill-alt mr-1"></i>Salary</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#set-salary" data-toggle="tab"><i class="fas fa-money-bill-alt mr-1"></i>Salary</a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="#leave" data-toggle="tab"><i class="fas fa-calendar-alt mr-1"></i>Leave</a></li>
                     <li class="nav-item"><a class="nav-link" href="#attendance" data-toggle="tab"><i class="fas fa-clock mr-1"></i>Attendance</a></li>
                     @if ($role == '1')
@@ -60,640 +60,557 @@
                     <!-- Personal Tab -->
                     <div class="tab-pane active" id="personal">
                         <div class="card card-outline card-primary mb-0">
-                            <div class="card-header">
-                                <h3 class="card-title">Personal Information</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <form action="{{ route('update_basic_info') }}" method="post">
-                                    @csrf
-                                    <!-- Basic Information -->
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="employee_id">Employee ID</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="employee_id" name="Employee_Id" readonly value="{{ $u_data['Employee_id'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="first_name">First Name <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="first_name" name="First_Name" required value="{{ $u_data['f_name'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="last_name">Last Name <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="last_name" name="Last_Name" required value="{{ $u_data['l_name'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
+                           <div class="card-header">
+                              <h3 class="card-title">Personal Information</h3>
+                              <div class="card-tools">
+                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                 <i class="fas fa-minus"></i>
+                                 </button>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <form action="{{ route('update_basic_info') }}" method="post">
+                                 @csrf
+                                 <!-- Basic Information -->
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="employee_id">Employee ID</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="employee_id" name="Employee_Id" readonly value="{{ $u_data['Employee_id'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <!-- Contact Information -->
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="email" id="email_p">Email <span class="text-danger" id="email_required">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                                    </div>
-                                                    <input type="email" class="form-control" id="email_field" name="Email" required value="{{ $u_data['email'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="phone">Phone Number <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="phone" name="Phone" maxlength="10" value="{{ $u_data['mobile_number'] ?? $u_data['phone'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="dob">Date of Birth <span class="text-danger">*</span></label>
-                                                <div class="input-group date" id="dob" data-target-input="nearest">
-                                                    <div class="input-group-prepend" data-target="#dob" data-toggle="datetimepicker">
-                                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                                    </div>
-                                                    <input type="date" class="form-control" name="DOB" value="{{ $u_data['dob'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="first_name">First Name <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="first_name" name="First_Name" required value="{{ $u_data['f_name'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <!-- Personal Documents -->
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="aadhar">Aadhar Number <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-id-card-alt"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="aadhar" name="Aadhar_Number" value="{{ $u_data['aadhaar_number'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="pan">PAN Number</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="pan" name="PAN_Number" value="{{ $u_data['pan_number'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="voter_id">Voter ID Number</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-vote-yea"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="voter_id" name="Voter_id_Number" maxlength="10" value="{{ $u_data['voter_id_number'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="last_name">Last Name <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="last_name" name="Last_Name" required value="{{ $u_data['l_name'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="ration_card">Ration Card Number <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-file-invoice"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="ration_card" name="Ration_Card_Number" maxlength="21" value="{{ $u_data['ration_card_number'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="gender">Gender</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="gender" name="Gender" value="{{ $u_data['gender'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="education">Education <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="education" name="Education" value="{{ $u_data['highest_qualification'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
+                                 </div>
+                                 <!-- Contact Information -->
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="email" id="email_p">Email <span class="text-danger" id="email_required">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                             </div>
+                                             <input type="email" class="form-control" id="email_field" name="Email" required value="{{ $u_data['email'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <!-- Address Information -->
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="current_address">Current Address</label>
-                                                <textarea class="form-control" id="current_address" name="Current_Address" rows="3">{{ $u_data['current_address'] ?? $u_data['address'] ?? '' }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="permanent_address">Permanent Address <span class="text-danger">*</span></label>
-                                                <textarea class="form-control" id="permanent_address" name="Parment_Addtess" rows="3">{{ $u_data['permanent_address'] ?? '' }}</textarea>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="phone">Phone Number <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="phone" name="Phone" maxlength="10" value="{{ $u_data['mobile_number'] ?? $u_data['phone'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <!-- Employment Details -->
-                                    <h5 class="mt-4 mb-3 border-bottom pb-2">Employment Details</h5>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="joining_date">Date of Joining <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-calendar-plus"></i></span>
-                                                    </div>
-                                                    <input type="date" class="form-control" id="joining_date" name="Joining_date" value="{{ $u_data['DOJ'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="salary">Salary <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="salary" name="Salary" required value="{{ $u_data['salary'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="department">Department</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="department" name="Department_inputr" required>
-                                                        <option value="0">Select Department</option>
-                                                        @isset($Department_master)
-                                                            @foreach ($Department_master as $dpm)
-                                                                @if ($u_data['Department'] == $dpm->id)
-                                                                    <option value="{{$dpm->id}}" selected>{{$dpm->Department_name}}</option>
-                                                                @else
-                                                                    <option value="{{$dpm->id}}">{{$dpm->Department_name}}</option>
-                                                                @endif
-                                                            @endforeach
-                                                        @endisset
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="dob">Date of Birth <span class="text-danger">*</span></label>
+                                          <div class="input-group date" id="dob" data-target-input="nearest">
+                                             <div class="input-group-prepend" data-target="#dob" data-toggle="datetimepicker">
+                                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                             </div>
+                                             <input type="date" class="form-control" name="DOB" value="{{ $u_data['dob'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="shift">Shift Name</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="shift" name="Shift_Number" required>
-                                                        <option value="0">Select Shift</option>
-                                                        @isset($shift_master)
-                                                            @foreach ($shift_master as $shift_m)
-                                                                @if ($u_data['shift_time'] == $shift_m->id)
-                                                                    <option value="{{$shift_m->id}}" selected>{{$shift_m->Shift_Name}}</option>
-                                                                @else
-                                                                    <option value="{{$shift_m->id}}">{{$shift_m->Shift_Name}}</option>
-                                                                @endif
-                                                            @endforeach
-                                                        @endisset
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="employee_type">Employee Type <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="employee_type" name="Employee_Type" required>
-                                                        <option value="0">Select Employee Type</option>
-                                                        @isset($employee_type_master)
-                                                            @foreach ($employee_type_master as $employee_type)
-                                                                @if ($u_data['employee_type'] == $employee_type->id)
-                                                                    <option value="{{$employee_type->id}}" selected>{{$employee_type->EmpTypeName}}</option>
-                                                                @else
-                                                                    <option value="{{$employee_type->id}}">{{$employee_type->EmpTypeName}}</option>
-                                                                @endif
-                                                            @endforeach
-                                                        @endisset
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="role">Role <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="role" name="Role" required>
-                                                        <option value="0">Select Employee Role</option>
-                                                        @isset($role_masrer)
-                                                            @foreach ($role_masrer as $role_m)
-                                                                @if ($u_data['role'] == $role_m->id)
-                                                                    <option value="{{$role_m->id}}" selected>{{$role_m->roles}}</option>
-                                                                @else
-                                                                    <option value="{{$role_m->id}}">{{$role_m->roles}}</option>
-                                                                @endif
-                                                            @endforeach
-                                                        @endisset
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+                                 </div>
+                                 <!-- Personal Documents -->
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="aadhar">Aadhar Number <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-id-card-alt"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="aadhar" name="Aadhar_Number" value="{{ $u_data['aadhaar_number'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="gate_off">Gate Off</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-door-open"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="gate_off" name="Gate_Off" required>
-                                                        <option value="0">Select Gate Off</option>
-                                                        <option value="1" @if ($u_data['Gate_Off'] == 1) selected @endif>Yes</option>
-                                                        <option value="0" @if ($u_data['Gate_Off'] == 0) selected @endif>No</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="can_login">Login Enabled <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-sign-in-alt"></i></span>
-                                                    </div>
-                                                    <select class="form-control" id="can_login" name="Can_Login" onchange="set_required()">
-                                                        <option value="0">Select</option>
-                                                        <option value="1" @if ($u_data['can_login'] == 1) selected @endif>Yes</option>
-                                                        <option value="0" @if ($u_data['can_login'] != 1) selected @endif>No</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="pan">PAN Number</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="pan" name="PAN_Number" value="{{ $u_data['pan_number'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <!-- Termination Details -->
-                                    <h5 class="mt-4 mb-3 border-bottom pb-2">Termination Details (if applicable)</h5>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="termination_date">Termination Date</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
-                                                    </div>
-                                                    <input type="date" class="form-control" id="termination_date" name="Termination_Date" value="{{ $u_data['termination_date'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="termination_reason">Reason for Termination</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="termination_reason" name="Reason_Of_Termination" value="{{ $u_data['reason_of_termination'] ?? '' }}">
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="voter_id">Voter ID Number</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-vote-yea"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="voter_id" name="Voter_id_Number" maxlength="10" value="{{ $u_data['voter_id_number'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-
-                                    <div class="form-group row mt-4">
-                                        <div class="col-sm-12">
-                                            <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Update Personal Information</button>
-                                        </div>
+                                 </div>
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="ration_card">Ration Card Number <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-file-invoice"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="ration_card" name="Ration_Card_Number" maxlength="21" value="{{ $u_data['ration_card_number'] ?? '' }}">
+                                          </div>
+                                       </div>
                                     </div>
-                                </form>
-                            </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="gender">Gender</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="gender" name="Gender" value="{{ $u_data['gender'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="education">Education <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="education" name="Education" value="{{ $u_data['highest_qualification'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <!-- Address Information -->
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                       <div class="form-group">
+                                          <label for="current_address">Current Address</label>
+                                          <textarea class="form-control" id="current_address" name="Current_Address" rows="3">{{ $u_data['current_address'] ?? $u_data['address'] ?? '' }}</textarea>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                       <div class="form-group">
+                                          <label for="permanent_address">Permanent Address <span class="text-danger">*</span></label>
+                                          <textarea class="form-control" id="permanent_address" name="Parment_Addtess" rows="3">{{ $u_data['permanent_address'] ?? '' }}</textarea>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <!-- Employment Details -->
+                                 <h5 class="mt-4 mb-3 border-bottom pb-2">Employment Details</h5>
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="joining_date">Date of Joining <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-calendar-plus"></i></span>
+                                             </div>
+                                             <input type="date" class="form-control" id="joining_date" name="Joining_date" value="{{ $u_data['DOJ'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="salary">Salary <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="salary" name="Salary" required value="{{ $u_data['salary'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="department">Department</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                             </div>
+                                             <select class="form-control" id="department" name="Department_inputr" required>
+                                                <option value="0">Select Department</option>
+                                                @isset($Department_master)
+                                                @foreach ($Department_master as $dpm)
+                                                @if ($u_data['Department'] == $dpm->id)
+                                                <option value="{{$dpm->id}}" selected>{{$dpm->Department_name}}</option>
+                                                @else
+                                                <option value="{{$dpm->id}}">{{$dpm->Department_name}}</option>
+                                                @endif
+                                                @endforeach
+                                                @endisset
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="shift">Shift Name</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                             </div>
+                                             <select class="form-control" id="shift" name="Shift_Number" required>
+                                                <option value="0">Select Shift</option>
+                                                @isset($shift_master)
+                                                @foreach ($shift_master as $shift_m)
+                                                @if ($u_data['shift_time'] == $shift_m->id)
+                                                <option value="{{$shift_m->id}}" selected>{{$shift_m->Shift_Name}}</option>
+                                                @else
+                                                <option value="{{$shift_m->id}}">{{$shift_m->Shift_Name}}</option>
+                                                @endif
+                                                @endforeach
+                                                @endisset
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="employee_type">Employee Type <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                             </div>
+                                             <select class="form-control" id="employee_type" name="Employee_Type" required>
+                                                <option value="0">Select Employee Type</option>
+                                                @isset($employee_type_master)
+                                                @foreach ($employee_type_master as $employee_type)
+                                                @if ($u_data['employee_type'] == $employee_type->id)
+                                                <option value="{{$employee_type->id}}" selected>{{$employee_type->EmpTypeName}}</option>
+                                                @else
+                                                <option value="{{$employee_type->id}}">{{$employee_type->EmpTypeName}}</option>
+                                                @endif
+                                                @endforeach
+                                                @endisset
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="role">Role <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                             </div>
+                                             <select class="form-control" id="role" name="Role" required>
+                                                <option value="0">Select Employee Role</option>
+                                                @isset($role_masrer)
+                                                @foreach ($role_masrer as $role_m)
+                                                @if ($u_data['role'] == $role_m->id)
+                                                <option value="{{$role_m->id}}" selected>{{$role_m->roles}}</option>
+                                                @else
+                                                <option value="{{$role_m->id}}">{{$role_m->roles}}</option>
+                                                @endif
+                                                @endforeach
+                                                @endisset
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="row">
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="gate_off">Gate Off</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-door-open"></i></span>
+                                             </div>
+                                             <select class="form-control" id="gate_off" name="Gate_Off" required>
+                                                <option value="0">Select Gate Off</option>
+                                                <option value="1" @if ($u_data['Gate_Off'] == 1) selected @endif>Yes</option>
+                                                <option value="0" @if ($u_data['Gate_Off'] == 0) selected @endif>No</option>
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="form-group">
+                                          <label for="can_login">Login Enabled <span class="text-danger">*</span></label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-sign-in-alt"></i></span>
+                                             </div>
+                                             <select class="form-control" id="can_login" name="Can_Login" onchange="set_required()">
+                                                <option value="0">Select</option>
+                                                <option value="1" @if ($u_data['can_login'] == 1) selected @endif>Yes</option>
+                                                <option value="0" @if ($u_data['can_login'] != 1) selected @endif>No</option>
+                                             </select>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <!-- Termination Details -->
+                                 <h5 class="mt-4 mb-3 border-bottom pb-2">Termination Details (if applicable)</h5>
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                       <div class="form-group">
+                                          <label for="termination_date">Termination Date</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
+                                             </div>
+                                             <input type="date" class="form-control" id="termination_date" name="Termination_Date" value="{{ $u_data['termination_date'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                       <div class="form-group">
+                                          <label for="termination_reason">Reason for Termination</label>
+                                          <div class="input-group">
+                                             <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                             </div>
+                                             <input type="text" class="form-control" id="termination_reason" name="Reason_Of_Termination" value="{{ $u_data['reason_of_termination'] ?? '' }}">
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="form-group row mt-4">
+                                    <div class="col-sm-12">
+                                       <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Update Personal Information</button>
+                                    </div>
+                                 </div>
+                              </form>
+                           </div>
                         </div>
-
                         <!-- Profile Picture Section -->
                         <div class="card card-outline card-success mt-4">
-                            <div class="card-header">
-                                <h3 class="card-title">Profile Picture</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <form action="{{ route('update_Profile_image') }}" method="post" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="text" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}" hidden>
-                                    <div class="row">
-                                        <div class="col-md-4 text-center">
-                                            <img src="{{ asset('/storage/' . ($u_data['photo_name'] ?? 'employees/default-avatar.png')) }}"
-                                                 alt="Profile Image" class="img-fluid img-thumbnail" style="max-height: 200px;">
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label for="profile_image">Select Profile Image</label>
-                                                <div class="input-group">
-                                                    <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="profile_image" name="Front_path" accept="image/*">
-                                                        <label class="custom-file-label" for="profile_image">Choose file</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button type="submit" class="btn btn-success"><i class="fas fa-upload mr-1"></i>Update Profile Image</button>
-                                        </div>
+                           <div class="card-header">
+                              <h3 class="card-title">Profile Picture</h3>
+                              <div class="card-tools">
+                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                 <i class="fas fa-minus"></i>
+                                 </button>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <form action="{{ route('update_Profile_image') }}" method="post" enctype="multipart/form-data">
+                                 @csrf
+                                 <input type="text" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}" hidden>
+                                 <div class="row">
+                                    <div class="col-md-4 text-center">
+                                       <img src="{{ asset('/storage/' . ($u_data['photo_name'] ?? 'employees/default-avatar.png')) }}"
+                                          alt="Profile Image" class="img-fluid img-thumbnail" style="max-height: 200px;">
                                     </div>
-                                </form>
-                            </div>
+                                    <div class="col-md-8">
+                                       <div class="form-group">
+                                          <label for="profile_image">Select Profile Image</label>
+                                          <div class="input-group">
+                                             <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="profile_image" name="Front_path" accept="image/*">
+                                                <label class="custom-file-label" for="profile_image">Choose file</label>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <button type="submit" class="btn btn-success"><i class="fas fa-upload mr-1"></i>Update Profile Image</button>
+                                    </div>
+                                 </div>
+                              </form>
+                           </div>
                         </div>
-
                         <!-- Bank Information -->
                         <div class="card card-outline card-info mt-4">
-                            <div class="card-header">
-                                <h3 class="card-title">Bank Information</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-sm btn-success mb-3" onclick="openAddBankAccountModal()">
-                                    <i class="fas fa-plus mr-1"></i>Add Bank Account
-                                </button>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped" id="account_table">
-                                        <thead>
-                                            <tr>
-                                                <th>Account Holder Name</th>
-                                                <th>Account Number</th>
-                                                <th>Bank Name</th>
-                                                <th>IFSC Code</th>
-                                                <th width="15%">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Data will be loaded via AJAX -->
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Add Bank Account Modal -->
-                                <div class="modal fade" id="addBankAccountModal" tabindex="-1" role="dialog" aria-labelledby="addBankAccountModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="addBankAccountModalLabel">Add Bank Account</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <form action="{{route('form_request')}}" method="post">
-                                                @csrf
-                                                <div class="modal-body">
-                                                    <input type="text" name="form_type" value="Bank_Account" hidden>
-                                                    <input type="text" name="Employee_Id" value="<?php if(isset($u_data['Employee_id'])){ echo $u_data['Employee_id']; } ?>" hidden>
-
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="holderName">Account Holder Name*</label>
-                                                            <input type="text" class="form-control" id="holderName" name="Holder_Name" placeholder="Account Holder Name" required>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="bankName">Bank Name*</label>
-                                                            <input type="text" class="form-control" id="bankName" name="Bank_Name" placeholder="Bank Name" required>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="accountNumber">Account Number*</label>
-                                                            <input type="number" class="form-control" id="accountNumber" name="Account_Number" placeholder="Account Number" required>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="ifscCode">IFSC Code*</label>
-                                                            <input type="text" class="form-control" id="ifscCode" name="IFSC_Code" placeholder="IFSC Code" required>
-                                                        </div>
-                                                    </div>
+                           <div class="card-header">
+                              <h3 class="card-title">Bank Information</h3>
+                              <div class="card-tools">
+                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                 <i class="fas fa-minus"></i>
+                                 </button>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <button class="btn btn-sm btn-success mb-3" onclick="openAddBankAccountModal()">
+                              <i class="fas fa-plus mr-1"></i>Add Bank Account
+                              </button>
+                              <div class="table-responsive">
+                                 <table class="table table-bordered table-striped" id="account_table">
+                                    <thead>
+                                       <tr>
+                                          <th>Account Holder Name</th>
+                                          <th>Account Number</th>
+                                          <th>Bank Name</th>
+                                          <th>IFSC Code</th>
+                                          <th width="15%">Actions</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <!-- Data will be loaded via AJAX -->
+                                    </tbody>
+                                 </table>
+                              </div>
+                              <!-- Add Bank Account Modal -->
+                              <div class="modal fade" id="addBankAccountModal" tabindex="-1" role="dialog" aria-labelledby="addBankAccountModalLabel" aria-hidden="true">
+                                 <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                       <div class="modal-header">
+                                          <h5 class="modal-title" id="addBankAccountModalLabel">Add Bank Account</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                          </button>
+                                       </div>
+                                       <form action="{{route('form_request')}}" method="post">
+                                          @csrf
+                                          <div class="modal-body">
+                                             <input type="text" name="form_type" value="Bank_Account" hidden>
+                                             <input type="text" name="Employee_Id" value="<?php if(isset($u_data['Employee_id'])){ echo $u_data['Employee_id']; } ?>" hidden>
+                                             <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                   <label for="holderName">Account Holder Name*</label>
+                                                   <input type="text" class="form-control" id="holderName" name="Holder_Name" placeholder="Account Holder Name" required>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                <div class="form-group col-md-6">
+                                                   <label for="bankName">Bank Name*</label>
+                                                   <input type="text" class="form-control" id="bankName" name="Bank_Name" placeholder="Bank Name" required>
                                                 </div>
-                                            </form>
-                                        </div>
+                                             </div>
+                                             <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                   <label for="accountNumber">Account Number*</label>
+                                                   <input type="number" class="form-control" id="accountNumber" name="Account_Number" placeholder="Account Number" required>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                   <label for="ifscCode">IFSC Code*</label>
+                                                   <input type="text" class="form-control" id="ifscCode" name="IFSC_Code" placeholder="IFSC Code" required>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                             <button type="submit" class="btn btn-primary">Submit</button>
+                                          </div>
+                                       </form>
                                     </div>
-                                </div>
-
-                                <!-- Update Bank Account Modal -->
-                                <div class="modal fade" id="updateBankAccountModal" tabindex="-1" role="dialog" aria-labelledby="updateBankAccountModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="updateBankAccountModalLabel">Update Bank Account</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <form id="updateBankForm" method="post">
-                                                @csrf
-                                                <div class="modal-body">
-                                                    <input type="text" name="form_type" value="Update_Bank_Account" hidden>
-                                                    <input type="number" name="bank_account_input_id" id="bank_account_input_id" hidden>
-
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="updateHolderName">Account Holder Name*</label>
-                                                            <input type="text" class="form-control" id="Holder_Name_input" name="Holder_Name" placeholder="Account Holder Name" required>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="updateBankName">Bank Name*</label>
-                                                            <input type="text" class="form-control" id="Bank_Name_input" name="Bank_Name" placeholder="Bank Name" required>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="updateAccountNumber">Account Number*</label>
-                                                            <input type="number" class="form-control" id="Account_Number_input" name="Account_Number" placeholder="Account Number" required>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="updateIfscCode">IFSC Code*</label>
-                                                            <input type="text" class="form-control" id="IFSC_Code_input" name="IFSC_Code" placeholder="IFSC Code" required>
-                                                        </div>
-                                                    </div>
+                                 </div>
+                              </div>
+                              <!-- Update Bank Account Modal -->
+                              <div class="modal fade" id="updateBankModal" tabindex="-1" aria-labelledby="updateBankModalLabel" aria-hidden="true">
+                                 <div class="modal-dialog modal-lg">
+                                    <!-- modal-lg for wider form -->
+                                    <div class="modal-content">
+                                       <div class="modal-header">
+                                          <h5 class="modal-title" id="updateBankModalLabel">Update Bank Account</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                       </div>
+                                       <form method="post" id="Update_bank_form">
+                                          @csrf
+                                          <div class="modal-body">
+                                             <input type="hidden" name="form_type" value="Update_Bank_Account">
+                                             <input type="hidden" name="bank_account_input_id" id="bank_account_input_id">
+                                             <div class="row">
+                                                <div class="col-md-6">
+                                                   <div class="form-group">
+                                                      <label>Account Holder Name*</label>
+                                                      <input type="text" class="form-control" name="Holder_Name" id="Holder_Name_input" placeholder="Account Holder Name">
+                                                   </div>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                <div class="col-md-6">
+                                                   <div class="form-group">
+                                                      <label>Bank Name*</label>
+                                                      <input type="text" class="form-control" name="Bank_Name" id="Bank_Name_input" placeholder="Bank Name">
+                                                   </div>
                                                 </div>
-                                            </form>
-                                        </div>
+                                             </div>
+                                             <div class="row mt-3">
+                                                <div class="col-md-6">
+                                                   <div class="form-group">
+                                                      <label>Account Number*</label>
+                                                      <input type="number" class="form-control" name="Account_Number" id="Account_Number_input" placeholder="Account Number">
+                                                   </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                   <div class="form-group">
+                                                      <label>IFSC Code*</label>
+                                                      <input type="text" class="form-control" name="IFSC_Code" id="IFSC_Code_input" placeholder="IFSC Code">
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                             <button type="submit" id="update_account_form_btn" class="btn btn-success">Submit</button>
+                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                          </div>
+                                       </form>
                                     </div>
-                                </div>
-                            </div>
+                                 </div>
+                              </div>
+                           </div>
                         </div>
-
                         @if ($role == '1')
                         <!-- Emergency Contacts Section -->
                         <div class="card card-outline card-danger mt-4">
-                            <div class="card-header">
-                                <h3 class="card-title">Emergency Contacts</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-sm btn-success mb-3" onclick="open_Emergency_Contact_form()">
-                                    <i class="fas fa-plus mr-1"></i>Add Emergency Contact
-                                </button>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Relationship</th>
-                                                <th>Phone</th>
-                                                <th>Email</th>
-                                                <th width="15%">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="emergency_contacts_table">
-                                            <!-- Data will be loaded via AJAX -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-
-                    <!-- Employment Tab -->
-                    <div class="tab-pane" id="employment">
-                        @if ($role == '1')
-                        <!-- Work Experience Section -->
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Work Experience</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-sm btn-success mb-3" onclick="open_Work_Experience_form()">
-                                    <i class="fas fa-plus mr-1"></i>Add Work Experience
-                                </button>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Company</th>
-                                                <th>Position</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
-                                                <th>Description</th>
-                                                <th width="15%">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="work_experience_table">
-                                            <!-- Data will be loaded via AJAX -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Qualification Section -->
-                        <div class="card card-outline card-info mt-4">
-                            <div class="card-header">
-                                <h3 class="card-title">Qualifications</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-sm btn-success mb-3" onclick="open_Qualification_form()">
-                                    <i class="fas fa-plus mr-1"></i>Add Qualification
-                                </button>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Institution</th>
-                                                <th>Degree</th>
-                                                <th>Field of Study</th>
-                                                <th>Year</th>
-                                                <th width="15%">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="qualification_table">
-                                            <!-- Data will be loaded via AJAX -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                           <div class="card-header">
+                              <h3 class="card-title">Emergency Contacts</h3>
+                              <div class="card-tools">
+                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                 <i class="fas fa-minus"></i>
+                                 </button>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <button class="btn btn-sm btn-success mb-3" onclick="open_Emergency_Contact_form()">
+                              <i class="fas fa-plus mr-1"></i>Add Emergency Contact
+                              </button>
+                              <div class="table-responsive">
+                                 <table class="table table-bordered table-striped">
+                                    <thead>
+                                       <tr>
+                                          <th>Name</th>
+                                          <th>Relationship</th>
+                                          <th>Phone</th>
+                                          <th>Email</th>
+                                          <th width="15%">Actions</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody id="emergency_contacts_table">
+                                       <!-- Data will be loaded via AJAX -->
+                                    </tbody>
+                                 </table>
+                              </div>
+                           </div>
                         </div>
                         @endif
                     </div>
 
                     <!-- Salary Tab -->
-                    <div class="tab-pane" id="salary">
+                    <div class="tab-pane" id="set-salary">
                         <div class="row">
                             <div class="col-md-12">
                                 <!-- Salary Card -->
@@ -741,6 +658,7 @@
                                                     <table class="table table-bordered table-striped" id="basic_salary_table">
                                                         <thead>
                                                             <tr>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
                                                                 <th>Month-Year</th>
                                                                 <th>Payslip Type</th>
                                                                 <th>₹ Basic Salary</th>
@@ -763,6 +681,7 @@
                                                     <table class="table table-bordered table-striped" id="allowances_table">
                                                         <thead>
                                                             <tr>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
                                                                 <th>Month-Year</th>
                                                                 <th>Allowance Title</th>
                                                                 <th>₹ Amount</th>
@@ -785,6 +704,7 @@
                                                     <table class="table table-bordered table-striped" id="deductions_table">
                                                         <thead>
                                                             <tr>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
                                                                 <th>Month-Year</th>
                                                                 <th>Deduction Title</th>
                                                                 <th>₹ Amount</th>
@@ -800,17 +720,20 @@
 
                                             <!-- Advances Tab -->
                                             <div class="tab-pane fade" id="nav-loan" role="tabpanel">
-                                                <button class="btn btn-sm btn-success mb-3" onclick="open_Loan_form()">
+                                                <button class="btn btn-sm btn-success mb-3" onclick="open_loan_form()">
                                                     <i class="fas fa-plus mr-1"></i>Add Advance
                                                 </button>
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped" id="loan_table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Month-Year</th>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
                                                                 <th>Advance Title</th>
+                                                                <th>Month-Year</th>
+                                                                <th>Reason</th>
+                                                                <th>Number of installment</th>
                                                                 <th>₹ Amount</th>
-                                                                <th>Status</th>
+                                                                <th>₹ Remaining</th>
                                                                 <th width="15%">Actions</th>
                                                             </tr>
                                                         </thead>
@@ -831,6 +754,7 @@
                                                     <table class="table table-bordered table-striped" id="other_payments_table">
                                                         <thead>
                                                             <tr>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
                                                                 <th>Month-Year</th>
                                                                 <th>Payment Title</th>
                                                                 <th>₹ Amount</th>
@@ -846,14 +770,16 @@
 
                                             <!-- Overtime Tab -->
                                             <div class="tab-pane fade" id="nav-overtime" role="tabpanel">
-                                                <button class="btn btn-sm btn-success mb-3" onclick="open_Overtime_form()">
+                                                <button class="btn btn-sm btn-success mb-3" onclick="open_overtime_form()">
                                                     <i class="fas fa-plus mr-1"></i>Add Overtime
                                                 </button>
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped" id="overtime_table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Date</th>
+                                                                <th><input type="checkbox" name="delet_data" id=""></th>
+                                                                <th>Month-Year</th>
+                                                                <th>Title</th>
                                                                 <th>Hours</th>
                                                                 <th>Rate (₹/hour)</th>
                                                                 <th>Total Amount</th>
@@ -1177,6 +1103,9 @@
 @stop
 
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
 <script>
     $(function () {
         // Initialize date picker
@@ -1207,6 +1136,14 @@
             $('#attendance-year-filter').val('');
             $('#attendance-status-filter').val('');
             loadAttendanceData();
+        });
+    });
+
+    $(document).ready(function() {
+        // Initialize tabs
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href"); // activated tab
+            console.log('Shown tab: ' + target);
         });
     });
 
@@ -1247,22 +1184,64 @@
         $('#addBankAccountModal').modal('show');
     }
 
-    // Functions for handling bank account forms
-    function close_Bank_Account_form() {
-        document.getElementById("Bank_Account_form_div").style.display = "none";
+    function open_Update_bank_form(id, name, bank, acc_number, ifsc) {
+        console.log("Editing bank account:", { id, name, bank, acc_number, ifsc });
+        console.log("Opening modal with data:");
+        console.log("ID:", id);
+        console.log("Holder Name:", name);
+        console.log("Bank Name:", bank);
+        console.log("Account Number:", acc_number);
+        console.log("IFSC Code:", ifsc);
+
+        $('#bank_account_input_id').val(id);
+        $('#Holder_Name_input').val(name);
+        $('#Bank_Name_input').val(bank);
+        $('#Account_Number_input').val(acc_number);
+        $('#IFSC_Code_input').val(ifsc);
+
+        console.log("Attempting to open modal...");
+
+        $('#updateBankModal').modal('show'); // Bootstrap modal
     }
 
-    function open_Bank_Account_form() {
-        document.getElementById("Bank_Account_form_div").style.display = "flex";
-    }
+    $(document).ready(function() {
+        $('#update_account_form_btn').on('click', function(event) {
+            event.preventDefault();
 
-    function close_update_Bank_Account_form() {
-        document.getElementById("update_Bank_Account_form_div").style.display = "none";
-    }
+            var formData = $('#Update_bank_form').serialize();
 
-    function open_update_Bank_Account_form() {
-        document.getElementById("update_Bank_Account_form_div").style.display = "flex";
-    }
+            $.ajax({
+                url: "{{ route('update_bank_account') }}",
+                method: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    $('#Update_bank_form')[0].reset();
+                    $('#updateBankModal').modal('hide');
+
+                    load_bank_data("{{ url('bank_account_api/' . $u_data['Employee_id']) }}");
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: xhr.responseJSON?.message || 'Something went wrong.',
+                    });
+                }
+            });
+        });
+    });
+
 
     // Function to open the Update Bank Account modal
     function openUpdateBankAccountModal(id) {
@@ -1318,8 +1297,10 @@
     });
 }
 
+    // Load bank data on page load
+    load_bank_data("{{ url('bank_account_api/' . $u_data['Employee_id']) }}");
+
     function load_bank_data(url_input) {
-        // Show loading animation if available
         if (typeof show_animation === 'function') {
             show_animation();
         }
@@ -1334,36 +1315,57 @@
             success: function(response) {
                 console.log("Response:", response);
 
-                var all_data = response.data;
-                var tableBody = "";
+                let all_data = response.data;
+                let table_html = `
+                    <thead>
+                        <tr>
+                            <th>Account Holder Name</th>
+                            <th>Account Number</th>
+                            <th>Bank Name</th>
+                            <th>IFSC Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
 
-                all_data.forEach(function(account) {
-                    tableBody += `<tr>
-                        <td>${account.Account_Holder_Name}</td>
-                        <td>${account.Account_Number}</td>
-                        <td>${account.Bank_Name}</td>
-                        <td>${account.IFSC_Code}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="openUpdateBankAccountModal('${account.id}')">
-                                <i class="fas fa-pencil-alt mr-1"></i> Edit
-                            </button>
-                            <a href="{{url('/delete')}}/${account.id}/accounts" class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash mr-1"></i> Delete
-                            </a>
-                        </td>
-                    </tr>`;
+                all_data.forEach(function(acc) {
+                    table_html += `
+                        <tr>
+                            <td>${acc.Account_Holder_Name}</td>
+                            <td>${acc.Account_Number}</td>
+                            <td>${acc.Bank_Name}</td>
+                            <td>${acc.IFSC_Code}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                    onclick="open_Update_bank_form(
+                                        \`${acc.id}\`,
+                                        \`${acc.Account_Holder_Name}\`,
+                                        \`${acc.Bank_Name}\`,
+                                        \`${acc.Account_Number}\`,
+                                        \`${acc.IFSC_Code}\`
+                                    )">
+                                    <i class="fas fa-pencil-alt"></i> Edit
+                                </button>
+
+
+                                <a href="{{url('/delete')}}/${acc.id}/accounts" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>`;
                 });
 
-                $("#account_table tbody").html(tableBody);
+                table_html += `</tbody>`;
 
-                // Hide loading animation if available
+                $("#account_table").html(table_html);
+
                 if (typeof hide_animation === 'function') {
                     hide_animation();
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
-                // Hide loading animation if available
                 if (typeof hide_animation === 'function') {
                     hide_animation();
                 }
@@ -1376,52 +1378,309 @@
         $('#bankAccountModal').modal('show');
     }
 
-    function open_Basic_Salary_form() {
-        $('#basicSalaryModal').modal('show');
+    $(document).ready(function() {
+        load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_basic_salary_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input,  // API endpoint URL
+            type: "GET",  // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response);  // Handle the successful response here
+                $("#basic_salary_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($salary => {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$salary.month} ${$salary.year}</td>
+                            <td>${$salary.Payslip_Type}</td>
+                            <td>${$salary.Basic_Salary}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="basic_salary_view('${$salary.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="open_basic_salary_update_form('${$salary.id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <a href="{{url('/delete')}}/${$salary.id}/basic_salary" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#basic_salary_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);  // Handle the error here
+                hide_animation();
+            }
+        });
     }
 
-    function open_Allowance_form() {
-        $('#allowanceModal').modal('show');
+    $(document).ready(function() {
+        load_allowances_data("{{url('allowances_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_allowances_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response); // Log the successful response
+                $("#allowances_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($allowance => {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$allowance.Month} ${$allowance.year}</td>
+                            <td>${$allowance.Alloweance_Titel}</td>
+                            <td>${$allowance.Allowance_Ammount_in_INR}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="Allowances_view('${$allowance.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Allowance_form('${$allowance.id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <a href="{{url('/delete')}}/${$allowance.id}/alloweance" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#allowances_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+                hide_animation();
+            }
+        });
     }
 
-    function open_leave_form() {
-        $('#leaveModal').modal('show');
+    $(document).ready(function() {
+        load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_deductions_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response); // Log the successful response
+                $("#deductions_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($deduction => {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$deduction.Month}</td>
+                            <td>${$deduction.deduction_Titel}</td>
+                            <td>${$deduction.deduction_Amount_in_INR}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <a href="{{url('/delete')}}/${$deduction.id}/deductions" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#deductions_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+                hide_animation();
+            }
+        });
     }
 
-    function open_Attendance_form() {
-        $('#attendanceModal').modal('show');
+    $(document).ready(function() {
+        load_loan_data("{{url('loan_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_loan_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response); // Log the successful response
+                $("#loan_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($loan => {
+                    const inputDate = $loan.Month;
+                    const date = new Date(inputDate);
+                    const options = { year: 'numeric', month: 'long' };
+                    const formattedDate = date.toLocaleDateString('en-US', options);
+
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$loan.Title}</td>
+                            <td>${formattedDate}</td>
+                            <td>${$loan.Reason}</td>
+                            <td>${$loan.Number_of_installment}</td>
+                            <td>${$loan.Loan_Amount_in_INR}</td>
+                            <td>${$loan.Loan_Remaining}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="loan_view('${$loan.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Loan_form('${$loan.Loan_id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <a href="{{url('/delete')}}/${$loan.id}/loan" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#loan_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+                hide_animation();
+            }
+        });
     }
 
-    function open_Deduction_form() {
-        $('#deductionModal').modal('show');
+    $(document).ready(function() {
+        load_other_payments_data("{{url('other_payments_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_other_payments_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response); // Log the successful response
+                $("#other_payments_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($payment => {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$payment.Month} ${$payment.Year}</td>
+                            <td>${$payment.Titel}</td>
+                            <td>${$payment.Amount_in_INR}</td>
+                            <td>
+                                <a href="{{url('/other-payments')}}/${$payment.id}" class="btn btn-sm btn-info">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                                <a href="{{url('/edit-other-payments')}}/${$payment.id}" class="btn btn-sm btn-primary">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </a>
+                                <a href="{{url('/delete')}}/${$payment.id}/other_payments" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#other_payments_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+                hide_animation();
+            }
+        });
     }
 
-    function open_Loan_form() {
-        $('#loanModal').modal('show');
+    $(document).ready(function() {
+        load_overtime_data("{{url('overtime_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
+
+    function load_overtime_data(url_input) {
+        show_animation();
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response); // Log the successful response
+                $("#overtime_table tbody").empty();
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($overtime => {
+                    var row = `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$overtime.Month} ${$overtime.Year}</td>
+                            <td>${$overtime.Titel}</td>
+                            <td>${$overtime.Total_Hours}</td>
+                            <td>${$overtime.Rate}</td>
+                            <td>${$overtime.Rate * $overtime.Total_Hours}</td>
+                            <td>
+                                <a href="{{url('/over-time')}}/${$overtime.id}" class="btn btn-sm btn-info">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                                <a href="{{url('/edit-over-time')}}/${$overtime.id}" class="btn btn-sm btn-primary">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </a>
+                                <a href="{{url('/delete')}}/${$overtime.id}/overtime" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+                    $("#overtime_table tbody").append(row);
+                });
+                hide_animation();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+                hide_animation();
+            }
+        });
     }
 
-    function open_Other_Payment_form() {
-        $('#otherPaymentModal').modal('show');
-    }
-
-    function open_Overtime_form() {
-        $('#overtimeModal').modal('show');
-    }
-
-    function open_Emergency_Contact_form() {
-        $('#emergencyContactModal').modal('show');
-    }
-
-    function open_Document_form() {
-        $('#documentModal').modal('show');
-    }
-
-    function open_Qualification_form() {
-        $('#qualificationModal').modal('show');
-    }
-
-    function open_Work_Experience_form() {
-        $('#workExperienceModal').modal('show');
-    }
 </script>
 @stop

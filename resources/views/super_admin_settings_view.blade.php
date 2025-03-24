@@ -69,34 +69,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Admin</td>
-                                <td>
-                                    <i class="fas fa-trash text-danger delete-role" data-role="Admin" title="Delete"></i>
-                                    <i class="fas fa-edit text-primary ml-2 edit-role" data-role="Admin" title="Edit"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>HR</td>
-                                <td>
-                                    <i class="fas fa-trash text-danger delete-role" data-role="HR" title="Delete"></i>
-                                    <i class="fas fa-edit text-primary ml-2 edit-role" data-role="HR" title="Edit"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Guard</td>
-                                <td>
-                                    <i class="fas fa-trash text-danger delete-role" data-role="Guard" title="Delete"></i>
-                                    <i class="fas fa-edit text-primary ml-2 edit-role" data-role="Guard" title="Edit"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Employee</td>
-                                <td>
-                                    <i class="fas fa-trash text-danger delete-role" data-role="Employee" title="Delete"></i>
-                                    <i class="fas fa-edit text-primary ml-2 edit-role" data-role="Employee" title="Edit"></i>
-                                </td>
-                            </tr>
+                            @foreach ($role_masrer as $role_m)
+                                @if ($role_m->roles =='Super admin')
+                                @else
+                                <tr>
+                                    <td>{{$role_m->roles}}</td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="text-danger delete-role"
+                                        onclick="confirmDelete('{{$role_m->id}}')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" class="text-primary ml-2 edit-role"
+                                        data-id="{{$role_m->id}}" data-role="{{$role_m->roles}}" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                @endif
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -110,7 +100,7 @@
                     <span>Shift Management</span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped">
                         <thead class="thead-dark">
                             <tr>
                                 <th>Shift Name</th>
@@ -123,47 +113,32 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($shift_master as $Shift_m)
                             <tr>
-                                <td>Day Shift</td>
-                                <td>09:00:00</td>
-                                <td>17:30:00</td>
-                                <td>13:00:00</td>
-                                <td>13:30:00</td>
-                                <td>8.5</td>
+                                <td>{{ $Shift_m->Shift_Name }}</td>
+                                <td>{{ $Shift_m->Shift_Start_Time }}</td>
+                                <td>{{ $Shift_m->Shift_End_Time }}</td>
+                                <td>{{ $Shift_m->Lunch_Start_Time }}</td>
+                                <td>{{ $Shift_m->Lunch_end_Time }}</td>
+                                <td>{{ $Shift_m->Shift_hours }}</td>
                                 <td>
-                                <button class="btn btn-sm btn-danger delete-shift" data-toggle="modal" data-target="#deleteShiftModal">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn btn-sm btn-primary edit-shift">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-
+                                    <a href="{{ url('/delete-shift') }}/{{ $Shift_m->id }}" class="btn btn-sm btn-danger delete-shift">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-primary btn-sm edit-shift-btn"
+                                        data-id="{{ $Shift_m->id }}"
+                                        data-name="{{ $Shift_m->Shift_Name }}"
+                                        data-start="{{ $Shift_m->Shift_Start_Time }}"
+                                        data-end="{{ $Shift_m->Shift_End_Time }}"
+                                        data-lunch-start="{{ $Shift_m->Lunch_Start_Time }}"
+                                        data-lunch-end="{{ $Shift_m->Lunch_end_Time }}"
+                                        data-hours="{{ $Shift_m->Shift_hours }}"
+                                        data-eligible-ot="{{ $Shift_m->Eligible_for_OverTime ?? 0 }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Morning</td>
-                                <td>04:00:00</td>
-                                <td>08:00:00</td>
-                                <td>08:30:00</td>
-                                <td>12:30:00</td>
-                                <td>8.5</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger delete-shift"><i class="fas fa-trash"></i></button>
-                                    <button class="btn btn-sm btn-primary edit-shift"><i class="fas fa-edit"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>General Shift</td>
-                                <td>21:16:00</td>
-                                <td>17:16:00</td>
-                                <td>13:00:00</td>
-                                <td>17:17:00</td>
-                                <td>20</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger delete-shift"><i class="fas fa-trash"></i></button>
-                                    <button class="btn btn-sm btn-primary edit-shift"><i class="fas fa-edit"></i></button>
-                                </td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -178,8 +153,8 @@
                     <span>Employee Type</span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Employee Type</th>
                                 <th>Daily Wages</th>
@@ -188,25 +163,27 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($employee_type_master as $emp_m)
                             <tr>
-                                <td>Casual</td>
-                                <td>Yes</td>
-                                <td>Yes</td>
+                                <td>{{ $emp_m->EmpTypeName }}</td>
+                                <td>{{ $emp_m->Daily_Wages }}</td>
+                                <td>{{ $emp_m->Eligible_for_OverTime == 1 ? 'Yes' : 'No' }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-primary edit-employee-type" data-toggle="modal" data-target="#updateEmployeeTypeModal">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-employee-type" data-toggle="modal" data-target="#deleteEmployeeTypeModal">
+                                    <a href="{{ url('/delete-employee-type/' . $emp_m->id) }}" class="btn btn-sm btn-danger delete-employee-type" title="Delete">
                                         <i class="fas fa-trash"></i>
-                                    </button>
+                                    </a>
+                                    <a href="{{ url('/edit-employee-type/' . $emp_m->id) }}" class="btn btn-sm btn-primary edit-employee-type ml-1" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
-                            <!-- Repeat rows dynamically -->
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
 
         <!-- Department Master Tab -->
         <div id="department" class="tab-pane fade mt-3">
@@ -215,41 +192,48 @@
                     <span>Department Master</span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($depatrment_master as $Department_array)
                             <tr>
-                                <td>Maintenance</td>
+                                <td>{{ $Department_array->Department_name }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-primary edit-department" data-toggle="modal" data-target="#updateDepartmentModal">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-department" data-toggle="modal" data-target="#deleteDepartmentModal">
+                                    <a href="{{ url('/delete-department-type/' . $Department_array->id) }}"
+                                       class="btn btn-sm btn-danger delete-department"
+                                       title="Delete">
                                         <i class="fas fa-trash"></i>
-                                    </button>
+                                    </a>
+                                    <a href="javascript:void(0);"
+                                       onclick="open_department_type_master_form('{{ $Department_array->id }}')"
+                                       class="btn btn-sm btn-primary edit-department ml-1"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
-                            <!-- Repeat rows dynamically for other departments -->
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+
         <!-- Leave Master Tab -->
         <div id="leaveMaster" class="tab-pane fade mt-3">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title">Leave Master</h3>
+                    <h5 class="card-title mb-0">Leave Master</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Leave Type</th>
                                 <th>Short Name</th>
@@ -259,31 +243,38 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($leave_type_master as $lm)
                             <tr>
-                                <td>Sick Leave</td>
-                                <td>SL</td>
-                                <td>Paid</td>
-                                <td><span class="badge" style="background-color: #d22d2d;">#d22d2d</span></td>
+                                <td>{{ $lm->Name }}</td>
+                                <td>{{ $lm->Short_Name }}</td>
+                                <td>{{ $lm->Payment_Status }}</td>
                                 <td>
-                                    <a href="#" class="text-danger delete-btn"><i class="fas fa-trash"></i></a>
-                                    <a href="#" class="text-primary ml-2 edit-btn" data-toggle="modal" data-target="#editLeaveModal"><i class="fas fa-edit"></i></a>
+                                    <span class="badge rounded-pill" style="background-color: {{ $lm->Color }};">
+                                        &nbsp;&nbsp;&nbsp;
+                                    </span>
+                                    <span class="ml-1">{{ $lm->Color }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ url('/delete-Leave-Master-Form/' . $lm->id) }}"
+                                       class="btn btn-sm btn-danger delete-btn"
+                                       title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    <a href="javascript:void(0);"
+                                       onclick="open_leave_type_master_form({{ $lm->id }})"
+                                       class="btn btn-sm btn-primary edit-btn ml-1"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Casual Leave</td>
-                                <td>CL</td>
-                                <td>Unpaid</td>
-                                <td><span class="badge" style="background-color: #ff00d0;">#ff00d0</span></td>
-                                <td>
-                                    <a href="#" class="text-danger delete-btn"><i class="fas fa-trash"></i></a>
-                                    <a href="#" class="text-primary ml-2 edit-btn" data-toggle="modal" data-target="#editLeaveModal"><i class="fas fa-edit"></i></a>
-                                </td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -536,15 +527,6 @@
                         <label for="dailyWages">Daily Wages*</label>
                         <input type="number" class="form-control" id="dailyWages" placeholder="Enter Daily Wages" required>
                     </div>
-                    <!-- Eligible for Overtime -->
-                    <div class="form-group">
-                        <label for="overtimeEligibility">Eligible for Overtime*</label>
-                        <select class="form-control" id="overtimeEligibility" required>
-                            <option value="">Select Eligibility</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
                     <!-- Submit Button -->
                     <div class="text-right">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -555,26 +537,24 @@
     </div>
 </div>
 
-<!-- Edit Role Modal -->
-<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleLabel" aria-hidden="true">
+<!-- Role Edit Modal -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Role</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title" id="editRoleModalLabel">Update Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
             </div>
             <div class="modal-body">
-                <form id="editRoleForm">
-                    <div class="form-group">
-                        <label>Select Role</label>
-                        <select class="form-control" id="editRoleDropdown">
-                            <option value="Admin">Admin</option>
-                            <option value="HR">HR</option>
-                            <option value="Guard">Guard</option>
-                            <option value="Employee">Employee</option>
-                        </select>
+                <form id="updateRoleForm" method="POST">
+                    @csrf
+                    <input type="hidden" id="role_id" name="id">
+                    <div class="form-group mb-3">
+                        <label for="role">Role*</label>
+                        <input type="text" class="form-control" id="role_input" name="role_inp" required>
                     </div>
-                    <div class="text-right">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form>
@@ -583,7 +563,7 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Role Modal -->
 <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -601,6 +581,79 @@
         </div>
     </div>
 </div>
+
+<!-- Update Shift Modal -->
+<div id="updateShiftModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Shift</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="updateShiftForm">
+                    @csrf
+                    <input type="hidden" name="id" id="shiftId">
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Shift Name*</label>
+                                <input type="text" name="Shift_Name" id="shiftName" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Shift Start Time*</label>
+                                <input type="time" name="Shift_Start_Time" id="shiftStartTime" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Shift End Time*</label>
+                                <input type="time" name="Shift_End_Time" id="shiftEndTime" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Lunch Start Time*</label>
+                                <input type="time" name="Lunch_Start_Time" id="lunchStartTime" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Lunch End Time*</label>
+                                <input type="time" name="Lunch_end_Time" id="lunchEndTime" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Shift Hours*</label>
+                                <input type="number" step="0.01" name="Shift_hours" id="shiftHours" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Eligible for OverTime</label>
+                                <select name="Eligible_for_OverTime" id="Eligible_for_OverTime" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Shift</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Delete Shift Modal -->
 <div id="deleteShiftModal" class="modal fade" tabindex="-1" role="dialog">
@@ -654,63 +707,6 @@
                         <input type="color" class="form-control" value="#d22d2d">
                     </div>
                     <button type="button" class="btn btn-primary btn-block">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Update Shift Modal -->
-<div id="updateShiftModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Shift</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="updateShiftForm">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Shift Name*</label>
-                                <input type="text" id="shiftName" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Shift Start Time*</label>
-                                <input type="time" id="shiftStartTime" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Shift End Time*</label>
-                                <input type="time" id="shiftEndTime" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Lunch Start Time*</label>
-                                <input type="time" id="lunchStartTime" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Lunch End Time*</label>
-                                <input type="time" id="lunchEndTime" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Shift Hours*</label>
-                                <input type="number" id="shiftHours" class="form-control" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">Update Shift</button>
-                    </div>
                 </form>
             </div>
         </div>
@@ -831,39 +827,158 @@
 
 @section('js')
 <script>
-    $(document).ready(function() {
-        $('.delete-btn').click(function(e) {
-            e.preventDefault();
-            alert("Delete action triggered!");
+    $(document).ready(function () {
+    // Delete button alert
+    $('.delete-btn').click(function (e) {
+        e.preventDefault();
+        alert("Delete action triggered!");
+    });
+
+    // Edit leave modal
+    $('.edit-btn').click(function () {
+        $('#editLeaveModal').modal('show');
+    });
+
+    // Initialize Bootstrap tabs
+    $('#adminTabs a').on('click', function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+
+    // Listen for clicks on edit-role links
+    $(document).on('click', '.edit-role', function () {
+        const roleId = $(this).data('id');
+        const roleName = $(this).data('role');
+
+        $('#role_id').val(roleId);
+        $('#role_input').val(roleName);
+        $('#editRoleModal').modal('show');
+    });
+
+    // Handle form submission via AJAX
+    $('#updateRoleForm').submit(function (e) {
+        e.preventDefault();
+
+        const formData = $(this).serialize();
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
         });
 
-        $('.edit-btn').click(function() {
-            $('#editLeaveModal').modal('show');
-        });
+        $.ajax({
+            url: '/edit-role',
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                // Evaluate returned <script> tags from controller
+                var temp = document.createElement('div');
+                temp.innerHTML = response;
 
-        // Open Edit Role Modal with preselected role
-        $(".edit-role").click(function() {
-            let roleName = $(this).data("role");
-            $("#editRoleDropdown").val(roleName); // Set selected value
-            $("#editRoleModal").modal("show");
-        });
-
-        // Delete Role Modal
-        $(".delete-role").click(function() {
-            let roleName = $(this).data("role");
-            $("#roleToDelete").text(roleName);
-            $("#deleteRoleModal").modal("show");
-        });
-
-        // Confirm Delete
-        $("#confirmDelete").click(function() {
-            alert("Role deleted successfully!");
-            $("#deleteRoleModal").modal("hide");
-        });
-
-        $('.edit-shift').click(function() {
-            $('#updateShiftModal').modal('show');
+                var scripts = temp.getElementsByTagName('script');
+                for (var i = 0; i < scripts.length; i++) {
+                    eval(scripts[i].innerText);
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    alert('You do not have permission to edit roles');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            }
         });
     });
+
+});
+
+// Confirm delete function
+function confirmDelete(id) {
+    document.getElementById('confirmDelete').href = "{{url('/delete-role')}}/" + id;
+    var modal = new bootstrap.Modal(document.getElementById('deleteRoleModal'));
+    modal.show();
+}
+
+    // Store the values globally when edit button is clicked
+var shiftData = {};
+
+$(document).on('click', '.edit-shift-btn', function(e) {
+    e.preventDefault();
+
+    // Store all data in the global variable
+    shiftData = {
+        id: $(this).data('id'),
+        name: $(this).data('name'),
+        startTime: $(this).data('start'),
+        endTime: $(this).data('end'),
+        lunchStart: $(this).data('lunch-start'),
+        lunchEnd: $(this).data('lunch-end'),
+        hours: $(this).data('hours'),
+    };
+
+    console.log("Data captured:", shiftData);
+
+    // Immediately populate form fields before showing the modal
+    $('#shiftId').val(shiftData.id);
+    $('#shiftName').val(shiftData.name);
+    $('#shiftStartTime').val(shiftData.startTime);
+    $('#shiftEndTime').val(shiftData.endTime);
+    $('#lunchStartTime').val(shiftData.lunchStart);
+    $('#lunchEndTime').val(shiftData.lunchEnd);
+    $('#shiftHours').val(shiftData.hours);
+
+    // Then show the modal
+    $('#updateShiftModal').modal('show');
+});
+
+// Additional check after modal is shown to ensure data is properly set
+$('#updateShiftModal').on('shown.bs.modal', function () {
+    console.log("Modal shown, confirming data is set correctly:");
+
+    // Double-check that form fields are populated
+    if (!$('#shiftName').val()) {
+        console.log("Re-setting form fields as they appear empty");
+        $('#shiftId').val(shiftData.id);
+        $('#shiftName').val(shiftData.name);
+        $('#shiftStartTime').val(shiftData.startTime);
+        $('#shiftEndTime').val(shiftData.endTime);
+        $('#lunchStartTime').val(shiftData.lunchStart);
+        $('#lunchEndTime').val(shiftData.lunchEnd);
+        $('#shiftHours').val(shiftData.hours);
+    }
+
+    console.log("Final values after modal shown:");
+    console.log("shiftId:", $('#shiftId').val());
+    console.log("shiftName:", $('#shiftName').val());
+});
+
+// Form submission handler remains the same
+$('#updateShiftForm').submit(function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        url: "{{ route('update_shift') }}",
+        type: "POST",
+        data: $(this).serialize(),
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response.success) {
+                alert('Shift updated successfully!');
+                $('#updateShiftModal').modal('hide');
+                location.reload();
+            } else {
+                alert(response.message || 'Failed to update shift');
+            }
+        },
+        error: function(xhr) {
+            alert('Error updating shift. Please try again.');
+            console.log(xhr.responseText);
+        }
+    });
+});
+
 </script>
 @stop
