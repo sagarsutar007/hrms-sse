@@ -28,7 +28,7 @@
                     <h3>P:{{$Present_number}} A:{{$Absent_number}}</h3>
                     <p>Attendance</p>
                 </div>
-                <a href="{{url('all-attendance')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="{{url('attendance-records')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -76,28 +76,14 @@
                             <th>On Leave</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Day Shift</td>
-                            <td>21</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Morning</td>
-                            <td>1</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
+                    <tbody id="shift_wise_body">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
 
     <!-- Employee Type Wise -->
     <div class="col-md-6">
@@ -117,44 +103,14 @@
                             <th>On Leave</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Casual</td>
-                            <td>9</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Daily Wages</td>
-                            <td>1</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Full Time</td>
-                            <td>7</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Staff</td>
-                            <td>5</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
+                    <tbody id="employeeTypeResult">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
 
     <!-- Late Comers -->
     <div class="col-md-6">
@@ -163,7 +119,7 @@
                 <h3 class="card-title">Late Comers</h3>
             </div>
             <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered" id="Late_commer_data_table">
                     <thead>
                         <tr>
                             <th>Employee ID</th>
@@ -183,6 +139,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- OT Hrs Department Wise -->
     <div class="col-md-6">
@@ -210,13 +167,13 @@
     </div>
 
     <!-- Absent List -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-dark text-white">
                 <h3 class="card-title">Absent List</h3>
             </div>
             <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered" id="absent_list_table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -226,27 +183,16 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Aadarsh Namdev</td>
-                            <td>18</td>
-                            <td>Day Shift</td>
-                        </tr>
-                        <tr>
-                            <td>Afraan Khatton</td>
-                            <td>4</td>
-                            <td>Day Shift</td>
-                        </tr>
-                        <tr>
-                            <td>...</td>
-                            <td>...</td>
-                            <td>...</td>
+                            <td colspan="3" class="text-center">Loading...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
     <!-- Top 10 Present List -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-dark text-white">
                 <h3 class="card-title">Top 10 Present List</h3>
@@ -259,17 +205,42 @@
                             <th>Present</th>
                         </tr>
                     </thead>
+                    <tbody id="present_list_body">
+                        <tr><td colspan="2" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Default Absent List -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h3 class="card-title">Default Absent</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered" id="default_absent_table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>John Doe</td><td>10</td></tr>
-                        <tr><td>Jane Smith</td><td>9</td></tr>
-                        <tr><td>Raj Patel</td><td>8</td></tr>
-                        <tr><td>...</td><td>...</td></tr> <!-- Add real data -->
+                        <tr>
+                            <td colspan="2" class="text-center">Loading...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <!-- Pie Charts for Employee Types -->
 <div class="row">
@@ -346,7 +317,256 @@
     createPieChart('fullTimeChart', 0, 0, 0, 7);
     createPieChart('staffChart', 0, 0, 0, 5);
 
+    function Late_commer_data_function(apiUrl) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response);
 
+                const $tbody = $("#Late_commer_data_table tbody");
+                $tbody.empty(); // Clear previous data
+
+                if (response.length === 0) {
+                    $tbody.html('<tr><td colspan="6" class="text-center">No Data Available</td></tr>');
+                    return;
+                }
+
+                response.forEach(record => {
+                    const {
+                        Department,
+                        EmpTypeName,
+                        Shift_Name,
+                        f_name,
+                        m_name,
+                        l_name,
+                        Employee_id,
+                        in_time
+                    } = record;
+
+                    const row = `
+                        <tr>
+                            <td>${Employee_id}</td>
+                            <td>${f_name || ""} ${m_name || ""} ${l_name || ""}</td>
+                            <td>${in_time}</td>
+                            <td>${EmpTypeName}</td>
+                            <td>${Shift_Name}</td>
+                            <td>${Department}</td>
+                        </tr>
+                    `;
+
+                    $tbody.append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    absent_list('{{url("/absent-employee-list/")}}')
+    function absent_list(apiUrl) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response: absent", response);
+
+                const $tbody = $("#absent_list_table tbody");
+                $tbody.empty(); // Clear existing rows
+
+                if (!response.data || response.data.length === 0) {
+                    $tbody.html('<tr><td colspan="3" class="text-center">No Data Available</td></tr>');
+                    return;
+                }
+
+                response.data.forEach(record => {
+                    const { Shift_name, name, EmployeeID } = record;
+
+                    const row = `
+                        <tr>
+                            <td>${name}</td>
+                            <td>${EmployeeID}</td>
+                            <td>${Shift_name}</td>
+                        </tr>
+                    `;
+                    $tbody.append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                $("#absent_list_table tbody").html('<tr><td colspan="3" class="text-center text-danger">Error loading data</td></tr>');
+            }
+        });
+    }
+
+    defult_absent('{{url("/Default-Absentees-By-Month/")}}')
+    function defult_absent(apiUrl) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response: absent", response);
+
+                const $tbody = $("#default_absent_table tbody");
+                $tbody.empty(); // Clear existing data
+
+                if (!response.data || response.data.length === 0) {
+                    $tbody.html('<tr><td colspan="2" class="text-center">No Data Available</td></tr>');
+                    return;
+                }
+
+                response.data.forEach(record => {
+                    const { name, EmployeeID } = record;
+
+                    const row = `
+                        <tr>
+                            <td>${EmployeeID}</td>
+                            <td>${name}</td>
+                        </tr>
+                    `;
+
+                    $tbody.append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                $("#default_absent_table tbody").html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
+            }
+        });
+    }
+
+    present_list('{{url("/attandance_100_top_10_list_api/")}}')
+    function present_list(apiUrl) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response: present", response);
+
+                const $tbody = $("#present_list_body");
+                $tbody.empty();
+
+                if (!response.data || response.data.length === 0) {
+                    $tbody.html('<tr><td colspan="2" class="text-center">No Data Available</td></tr>');
+                    return;
+                }
+
+                response.data.forEach(record => {
+                    const { name, Present } = record;
+
+                    const row = `
+                        <tr>
+                            <td>${name}</td>
+                            <td>${Present}</td>
+                        </tr>
+                    `;
+
+                    $tbody.append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                $("#present_list_body").html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
+            }
+        });
+    }
+
+    renderEmployeeTypeWiseData("{{url("/Get-Employee-Type-Wise-Current-Date-Data-api/")}}");
+    function renderEmployeeTypeWiseData(apiUrl) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("API URL:", apiUrl);
+                console.log("Response:", response);
+
+                let tableRows = "";
+
+                response.forEach(record => {
+                    const { EmpTypeName, TotalEmployees, Present, OnWeeklyOff, LatePunch, OnLeave } = record;
+
+                    tableRows += `
+                        <tr>
+                            <td>${EmpTypeName}</td>
+                            <td>${TotalEmployees}</td>
+                            <td>${Present}</td>
+                            <td>${OnWeeklyOff}</td>
+                            <td>${LatePunch}</td>
+                            <td>${OnLeave}</td>
+                        </tr>`;
+                });
+
+                $("#employeeTypeResult").html(tableRows);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    attendanceDataSet('{{url("/all-attandance-detail-with-let-api/")}}');
+    function fetchDataAndRenderTable(apiUrl, targetElement) {
+        $.ajax({
+            url: apiUrl,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Response:", response);
+                const $tbody = $(targetElement);
+                $tbody.empty();
+
+                if (!response || response.length === 0) {
+                    $tbody.html('<tr><td colspan="6" class="text-center">No Data Available</td></tr>');
+                    return;
+                }
+
+                response.forEach(record => {
+                    const { Shift_Name, TotalEmployees, Present, OnWeeklyOff, LatePunch, OnLeave } = record;
+
+                    const row = `
+                        <tr>
+                            <td>${Shift_Name}</td>
+                            <td>${TotalEmployees}</td>
+                            <td>${Present}</td>
+                            <td>${OnWeeklyOff}</td>
+                            <td>${LatePunch}</td>
+                            <td>${OnLeave}</td>
+                        </tr>
+                    `;
+
+                    $tbody.append(row);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                $(targetElement).html('<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>');
+            }
+        });
+    }
 
 
 </script>

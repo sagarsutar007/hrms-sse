@@ -308,6 +308,9 @@ Route::get('/total_salary_summary',[leaveController::class,'total_salary_summary
 
 // view All Reports
 route::get('/all-attendance', [roughtController::class,'all_attendance'])->name('all_attendance');
+Route::get('/attendance/fetch', [roughtController::class, 'fetchAttendance'])->name('attendance.fetch');
+Route::post('/attendance/filter', [roughtController::class, 'filterAttendance'])->name('attendance.filter');
+route::get('/attendance-records', [roughtController::class,'attendanceRecords'])->name('attendance-records');
 route::get('/all-holidays', [roughtController::class,'all_holidays'])->name('all_holidays');
 route::get('/all-leave', [roughtController::class,'all_leave'])->name('all_leave');
 route::get('/all-travel', [roughtController::class,'all_travel'])->name('all_travel');

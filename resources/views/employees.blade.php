@@ -279,6 +279,24 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="punchCardModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Punch Card</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Punch card content will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="downloadModalPunchCard()">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('js')
@@ -311,13 +329,13 @@
 
                                 // Create the actions cell with view opening modal
                                 var actionsCell = '<div class="action-btns">' +
-                                    '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
-                                    '<i class="fas fa-eye"></i></a> ' +
-                                    '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
-                                    '<i class="fas fa-pencil-alt"></i></a> ' +
-                                    '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
-                                    '<i class="fas fa-download"></i></a>' +
-                                    '</div>';
+                                '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
+                                '<i class="fas fa-eye"></i></a> ' +
+                                '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
+                                '<i class="fas fa-pencil-alt"></i></a> ' +
+                                '<a href="javascript:void(0);" class="text-success download-id-card" data-id="' + user.id + '" title="Download ID Card">' +
+                                '<i class="fas fa-download"></i></a>' +
+                                '</div>'
 
                                 // Push the formatted row data
                                 data.push({
@@ -439,7 +457,7 @@
 
             // Set the edit and download buttons
             $('#edit-employee-btn').attr('href', 'user-details/' + employeeId);
-            $('#download-id-card-btn').attr('href', 'dounloade-user-id-catd/' + employeeId);
+            // $('#download-id-card-btn').attr('href', 'dounloade-user-id-catd/' + employeeId);
 
             // Show the modal
             $('#employee-view-modal').modal('show');
@@ -714,6 +732,84 @@
         // Print table button
         $('#printTable').on('click', function() {
             table.button('.buttons-print').trigger();
+        });
+    });
+
+    function openPunchCardModal(id) {
+        // Find the specific punch card div
+        var originalPunchCard = document.getElementById(id);
+
+        // Clone the original punch card
+        var punchCardContent = originalPunchCard.cloneNode(true);
+
+        // Ensure the cloned content is visible
+        punchCardContent.style.visibility = 'visible';
+
+        // Clear previous content and add the cloned punch card
+        var modalBody = document.querySelector('#punchCardModal .modal-body');
+        modalBody.innerHTML = '';
+        modalBody.appendChild(punchCardContent);
+
+        // Regenerate QR code in the modal
+        var originalQRCodeDiv = originalPunchCard.querySelector('[id^="qrcode"]');
+        var modalQRCodeDiv = punchCardContent.querySelector('[id^="qrcode"]');
+
+        if (originalQRCodeDiv && modalQRCodeDiv) {
+            // Get the QR code text from the original div
+            var qrCodeText = originalQRCodeDiv.getAttribute('data-qr-text');
+
+            // Clear any existing QR code
+            modalQRCodeDiv.innerHTML = '';
+
+            // Regenerate QR code
+            new QRCode(modalQRCodeDiv, {
+                text: qrCodeText,
+                width: 85,
+                height: 85
+            });
+        }
+
+        // Show the modal
+        $('#punchCardModal').modal('show');
+    }
+
+    function downloadModalPunchCard() {
+        var modalContent = document.querySelector('#punchCardModal .modal-body .id_inner_Div');
+
+        html2canvas(modalContent, {
+            scale: 2,
+            useCORS: true
+        }).then(function(canvas) {
+            // Convert the canvas to a data URL
+            var imgData = canvas.toDataURL('image/jpeg');
+
+            // Create a temporary link to trigger the download
+            var link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'punch-card.jpg';
+            link.click();
+        }).catch(function(error) {
+            console.error('Error downloading punch card:', error);
+            alert('Failed to download punch card. Please try again.');
+        });
+    }
+
+    // Modify existing HTML to prepare for modal
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add data attribute for QR code text to each qr code div
+        document.querySelectorAll('[id^="qrcode"]').forEach(function(qrCodeDiv) {
+            var qrCodeText = qrCodeDiv.getAttribute('data-text') ||
+                             qrCodeDiv.querySelector('img').getAttribute('src');
+            qrCodeDiv.setAttribute('data-qr-text', qrCodeText);
+        });
+
+        // Update download buttons to use modal
+        document.querySelectorAll('.downloade_btn').forEach(function(btn) {
+            var punchCardDiv = btn.previousElementSibling;
+
+            // Replace onclick with modal trigger
+            btn.querySelector('button').setAttribute('onclick',
+                'openPunchCardModal("' + punchCardDiv.id + '")');
         });
     });
 </script>

@@ -39,9 +39,9 @@ class roughtController extends Controller
             $employee_numbersql = "Select   \n"
 
             . "count(u.id) as TotalEmployees\n"
-        
+
             . "from all_users u \n"
-        
+
             . "where (u.DOJ is null or u.DOJ<= CURRENT_DATE) and (u.termination_date is null or u.termination_date>= CURRENT_DATE);";
 
             $employee_number_qr = DB::statement($employee_numbersql);
@@ -49,7 +49,7 @@ class roughtController extends Controller
 
 
             $total_on_leave_sql = "SELECT Sum(case when Half_Day=1 then 0.5 else 1 end ) as TotalOnLeave
-            FROM _leave  
+            FROM _leave
          Where CURRENT_DATE between Start_Date and End_Date";
 
 
@@ -58,11 +58,11 @@ class roughtController extends Controller
 
             $all_attandencet_sql = "SELECT * FROM `dailystats`;";
             $all_attandencet_qr = DB::select($all_attandencet_sql); // Use DB::select to fetch the results as an array
-           
+
             if (!empty($all_attandencet_qr)) {
                 // Assuming you only want the first row
                 $val = $all_attandencet_qr[0];
-            
+
                 $employee_number = $val->TotalEmployees;
                 $Present_number = $val->Present;
                 $OnWeeklyOff_number = $val->OnWeeklyOff;
@@ -70,9 +70,9 @@ class roughtController extends Controller
                 $Absent_number = $val->Absent;
                 $LatePunch = $val->LatePunch;
             }
-             
-             
-           
+
+
+
 
             $user_permission = DB::table('user_permissions')
     ->where('Employee_id', $EmployeesID)
@@ -91,7 +91,7 @@ class roughtController extends Controller
                 ->with('view_home_page_options',$view_home_page_options)
                 ->with('view_menu_items',$view_menu_items)
                 ->with('leave_number',$OnLeave_number );
-               
+
                }else{
                  return redirect()->route('login');
                }
@@ -113,7 +113,7 @@ return redirect()->route('login');
     return redirect()->route('login');
    }
 
-  
+
 
   }
 
@@ -149,9 +149,9 @@ return redirect()->route('login');
                 $employee_numbersql = "Select   \n"
 
                 . "count(u.id) as TotalEmployees\n"
-            
+
                 . "from all_users u \n"
-            
+
                 . "where (u.DOJ is null or u.DOJ<= CURRENT_DATE) and (u.termination_date is null or u.termination_date>= CURRENT_DATE);";
 
                 $employee_number_qr = DB::statement($employee_numbersql);
@@ -159,7 +159,7 @@ return redirect()->route('login');
 
 
                 $total_on_leave_sql = "SELECT Sum(case when Half_Day=1 then 0.5 else 1 end ) as TotalOnLeave
-                FROM _leave  
+                FROM _leave
              Where CURRENT_DATE between Start_Date and End_Date";
 
 
@@ -168,11 +168,11 @@ return redirect()->route('login');
 
                 $all_attandencet_sql = "SELECT * FROM `dailystats`;";
                 $all_attandencet_qr = DB::select($all_attandencet_sql); // Use DB::select to fetch the results as an array
-               
+
                 if (!empty($all_attandencet_qr)) {
                     // Assuming you only want the first row
                     $val = $all_attandencet_qr[0];
-                
+
                     $employee_number = $val->TotalEmployees;
                     $Present_number = $val->Present;
                     $OnWeeklyOff_number = $val->OnWeeklyOff;
@@ -182,10 +182,10 @@ return redirect()->route('login');
                 }
                 $vwabsentemployee_statement = "SELECT * FROM `vwabsentemployee`;";
                 $vwabsentemployee_data= DB::statement($vwabsentemployee_statement);
-                 
-                 
-                 
-              
+
+
+
+
 
                 if(isset( $em_data)){
                     return view("index")
@@ -197,7 +197,7 @@ return redirect()->route('login');
                     ->with('LatePunch',$LatePunch)
                     ->with('absent_data',$vwabsentemployee_data)
                     ->with('leave_number',$OnLeave_number );
-                   
+
                    }else{
                      return redirect()->route('login');
                    }
@@ -205,7 +205,7 @@ return redirect()->route('login');
 
             }
 
-            
+
         }else{
             ?>
 <script>
@@ -214,7 +214,7 @@ alert('Please Login again')
 <?php
 return redirect()->route('login');
         }
-            
+
         }else
         {
             ?>
@@ -224,38 +224,79 @@ alert('Server Error Please Login again')
 <?php
             return redirect()->route('login');
         }
-        
+
     }else{
         return redirect()->route('login');
     }
     }
 
+    public function attendanceRecords()
+    {
+        $EmployeeTypes = DB::table('dailyattendance')->distinct()->get();
+        $Departments = DB::table('dailyattendance')->distinct()->get();
 
-
-
-
-// view all reports
-// all_attendance
-    public function all_attendance(){
-        $EmployeesID = session()->get('EmployeeID');
-        $role = session()->get('role');
-        if(isset( $EmployeesID)){
-          $emp_type_Data = DB::statement("SELECT *  FROM `all_attandencetable` WHERE `attandence_Date` = '2024-12-08' ORDER BY `attandence_Date` DESC ");
-
-          $all_users = DB::table('all_users')
-          ->get();
-          
-          return view("All_attendance_with_absent")
-          ->with('emp_type_Data', $emp_type_Data)
-          ->with('all_users', $all_users)
-        ->with('role',$role);
-
-        }else{
-        return redirect()->route('login');
-        }
+        return view('attendance-records', compact('EmployeeTypes', 'Departments'));
     }
 
+    public function fetchAttendance(Request $request)
+{
+    $fromDate = $request->input('from_date');
+    $toDate = $request->input('to_date');
+    $employeeType = $request->input('employee_type');
+    $department = $request->input('department');
 
+    // Build your query with filters
+    $query = Attendance::query();
+
+    if ($fromDate && $toDate) {
+        $query->whereBetween('attandence_Date', [$fromDate, $toDate]);
+    }
+
+    if ($employeeType) {
+        $query->where('EmpTypeName', $employeeType);
+    }
+
+    if ($department) {
+        $query->where('Department_name', $department);
+    }
+
+    $attendanceData = $query->get();
+
+    return response()->json([
+        'attendance_data' => [
+            'data' => $attendanceData
+        ]
+    ]);
+}
+
+public function index(Request $request)
+{
+    $attendance = AttendanceInfo::paginate(15);
+    return response()->json($attendance);
+}
+
+public function search(Request $request)
+{
+    $query = AttendanceInfo::query();
+
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('NAME', 'LIKE', "%{$request->search}%")
+              ->orWhere('Employee_id', 'LIKE', "%{$request->search}%");
+        });
+    }
+
+    if ($request->filled('from_date')) {
+        $query->where('attendance_Date', '>=', $request->from_date);
+    }
+
+    if ($request->filled('to_date')) {
+        $query->where('attendance_Date', '<=', $request->to_date);
+    }
+
+    $attendance = $query->paginate(15);
+    return response()->json($attendance);
+}
 
 
     // all_holidays
@@ -276,16 +317,16 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('_leave')
-          
+
           ->get();
           return view("all_Leave_Request")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -299,8 +340,8 @@ alert('Server Error Please Login again')
           return view("All_Travel_Request")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -322,8 +363,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('projects')
           ->join('all_users', 'all_users.Employee_id', '=', 'projects.Employee_id')
           ->select('all_users.*', 'projects.*')
@@ -331,8 +372,8 @@ alert('Server Error Please Login again')
           return view("All_ Projects")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -356,8 +397,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('alloweance')
           ->join('all_users', 'all_users.Employee_id', '=', 'alloweance.Employee_id')
           ->select('all_users.*', 'alloweance.*')
@@ -365,8 +406,8 @@ alert('Server Error Please Login again')
           return view("All_Alloweance")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -375,8 +416,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('loan')
           ->join('all_users', 'all_users.Employee_id', '=', 'loan.Employee_id')
           ->select('all_users.*', 'loan.*')
@@ -384,8 +425,8 @@ alert('Server Error Please Login again')
           return view("All_Loan")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -394,8 +435,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('deductions')
           ->join('all_users', 'all_users.Employee_id', '=', 'deductions.Employee_id')
           ->select('all_users.*', 'deductions.*')
@@ -403,8 +444,8 @@ alert('Server Error Please Login again')
           return view("All_Deductions")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -413,8 +454,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('other_payments')
           ->join('all_users', 'all_users.Employee_id', '=', 'other_payments.Employee_id')
           ->select('all_users.*', 'other_payments.*')
@@ -422,8 +463,8 @@ alert('Server Error Please Login again')
           return view("All_Other_Payment")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -432,16 +473,16 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('other_payments')
           ->where('id',$req->id)
           ->get();
           return view("edit_other_paymrnt")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -455,8 +496,8 @@ alert('Server Error Please Login again')
           return view("All_Award")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -465,8 +506,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('ticket_info')
           ->join('all_users', 'all_users.Employee_id', '=', 'ticket_info.Employee_id')
           ->select('all_users.*', 'ticket_info.*')
@@ -474,8 +515,8 @@ alert('Server Error Please Login again')
           return view("All_Ticket")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -484,8 +525,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('transfer_info')
           ->join('all_users', 'all_users.Employee_id', '=', 'transfer_info.Employee_id')
           ->select('all_users.*', 'transfer_info.*')
@@ -493,8 +534,8 @@ alert('Server Error Please Login again')
           return view("All_Transfer")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -503,8 +544,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('_promotion')
           ->join('all_users', 'all_users.Employee_id', '=', '_promotion.Employee_id')
           ->select('all_users.*', '_promotion.*')
@@ -512,8 +553,8 @@ alert('Server Error Please Login again')
           return view("All_Promotion")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -522,8 +563,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('complaints')
           ->join('all_users', 'all_users.Employee_id', '=', 'complaints.Employee_id')
           ->select('all_users.*', 'complaints.*')
@@ -531,8 +572,8 @@ alert('Server Error Please Login again')
           return view("All_Complaints")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -541,8 +582,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('warning')
           ->join('all_users', 'all_users.Employee_id', '=', 'warning.Employee_id')
           ->select('all_users.*', 'warning.*')
@@ -550,8 +591,8 @@ alert('Server Error Please Login again')
           return view("All_Warning")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -560,8 +601,8 @@ alert('Server Error Please Login again')
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         if(isset( $EmployeesID)){
-    
-  
+
+
           $emp_type_Data = DB::table('payslip')
           ->join('all_users', 'all_users.Employee_id', '=', 'payslip.Employee_id')
           ->select('all_users.*', 'payslip.*')
@@ -569,8 +610,8 @@ alert('Server Error Please Login again')
           return view("All_Payslip")
           ->with('emp_type_Data', $emp_type_Data)
         ->with('role',$role);
-        
-      
+
+
         }else{
         return redirect()->route('login');
         }
@@ -588,7 +629,7 @@ alert('Server Error Please Login again')
         $emp_type_Data = DB::table('all_attandencetable')
         ->whereAny([
           'id','Employee_id','in_time','out_time'
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
 
@@ -605,12 +646,12 @@ alert('Server Error Please Login again')
 alert("No record found")
 history.back()
 </script>
-<?php 
+<?php
         }
-        
-        
-      
-    
+
+
+
+
       }else{
       return redirect()->route('login');
       }
@@ -624,7 +665,7 @@ history.back()
         $emp_type_Data = DB::table('holiday_master')
         ->whereAny([
           'holiday_master.id','holiday_master.holiday_Date',
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
 if($emp_type_Data){
@@ -638,10 +679,10 @@ if($emp_type_Data){
 alert("No record found")
 history.back()
 </script>
-<?php 
+<?php
 }
 
-    
+
       }else{
       return redirect()->route('login');
       }
@@ -653,14 +694,14 @@ history.back()
         $emp_type_Data = DB::table('_leave')
         ->whereAny([
           '_leave.id','_leave.Name','_leave.Leave_Type','_leave.Employee_id',
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("all_Leave_Request")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -672,14 +713,14 @@ history.back()
         $emp_type_Data = DB::table('travel_info')
         ->whereAny([
           'travel_info.id','travel_info.Name','travel_info.Place_Of_Visit','travel_info.Summary','travel_info.Employee_id','travel_info.Travel_start_date',
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("All_Travel_Request")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -691,7 +732,7 @@ history.back()
         $emp_type_Data = DB::table('training_info')
         ->whereAny([
           'training_info.id','training_info.Name','training_info.Training_Typ','training_info.Employee_id','training_info.Trainer',
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("All_Tranings")
@@ -705,21 +746,21 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('projects')
         ->join('all_users', 'all_users.Employee_id', '=', 'projects.Employee_id')
         ->select('all_users.*', 'projects.*')
         ->whereAny([
           'projects.id','projects.Project_Summary','projects.Priority','projects.Employee_id','projects.Assigned_Employees','projects.Project_Progress',
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("All_ Projects")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -733,7 +774,7 @@ history.back()
         ->select('all_users.*', 'tasks.*')
         ->whereAny([
           'tasks.id','tasks.Tasks_Title','tasks.Start_date','tasks.Employee_id','tasks.Status','tasks.task_Progress'
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("All_Tasks")
@@ -747,21 +788,21 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('alloweance')
         ->join('all_users', 'all_users.Employee_id', '=', 'alloweance.Employee_id')
         ->select('all_users.*', 'alloweance.*')
         ->whereAny([
           'alloweance.id','alloweance.Month','alloweance.Alloweance_Titel','alloweance.Employee_id','alloweance.Allowance_Ammount_in_INR'
-         
+
         ], 'like', '%'. $req->search_input.'%')
         ->get();
         return view("All_Alloweance")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -770,7 +811,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('loan')
         ->join('all_users', 'all_users.Employee_id', '=', 'loan.Employee_id')
@@ -782,8 +823,8 @@ history.back()
         return view("All_Loan")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -792,7 +833,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('deductions')
         ->join('all_users', 'all_users.Employee_id', '=', 'deductions.Employee_id')
@@ -804,8 +845,8 @@ history.back()
         return view("All_Deductions")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -840,8 +881,8 @@ history.back()
         return view("edit_other_paymrnt")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -858,8 +899,8 @@ history.back()
         return view("All_Award")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -868,12 +909,12 @@ history.back()
   public function single_account_data(Request $req)
   {
       $id = $req->id;
-  
+
       // Fetch data from the database
       $account_Data = DB::table('accounts')
           ->where('id', $id)
           ->first(); // Get a single record
-  
+
       // Return the response as JSON
       return response()->json([
           'success' => true,
@@ -881,12 +922,12 @@ history.back()
           'message' => $account_Data ? 'Data fetched successfully' : 'No data found'
       ]);
   }
-  
+
   public function all_ticket_search(Request $req){
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('ticket_info')
         ->join('all_users', 'all_users.Employee_id', '=', 'ticket_info.Employee_id')
@@ -898,8 +939,8 @@ history.back()
         return view("All_Ticket")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -908,7 +949,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('transfer_info')
         ->join('all_users', 'all_users.Employee_id', '=', 'transfer_info.Employee_id')
@@ -920,8 +961,8 @@ history.back()
         return view("All_Transfer")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -930,7 +971,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('_promotion')
         ->join('all_users', 'all_users.Employee_id', '=', '_promotion.Employee_id')
@@ -942,8 +983,8 @@ history.back()
         return view("All_Promotion")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -952,7 +993,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('complaints')
         ->join('all_users', 'all_users.Employee_id', '=', 'complaints.Employee_id')
@@ -964,8 +1005,8 @@ history.back()
         return view("All_Complaints")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -974,7 +1015,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('warning')
         ->join('all_users', 'all_users.Employee_id', '=', 'warning.Employee_id')
@@ -986,8 +1027,8 @@ history.back()
         return view("All_Warning")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
@@ -996,7 +1037,7 @@ history.back()
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
       if(isset( $EmployeesID)){
-  
+
 
         $emp_type_Data = DB::table('payslip')
         ->join('all_users', 'all_users.Employee_id', '=', 'payslip.Employee_id')
@@ -1008,23 +1049,23 @@ history.back()
         return view("All_Payslip")
         ->with('emp_type_Data', $emp_type_Data)
       ->with('role',$role);
-      
-    
+
+
       }else{
       return redirect()->route('login');
       }
   }
 
-  
+
   public function all_swap_day_list(){
     $EmployeesID = session()->get('EmployeeID');
     $role = session()->get('role');
     if(isset( $EmployeesID)){
-  
+
       return view("all_swipe_list")
     ->with('role',$role);
-    
-  
+
+
     }else{
     return redirect()->route('login');
     }
@@ -1057,7 +1098,7 @@ public function add_arrear_api(Request $req)
             ->update([
                 'Arrear_Amount' => $validatedData['Arrear_Amount'],
                 'Arrear_Reasons'=> $validatedData['Arrear_Reason'],
-               
+
             ]);
 
         if ($updateSuccess) {
@@ -1079,7 +1120,7 @@ public function add_arrear_api(Request $req)
             'Arrear_Reasons'=> $validatedData['Arrear_Reason'],
             'Arrear_Month'  => now(),
             'Arrear_Year'   => $currentYear,
-           
+
         ]);
 
         if ($insertSuccess) {
@@ -1102,7 +1143,7 @@ public function add_arrear_api(Request $req)
 
 
 
-  
+
   public function holiday_report(){
     $EmployeesID = session()->get('EmployeeID');
     $role = session()->get('role');
@@ -1110,8 +1151,8 @@ public function add_arrear_api(Request $req)
 
       return view("holiday_report")
     ->with('role',$role);
-    
-  
+
+
     }else{
     return redirect()->route('login');
     }
@@ -1258,7 +1299,7 @@ public function present_employee_list(Request $req)
     ]);
 
 
-   
+
 }
 // Let_commers_list
 public function Let_commers_list(Request $req)
@@ -1279,7 +1320,7 @@ public function Let_commers_list(Request $req)
     ]);
 
 
-   
+
 }
 
 // 100 % attandence
@@ -1475,7 +1516,7 @@ public function totall_salary_amount(Request $req) {
      $month = $parsedDate->format('m'); // Extracts the month in two-digit format (e.g., "01" for January)
 
 
-   
+
 
       // Execute the query using raw SQL
       $arrearData = DB::table('arrear_table as a')
@@ -1563,7 +1604,7 @@ public function totall_salary_amount_role_wise_year(Request $req) {
               DB::raw("COUNT(DISTINCT a.Employee_id) AS Total_Employees")
           ])
           ->whereYear('a.Arrear_Month', $year)
-        
+
           ->groupBy('r.roles','r.id') // Grouping by Role
           ->orderBy('Total_Salary_Amount', 'DESC') // Highest salary role first
           ->get();
@@ -1611,7 +1652,7 @@ public function totall_salary_amount_employ_wise_year(Request $req) {
               DB::raw("COUNT(DISTINCT a.Employee_id) AS Total_Employees")
           ])
           ->whereYear('a.Arrear_Month', $year)
-         
+
           ->groupBy('et.EmpTypeName','et.id') // Grouping by Employee Type
           ->orderBy('Total_Salary_Amount', 'DESC') // Highest salary first
           ->get();
@@ -1653,7 +1694,7 @@ public function totall_salary_amount_department_wise_year(Request $req) {
               DB::raw("COUNT(DISTINCT a.Employee_id) AS Total_Employees")
           ])
           ->whereYear('a.Arrear_Month', $year)
-      
+
           ->groupBy('d.Department_name','d.id') // Grouping by department
           ->orderBy('Total_Salary_Amount', 'DESC') // Highest salary department first
           ->get();
@@ -1680,7 +1721,7 @@ public function totall_salary_amount_year(Request $req) {
   try {
       // Define the target year and month (defaulting to November 2024 if not provided)
       $year = $req->year;  // Extracts the year
-   
+
 
       // Execute the query using raw SQL
       $arrearData = DB::table('arrear_table as a')
@@ -1716,7 +1757,7 @@ public function totall_salary_amount_year(Request $req) {
           ")
       ])
       ->whereYear('a.Arrear_Month', $year)
-   
+
       ->groupBy('s.shift_name', 'et.EmpTypeName', 'd.Department_name', 'r.roles', 'a.Arrear_Year', 'a.Arrear_Month', 'a.Employee_id')
       ->orderBy('s.shift_name')
       ->orderBy('et.EmpTypeName')
@@ -1753,10 +1794,10 @@ public function Default_Absentees_By_Month(Request $req) {
   try {
       // Retrieve date or use current date if not provided
       $parsedDate = $req->date ? Carbon::parse($req->date) : Carbon::now();
- 
+
       // Extract year and month from the parsed date
       $year = $parsedDate->year;  // Extract year
-      $month = $parsedDate->month; // Extract month 
+      $month = $parsedDate->month; // Extract month
 
       // Format the year and month in YYYY-MM format
       $p0 = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT); // Ensure month has two digits
@@ -1930,7 +1971,7 @@ public function department_lable_data(Request $req) {
       ], 500);
   }
 }
- 
+
 
 
 public function emptype_type_lable_data(Request $req) {
@@ -1972,7 +2013,7 @@ public function emptype_type_lable_data(Request $req) {
 
 public function company_data_all_parms(Request $req) {
   try {
-      
+
 // Extract year and month from the parsed date
 $year = $req->year;  // Extract year
 $month = $req->month; // Extract month
@@ -1984,8 +2025,8 @@ $p3 = $req->role; // Adjust as needed
 $p4 = $year;   // Pass extracted year
 $p5 = $month;  // Pass extracted month
 
-  
-    
+
+
       // Execute the stored procedure
       $salaryData = DB::select("CALL GetSalaryAndOTDetails(?, ?, ?, ?, ?, ?)", [
           $p0, $p1, $p2, $p3, $p4, $p5
@@ -2005,7 +2046,7 @@ $p5 = $month;  // Pass extracted month
 
 public function company_data_all_parms_2(Request $req) {
   try {
-      
+
     $parsedDate = $req->date ? Carbon::parse($req->date) : Carbon::now();
 
     // Extract year and month from the parsed date
@@ -2019,8 +2060,8 @@ $p3 = $req->role; // Adjust as needed
 $p4 = $year;   // Pass extracted year
 $p5 = $month;  // Pass extracted month
 
-  
-    
+
+
       // Execute the stored procedure
       $salaryData = DB::select("CALL GetSalaryAndOTDetails(?, ?, ?, ?, ?, ?)", [
           $p0, $p1, $p2, $p3, $p4, $p5
@@ -2037,14 +2078,14 @@ $p5 = $month;  // Pass extracted month
       ], 500);
   }
 }
- 
- 
- 
 
 
 
 
- 
+
+
+
+
 
 //true false
 
@@ -2054,7 +2095,7 @@ $p5 = $month;  // Pass extracted month
 
 
 
-    
+
 
 
 

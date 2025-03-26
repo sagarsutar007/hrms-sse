@@ -322,7 +322,6 @@
                 table_html_data += `</tbody></table>`;
                 $("#result").html(table_html_data);
 
-                // Pagination
                 var pagination_html = '<ul class="pagination">';
                 response.all_users.links.forEach(element => {
                     let activeClass = element.active ? 'active' : '';
