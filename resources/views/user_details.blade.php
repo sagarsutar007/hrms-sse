@@ -623,7 +623,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body p-1">
                                         <nav>
                                             <div class="nav nav-tabs" id="salary-nav-tab" role="tablist">
                                                 <a class="nav-item nav-link active" id="nav-basic-salary-tab" data-toggle="tab" href="#nav-basic-salary" role="tab">
@@ -648,7 +648,7 @@
                                                 @endif
                                             </div>
                                         </nav>
-                                        <div class="tab-content py-3" id="salary-nav-tabContent">
+                                        <div class="tab-content py-3 px-1" id="salary-nav-tabContent">
                                             <!-- Basic Salary Tab -->
                                             <div class="tab-pane fade show active" id="nav-basic-salary" role="tabpanel">
                                                 <button class="btn btn-sm btn-success mb-3" onclick="open_Basic_Salary_form()">
@@ -1255,64 +1255,64 @@
 
     // Function to open the Update Bank Account modal
     function openUpdateBankAccountModal(id) {
-    // Set the bank account ID in the hidden input
-    $('#bank_account_input_id').val(id);
+        // Set the bank account ID in the hidden input
+        $('#bank_account_input_id').val(id);
 
-    // Show loading indicator if needed
-    if (typeof show_animation === 'function') {
-        show_animation();
-    }
-
-    // Fetch the bank account details to populate the form
-    $.ajax({
-        url: `/get-account/${id}`,
-        type: "GET",
-        dataType: "json",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        success: function(response) {
-            console.log("Account details:", response);
-
-            if (response.success && response.data) {
-                const account = response.data;
-
-                // Populate the form fields with existing data
-                $('#Holder_Name_input').val(account.Account_Holder_Name);
-                $('#Bank_Name_input').val(account.Bank_Name);
-                $('#Account_Number_input').val(account.Account_Number);
-                $('#IFSC_Code_input').val(account.IFSC_Code);
-
-                // Show the modal
-                $('#updateBankAccountModal').modal('show');
-            } else {
-                console.error("Failed to get account details");
-                alert("Failed to load account details. Please try again.");
-            }
-
-            // Hide loading indicator
-            if (typeof hide_animation === 'function') {
-                hide_animation();
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error fetching account details:", error);
-            alert("Error loading account details. Please try again.");
-
-            // Hide loading indicator
-            if (typeof hide_animation === 'function') {
-                hide_animation();
-            }
+        // Show loading indicator if needed
+        if (typeof show_animation === 'function') {
+            
         }
-    });
-}
+
+        // Fetch the bank account details to populate the form
+        $.ajax({
+            url: `/get-account/${id}`,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Account details:", response);
+
+                if (response.success && response.data) {
+                    const account = response.data;
+
+                    // Populate the form fields with existing data
+                    $('#Holder_Name_input').val(account.Account_Holder_Name);
+                    $('#Bank_Name_input').val(account.Bank_Name);
+                    $('#Account_Number_input').val(account.Account_Number);
+                    $('#IFSC_Code_input').val(account.IFSC_Code);
+
+                    // Show the modal
+                    $('#updateBankAccountModal').modal('show');
+                } else {
+                    console.error("Failed to get account details");
+                    alert("Failed to load account details. Please try again.");
+                }
+
+                // Hide loading indicator
+                if (typeof hide_animation === 'function') {
+                    
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching account details:", error);
+                alert("Error loading account details. Please try again.");
+
+                // Hide loading indicator
+                if (typeof hide_animation === 'function') {
+                    
+                }
+            }
+        });
+    }
 
     // Load bank data on page load
     load_bank_data("{{ url('bank_account_api/' . $u_data['Employee_id']) }}");
 
     function load_bank_data(url_input) {
         if (typeof show_animation === 'function') {
-            show_animation();
+            
         }
 
         $.ajax({
@@ -1371,13 +1371,13 @@
                 $("#account_table").html(table_html);
 
                 if (typeof hide_animation === 'function') {
-                    hide_animation();
+                    
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
                 if (typeof hide_animation === 'function') {
-                    hide_animation();
+                    
                 }
             }
         });
@@ -1394,7 +1394,7 @@
 
     function load_basic_salary_data(url_input) {
         console.log("Function called with URL:", url_input);
-        show_animation();
+        
 
         $.ajax({
             url: url_input,
@@ -1410,7 +1410,7 @@
                 if (!response.data || response.data.length === 0) {
                     console.log("No data found in response or empty array");
                     $("#basic_salary_table tbody").html("<tr><td colspan='5' class='text-center'>No data available</td></tr>");
-                    hide_animation();
+                    
                     return;
                 }
 
@@ -1437,13 +1437,13 @@
                 // Only update the tbody, not the whole table
                 console.log("Generated HTML:", table_html_data);
                 $("#basic_salary_table tbody").html(table_html_data);
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("AJAX Error:", xhr.status, error);
                 console.error("Response text:", xhr.responseText);
                 $("#basic_salary_table tbody").html(`<tr><td colspan='5' class='text-center'>Error loading data: ${error}</td></tr>`);
-                hide_animation();
+                
             }
         });
     }
@@ -1453,7 +1453,7 @@
     });
 
     function load_allowances_data(url_input) {
-        show_animation();
+        
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1488,11 +1488,11 @@
                         </tr>`;
                     $("#allowances_table tbody").append(row);
                 });
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                hide_animation();
+                
             }
         });
     }
@@ -1502,7 +1502,7 @@
     });
 
     function load_deductions_data(url_input) {
-        show_animation();
+        
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1537,11 +1537,11 @@
                         </tr>`;
                     $("#deductions_table tbody").append(row);
                 });
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                hide_animation();
+                
             }
         });
     }
@@ -1551,7 +1551,7 @@
     });
 
     function load_loan_data(url_input) {
-        show_animation();
+        
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1594,11 +1594,11 @@
                         </tr>`;
                     $("#loan_table tbody").append(row);
                 });
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                hide_animation();
+                
             }
         });
     }
@@ -1608,7 +1608,7 @@
     });
 
     function load_other_payments_data(url_input) {
-        show_animation();
+        
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1643,11 +1643,11 @@
                         </tr>`;
                     $("#other_payments_table tbody").append(row);
                 });
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                hide_animation();
+                
             }
         });
     }
@@ -1657,7 +1657,7 @@
     });
 
     function load_overtime_data(url_input) {
-        show_animation();
+        
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1694,16 +1694,103 @@
                         </tr>`;
                     $("#overtime_table tbody").append(row);
                 });
-                hide_animation();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                hide_animation();
+                
+            }
+        });
+    }
+    
+</script>
+
+<script>
+
+    load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
+    
+    function load_basic_salary_data(url_input) {
+        
+        $.ajax({
+            url: url_input,  // API endpoint URL
+            type: "GET",  // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Salary Response:", response);  // Handle the successful response here
+                $("#basic_salary_table").empty();
+                
+                // Table Header
+                var table_html_data = `
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="delet_data" id=""></th>
+                            <th>Month-Year</th>
+                            <th>Payslip Type</th>
+                            <th>(₹) Basic Salary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($salary => {
+                    table_html_data += `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$salary.month} ${$salary.year}</td>
+                            <td>${$salary.Payslip_Type}</td>
+                            <td>${$salary.Basic_Salary}</td>
+                            <td>
+                                <span onclick="basic_salary_view('${$salary.id}')"><i class="fa-regular fa-eye"></i></span>
+                                <span onclick="open_basic_salary_update_form('${$salary.id}')" class="B_Salary_a"><i class="fa-solid fa-pencil"></i></span>
+                                <a href="{{url('/delete')}}/${$salary.id}/basic_salary" class="Delete_Set_Salary_a"><i class="fa-solid fa-trash-can"></i></a>
+                            </td>
+                        </tr>`;
+                });
+
+                table_html_data += `</tbody>`;
+                $("#basic_salary_table").html(table_html_data);
+                
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);  // Handle the error here
+                
             }
         });
     }
 
+    $(document).ready(function() {
+        // Handle form submission
+        $('#Add_Basic_Salary_form_Btn').on('click', function(event) {
+            event.preventDefault();
+            // Serialize form data
+            var formData = $('#Add_Basic_Salary_form').serialize();
 
-
+            // Make AJAX POST request
+            $.ajax({
+                url: "{{ route('form_request') }}", // Laravel route
+                method: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
+                },
+                success: function(response) {
+                    // Handle success response
+                    alert(response.message);
+                    close_Basic_Salary_form() // Hide the form
+                    $('#Add_Basic_Salary_form')[0].reset(); // Reset the form
+                    load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    alert('An error occurred: ' + xhr.responseText);
+                }
+            });
+        });
+    });
 </script>
 @stop

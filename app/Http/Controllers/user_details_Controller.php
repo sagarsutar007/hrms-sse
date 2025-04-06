@@ -301,19 +301,18 @@ foreach ($dudections_ids as $dd_ids) {
     
 
     public function  one_user_data_with_id(Request $req){
-  // Fetch user data with pagination
-  $userData = DB::table('users')
-  ->join('role_masrer', 'users.role', '=', 'role_masrer.id')
-  ->where('Employee_id', $req->id)
- ->get();
+        // Fetch user data with pagination
+        $userData = DB::table('users')
+        ->join('role_masrer', 'users.role', '=', 'role_masrer.id')
+        ->where('Employee_id', $req->id)
+        ->get();
 
-  // Return a JSON response
-  return response()->json([
-      'success' => true,
-      'message' => 'Users retrieved successfully.',
-      'attandence_data' => $userData, // Current page's user data
-     
-  ]);
+        // Return a JSON response
+        return response()->json([
+            'success' => true,
+            'message' => 'Users retrieved successfully.',
+            'attandence_data' => $userData,
+        ]);
     }
 
     public function delet_user_with_id(Request $req)
@@ -759,10 +758,10 @@ history.back();
                       $shift_master = DB::table('shift_master')
                           ->get();
 
-//employee_type_master
+                        //employee_type_master
                       $employee_type_master = DB::table('shift__employee_type_master')
                           ->get();
-//role_masrer
+                        //role_masrer
                       $role_masrer = DB::table('role_masrer')
                           ->get();
                           //
@@ -804,9 +803,6 @@ history.back();
                           ->with('employee_type_master', $employee_type_master)
                           ->with('leave_type_master', $leave_type_master)
                           ->with('permissions', $permissions);
-
-                  
-
               } else {
                   echo "data not found";
               }
@@ -814,15 +810,9 @@ history.back();
               echo "No record";
           }
 
-      }else{
-        ?>
-<script>
-alert("Please Set User Id")
-history.back();
-</script>
-<?php
+      } else {
+          echo "No record";
       }
-
   }
 
 // add Emergency Contacts
