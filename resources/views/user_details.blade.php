@@ -656,9 +656,10 @@
                                                 </button>
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped" id="basic_salary_table">
+                                                        <!-- The table content will be dynamically populated by the load_basic_salary_data() function -->
                                                         <thead>
                                                             <tr>
-                                                                <th><input type="checkbox" name="delet_data" id=""></th>
+                                                                <th><input type="checkbox" name="delet_data" id="select-all-checkbox"></th>
                                                                 <th>Month-Year</th>
                                                                 <th>Payslip Type</th>
                                                                 <th>₹ Basic Salary</th>
@@ -666,11 +667,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <!-- Data will be loaded via AJAX -->
+                                                            <!-- Data will be injected here by JavaScript -->
+                                                            <tr>
+                                                                <td colspan="5" class="text-center">Loading data...</td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                <div class="mt-2">
+                                                    <button class="btn btn-sm btn-danger" id="delete-selected" style="display: none;">
+                                                        <i class="fas fa-trash mr-1"></i>Delete Selected
+                                                    </button>
+                                                </div>
                                             </div>
+
 
                                             <!-- Allowances Tab -->
                                             <div class="tab-pane fade" id="nav-allowances" role="tabpanel">
@@ -1383,45 +1393,56 @@
     });
 
     function load_basic_salary_data(url_input) {
+        console.log("Function called with URL:", url_input);
         show_animation();
+
         $.ajax({
-            url: url_input,  // API endpoint URL
-            type: "GET",  // HTTP method
+            url: url_input,
+            type: "GET",
             dataType: "json",
             headers: {
                 "Content-Type": "application/json"
             },
             success: function(response) {
-                console.log("Response:", response);  // Handle the successful response here
-                $("#basic_salary_table tbody").empty();
+                console.log("Response received:", response);
+
+                // Check if response.data exists and has items
+                if (!response.data || response.data.length === 0) {
+                    console.log("No data found in response or empty array");
+                    $("#basic_salary_table tbody").html("<tr><td colspan='5' class='text-center'>No data available</td></tr>");
+                    hide_animation();
+                    return;
+                }
+
+                // Table Header - leave in place, don't recreate thead
+                var table_html_data = "";
 
                 // Populate Table Rows
-                var all_data = response.data;
-                all_data.forEach($salary => {
-                    var row = `
+                response.data.forEach(function(salary) {
+                    console.log("Processing salary item:", salary);
+                    table_html_data += `
                         <tr>
                             <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$salary.month} ${$salary.year}</td>
-                            <td>${$salary.Payslip_Type}</td>
-                            <td>${$salary.Basic_Salary}</td>
+                            <td>${salary.month} ${salary.year}</td>
+                            <td>${salary.Payslip_Type}</td>
+                            <td>${salary.Basic_Salary}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-info" onclick="basic_salary_view('${$salary.id}')">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="open_basic_salary_update_form('${$salary.id}')">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </button>
-                                <a href="{{url('/delete')}}/${$salary.id}/basic_salary" class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </a>
+                                <span onclick="basic_salary_view('${salary.id}')"><i class="fa-regular fa-eye"></i></span>
+                                <span onclick="open_basic_salary_update_form('${salary.id}')" class="B_Salary_a"><i class="fa-solid fa-pencil"></i></span>
+                                <a href="{{url('/delete')}}/${salary.id}/basic_salary" class="Delete_Set_Salary_a"><i class="fa-solid fa-trash-can"></i></a>
                             </td>
                         </tr>`;
-                    $("#basic_salary_table tbody").append(row);
                 });
+
+                // Only update the tbody, not the whole table
+                console.log("Generated HTML:", table_html_data);
+                $("#basic_salary_table tbody").html(table_html_data);
                 hide_animation();
             },
             error: function(xhr, status, error) {
-                console.error("Error:", error);  // Handle the error here
+                console.error("AJAX Error:", xhr.status, error);
+                console.error("Response text:", xhr.responseText);
+                $("#basic_salary_table tbody").html(`<tr><td colspan='5' class='text-center'>Error loading data: ${error}</td></tr>`);
                 hide_animation();
             }
         });
@@ -1681,6 +1702,8 @@
             }
         });
     }
+
+
 
 </script>
 @stop

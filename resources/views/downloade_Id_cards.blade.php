@@ -12,9 +12,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Manage Punch Cards</h3>
                 <div>
-                    <button id="selectAllButton" class="btn btn-sm btn-secondary">Select All</button>
-                    <button id="deselectAllButton" class="btn btn-sm btn-secondary">Deselect All</button>
-                    <button id="printButton" class="btn btn-sm btn-primary">Print Selected Cards</button>
+                    <button id="selectAllButton" class="btn btn-sm btn-secondary" onclick="selectAllCards(); return false;">Select All</button>
+                    <button id="deselectAllButton" class="btn btn-sm btn-secondary" onclick="deselectAllCards(); return false;">Deselect All</button>
+                    <button id="printButton" class="btn btn-sm btn-primary" onclick="printSelectedCards(); return false;">Print Selected Cards</button>
                 </div>
             </div>
         </div>
@@ -178,6 +178,7 @@
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
 
             .punch-card {
@@ -189,72 +190,159 @@
 @stop
 
 @section('js')
+    <!-- jQuery Check and Load if Needed -->
+    <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
+            console.error('jQuery was not loaded. Loading it now.');
+        }
+    </script>
+
     <!-- QR Code Library -->
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <!-- Direct functions attached to window object -->
     <script>
-        $(function () {
-            // Generate QR codes for each card
-            @if(isset($user_data) && !empty($user_data))
-                @foreach($user_data as $index => $user)
-                    new QRCode(document.getElementById("qrcode{{ $index }}"), {
-                        text: "{{ url('/login') }}/{{ $user->Employee_id }}",
-                        width: 80,
-                        height: 80,
-                    });
-                @endforeach
-            @endif
-
-            // Select/Deselect all cards
-            $('#selectAllButton').click(function() {
-                $('.card-checkbox').prop('checked', true);
+        // Global functions accessible by inline onclick attributes
+        function selectAllCards() {
+            console.log('Select all function called');
+            document.querySelectorAll('.card-checkbox').forEach(function(checkbox) {
+                checkbox.checked = true;
             });
+            return false;
+        }
 
-            $('#deselectAllButton').click(function() {
-                $('.card-checkbox').prop('checked', false);
+        function deselectAllCards() {
+            console.log('Deselect all function called');
+            document.querySelectorAll('.card-checkbox').forEach(function(checkbox) {
+                checkbox.checked = false;
             });
+            return false;
+        }
 
-            // Print selected cards
-            $('#printButton').click(function() {
-                const selectedCards = Array.from(document.querySelectorAll('.card-checkbox:checked'))
-                    .map(checkbox => checkbox.closest('.punch-card'));
+        function printSelectedCards() {
+            console.log('Print function called');
+            const selectedCheckboxes = document.querySelectorAll('.card-checkbox:checked');
 
-                if (selectedCards.length === 0) {
-                    alert('Please select at least one card to print.');
-                    return;
-                }
+            if(selectedCheckboxes.length === 0) {
+                alert('Please select at least one card to print.');
+                return false;
+            }
 
-                // Create a temporary container for printable content
-                const printableArea = document.createElement('div');
-                printableArea.className = 'printable';
+            // Create printable area
+            const printableArea = document.createElement('div');
+            printableArea.className = 'printable';
 
-                const pageDiv = document.createElement('div');
-                pageDiv.className = 'container-fluid';
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'container-fluid';
 
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row';
+            let rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
 
-                // Add cards to grid
-                selectedCards.forEach(card => {
+            // Add cards to print area
+            selectedCheckboxes.forEach(function(checkbox, index) {
+                const cardParent = checkbox.closest('.col-lg-2, .col-md-3, .col-sm-4');
+                if(cardParent) {
                     const colDiv = document.createElement('div');
                     colDiv.className = 'col-2 mb-3';
 
-                    const cardClone = card.cloneNode(true);
-                    cardClone.querySelector('.card-checkbox').remove();
+                    // Clone the card but not the checkbox
+                    const card = cardParent.querySelector('.punch-card').cloneNode(true);
+                    const checkboxInCard = card.querySelector('.card-checkbox');
+                    if(checkboxInCard) {
+                        checkboxInCard.remove();
+                    }
 
-                    colDiv.appendChild(cardClone);
+                    colDiv.appendChild(card);
                     rowDiv.appendChild(colDiv);
-                });
 
-                pageDiv.appendChild(rowDiv);
-                printableArea.appendChild(pageDiv);
-                document.body.appendChild(printableArea);
-
-                // Trigger print
-                window.print();
-
-                // Clean up
-                document.body.removeChild(printableArea);
+                    // Create a new row after every 6 cards
+                    if((index + 1) % 6 === 0 && index < selectedCheckboxes.length - 1) {
+                        containerDiv.appendChild(rowDiv);
+                        rowDiv = document.createElement('div');
+                        rowDiv.className = 'row';
+                    }
+                }
             });
+
+            // Add remaining cards
+            if(rowDiv.children.length > 0) {
+                containerDiv.appendChild(rowDiv);
+            }
+
+            printableArea.appendChild(containerDiv);
+            document.body.appendChild(printableArea);
+
+            // Print
+            window.print();
+
+            // Remove print area after delay
+            setTimeout(function() {
+                if (document.body.contains(printableArea)) {
+                    document.body.removeChild(printableArea);
+                }
+            }, 1000);
+
+            return false;
+        }
+    </script>
+
+    <!-- Main script for page functionality -->
+    <script>
+        // Wait for document to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Document loaded, setting up QR codes and events');
+
+            // Generate QR codes for each card
+            @if(isset($user_data) && !empty($user_data))
+                @foreach($user_data as $index => $user)
+                    try {
+                        new QRCode(document.getElementById("qrcode{{ $index }}"), {
+                            text: "{{ url('/login') }}/{{ $user->Employee_id }}",
+                            width: 80,
+                            height: 80,
+                        });
+                        console.log('QR code generated for index {{ $index }}');
+                    } catch(e) {
+                        console.error('Error generating QR code for index {{ $index }}:', e);
+                    }
+                @endforeach
+            @endif
+
+            // Add event listeners to buttons
+            const selectAllButton = document.getElementById('selectAllButton');
+            const deselectAllButton = document.getElementById('deselectAllButton');
+            const printButton = document.getElementById('printButton');
+
+            if(selectAllButton) {
+                selectAllButton.addEventListener('click', selectAllCards);
+                console.log('Select all button event listener added');
+            } else {
+                console.warn('Select all button not found in DOM');
+            }
+
+            if(deselectAllButton) {
+                deselectAllButton.addEventListener('click', deselectAllCards);
+                console.log('Deselect all button event listener added');
+            } else {
+                console.warn('Deselect all button not found in DOM');
+            }
+
+            if(printButton) {
+                printButton.addEventListener('click', printSelectedCards);
+                console.log('Print button event listener added');
+            } else {
+                console.warn('Print button not found in DOM');
+            }
+        });
+
+        // Also use jQuery event binding as backup
+        $(function() {
+            console.log('jQuery ready function running');
+
+            $('#selectAllButton').on('click', selectAllCards);
+            $('#deselectAllButton').on('click', deselectAllCards);
+            $('#printButton').on('click', printSelectedCards);
         });
     </script>
 @stop

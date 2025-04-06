@@ -445,19 +445,16 @@ $(document).ready(function () {
 
 // Event handler for the submit button
 $("#submit_btn").on("click", function(event) {
-    event.preventDefault(); // Prevent the link's default action
-    // Call the insert_holiday function
+    event.preventDefault();
     insert_holiday();
 });
 
-// Calendar object to track state
 var calendar = {
     current: new Date(),
     activeDate: null,
     events: {}
 };
 
-// Days of the week for header
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // Function to render the calendar

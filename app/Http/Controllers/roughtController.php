@@ -298,6 +298,24 @@ public function search(Request $request)
     return response()->json($attendance);
 }
 
+public function all_attendance(){
+    $EmployeesID = session()->get('EmployeeID');
+    $role = session()->get('role');
+    if(isset( $EmployeesID)){
+      $emp_type_Data = DB::statement("SELECT *  FROM `all_attandencetable` WHERE `attandence_Date` = '2024-12-08' ORDER BY `attandence_Date` DESC ");
+
+      $all_users = DB::table('all_users')
+      ->get();
+
+      return view("All_attendance_with_absent")
+      ->with('emp_type_Data', $emp_type_Data)
+      ->with('all_users', $all_users)
+    ->with('role',$role);
+
+    }else{
+    return redirect()->route('login');
+    }
+}
 
     // all_holidays
     public function all_holidays(){
