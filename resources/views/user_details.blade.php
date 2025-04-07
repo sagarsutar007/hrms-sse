@@ -679,6 +679,50 @@
                                                         <i class="fas fa-trash mr-1"></i>Delete Selected
                                                     </button>
                                                 </div>
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="BasicSalaryModal" tabindex="-1" role="dialog" aria-labelledby="BasicSalaryModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <form method="post" id="Add_Basic_Salary_form">
+                                                        @csrf
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="Basic_Salary_form_header">Add Basic Salary</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span>&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+
+                                                            <input type="number" id="basic_salary_input_id" name="basic_salary_input_id" hidden>
+                                                            <input type="text" name="form_type" value="Basic_Salary" hidden>
+                                                            <input type="text" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}" hidden>
+
+                                                            <div class="form-group">
+                                                            <label>Basic Salary *</label>
+                                                            <input type="number" name="Basic_Salary" class="form-control" id="Basic_Salary_amount" placeholder="Basic Salary">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                            <label>Month *</label>
+                                                            <input type="month" name="month" class="form-control" id="Basic_Salary_month">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                            <label>Year *</label>
+                                                            <input type="text" name="year" class="form-control" id="Basic_Salary_year" placeholder="Year">
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary" id="Add_Basic_Salary_form_Btn">Submit</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                        </form>
+                                                    </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
 
 
@@ -1260,7 +1304,7 @@
 
         // Show loading indicator if needed
         if (typeof show_animation === 'function') {
-            
+
         }
 
         // Fetch the bank account details to populate the form
@@ -1292,7 +1336,7 @@
 
                 // Hide loading indicator
                 if (typeof hide_animation === 'function') {
-                    
+
                 }
             },
             error: function(xhr, status, error) {
@@ -1301,7 +1345,7 @@
 
                 // Hide loading indicator
                 if (typeof hide_animation === 'function') {
-                    
+
                 }
             }
         });
@@ -1312,7 +1356,7 @@
 
     function load_bank_data(url_input) {
         if (typeof show_animation === 'function') {
-            
+
         }
 
         $.ajax({
@@ -1371,13 +1415,13 @@
                 $("#account_table").html(table_html);
 
                 if (typeof hide_animation === 'function') {
-                    
+
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
                 if (typeof hide_animation === 'function') {
-                    
+
                 }
             }
         });
@@ -1394,7 +1438,7 @@
 
     function load_basic_salary_data(url_input) {
         console.log("Function called with URL:", url_input);
-        
+
 
         $.ajax({
             url: url_input,
@@ -1410,7 +1454,7 @@
                 if (!response.data || response.data.length === 0) {
                     console.log("No data found in response or empty array");
                     $("#basic_salary_table tbody").html("<tr><td colspan='5' class='text-center'>No data available</td></tr>");
-                    
+
                     return;
                 }
 
@@ -1437,13 +1481,13 @@
                 // Only update the tbody, not the whole table
                 console.log("Generated HTML:", table_html_data);
                 $("#basic_salary_table tbody").html(table_html_data);
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("AJAX Error:", xhr.status, error);
                 console.error("Response text:", xhr.responseText);
                 $("#basic_salary_table tbody").html(`<tr><td colspan='5' class='text-center'>Error loading data: ${error}</td></tr>`);
-                
+
             }
         });
     }
@@ -1453,7 +1497,7 @@
     });
 
     function load_allowances_data(url_input) {
-        
+
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1488,11 +1532,11 @@
                         </tr>`;
                     $("#allowances_table tbody").append(row);
                 });
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                
+
             }
         });
     }
@@ -1502,7 +1546,7 @@
     });
 
     function load_deductions_data(url_input) {
-        
+
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1537,11 +1581,11 @@
                         </tr>`;
                     $("#deductions_table tbody").append(row);
                 });
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                
+
             }
         });
     }
@@ -1551,7 +1595,7 @@
     });
 
     function load_loan_data(url_input) {
-        
+
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1594,11 +1638,11 @@
                         </tr>`;
                     $("#loan_table tbody").append(row);
                 });
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                
+
             }
         });
     }
@@ -1608,7 +1652,7 @@
     });
 
     function load_other_payments_data(url_input) {
-        
+
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1643,11 +1687,11 @@
                         </tr>`;
                     $("#other_payments_table tbody").append(row);
                 });
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                
+
             }
         });
     }
@@ -1657,7 +1701,7 @@
     });
 
     function load_overtime_data(url_input) {
-        
+
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -1694,23 +1738,23 @@
                         </tr>`;
                     $("#overtime_table tbody").append(row);
                 });
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-                
+
             }
         });
     }
-    
+
 </script>
 
 <script>
 
     load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
-    
+
     function load_basic_salary_data(url_input) {
-        
+
         $.ajax({
             url: url_input,  // API endpoint URL
             type: "GET",  // HTTP method
@@ -1721,7 +1765,7 @@
             success: function(response) {
                 console.log("Salary Response:", response);  // Handle the successful response here
                 $("#basic_salary_table").empty();
-                
+
                 // Table Header
                 var table_html_data = `
                     <thead>
@@ -1754,11 +1798,11 @@
 
                 table_html_data += `</tbody>`;
                 $("#basic_salary_table").html(table_html_data);
-                
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);  // Handle the error here
-                
+
             }
         });
     }
@@ -1792,5 +1836,65 @@
             });
         });
     });
+
+    function open_Basic_Salary_form() {
+        $('#BasicSalaryModal').modal('show');
+        $('#Basic_Salary_form_header').text('Add Basic Salary');
+        $('#Add_Basic_Salary_form')[0].reset();
+        $('#basic_salary_input_id').val('');
+    }
+
+
+    function open_basic_salary_update_form(id) {
+        $('#BasicSalaryModal').modal('show'); // show modal
+        $("#Basic_Salary_form_header").text("Update Basic Salary");
+        $("#basic_salary_input_id").val(id);
+
+        $.ajax({
+            type: "GET",
+            url: "{{ url('/basic-salary/') }}/" + id,
+            dataType: "json",
+            success: function(response) {
+                var r_data = response.data;
+                $("#Basic_Salary_amount").val(r_data.Basic_Salary);
+                $("#Basic_Salary_month").val(r_data.month);
+                $("#Basic_Salary_year").val(r_data.year);
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+   $(document).ready(function() {
+       // Handle form submission
+       $('#Add_Basic_Salary_form_Btn').on('click', function(event) {
+           event.preventDefault();
+           // Serialize form data
+           var formData = $('#Add_Basic_Salary_form').serialize();
+
+           // Make AJAX POST request
+           $.ajax({
+               url: "{{ route('form_request') }}", // Laravel route
+               method: "POST",
+               data: formData,
+               headers: {
+                   'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
+               },
+               success: function(response) {
+                   // Handle success response
+                   alert(response.message);
+                   close_Basic_Salary_form() // Hide the form
+                   $('#Add_Basic_Salary_form')[0].reset(); // Reset the form
+                   load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
+               },
+               error: function(xhr, status, error) {
+                   // Handle error response
+                   alert('An error occurred: ' + xhr.responseText);
+               }
+           });
+       });
+   });
+
 </script>
 @stop
