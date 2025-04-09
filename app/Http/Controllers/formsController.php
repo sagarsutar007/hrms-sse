@@ -35,7 +35,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
             } else {
 
                 $emergency__contactsData2 = DB::table('_emergency__contacts')
@@ -87,7 +87,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                        
+
                     }
                 }
 
@@ -102,7 +102,7 @@ history.back()
         $EmployeesID = session()->get('EmployeeID');
     $role = session()->get('role');
     if(isset( $EmployeesID)){
-    
+
         if (isset($id)) {
 
             $emergency__contactsData = DB::table('_emergency__contacts')
@@ -152,7 +152,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                    
+
 
                 }
             }
@@ -193,7 +193,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
             } else {
 
                 $emergency__contactsData2 = DB::table('_qualifications')
@@ -217,7 +217,7 @@ history.back()
                             $Language = $c_data->Language;
                             $Professional_Skills = $c_data->Professional_Skills;
                             $Description = $c_data->Description;
-    
+
                             $em_data = array("id" => $id,
                                 "Employee_name" => $Employee_name,
                                 "Employee_id" => $Employee_id,
@@ -228,9 +228,9 @@ history.back()
                                 "Language" => $Language,
                                 "Professional_Skills" => $Professional_Skills,
                                 "Description" => $Description,
-    
+
                             );
-    
+
                             return view("qualifications_view")
                             ->with('role',$role)
                                 ->with('em_data', $em_data);
@@ -243,7 +243,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                        
+
                     }
                 }
 
@@ -269,7 +269,7 @@ history.back()
 
 
 
-     
+
 
     }
     public function edit_qualifications(Request $Contact_req)
@@ -281,7 +281,7 @@ history.back()
             ->join('all_users', '_qualifications.Employee_id', '=', 'all_users.Employee_id')
                     ->select('_qualifications.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
                     ->where('_qualifications.id', $id)
-          
+
                 ->get();
 
             if (isset($emergency__contactsData)) {
@@ -324,7 +324,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                    
+
                 }
             }
 
@@ -363,7 +363,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
             } else {
 
                 $emergency__contactsData2 = DB::table('all__document')
@@ -387,7 +387,7 @@ history.back()
                             $Description = $c_data->Description;
                             $Document_path = $c_data->Document_path;
                             $Document_path_back = $c_data->Document_path_back;
-    
+
                             $em_data = array("id" => $id,
                                 "Employee_name" => $Employee_name,
                                 "Employee_id" => $Employee_id,
@@ -396,11 +396,11 @@ history.back()
                                 "Expired_Date" => $Expired_Date,
                                 "Document_path" => $Document_path,
                                 "Document_path_back" => $Document_path_back,
-    
+
                                 "Description" => $Description,
-    
+
                             );
-    
+
                             return view("document_view")
                                 ->with('role',$role)
                                 ->with('em_data', $em_data);
@@ -413,7 +413,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                        
+
                     }
                 }
 
@@ -434,7 +434,7 @@ history.back()
             ->join('all_users', 'all__document.Employee_id', '=', 'all_users.Employee_id')
             ->select('all__document.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
             ->where('all__document.id', $id)
-        
+
                 ->get();
 
             if (isset($emergency__contactsData)) {
@@ -474,7 +474,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                    
+
                 }
             }
 
@@ -513,7 +513,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
             } else {
 
                 $emergency__contactsData2 = DB::table('_work__experience')
@@ -535,7 +535,7 @@ history.back()
                             $From = $c_data->From;
                             $Description = $c_data->Description;
                             $to = $c_data->to;
-    
+
                             $em_data = array("id" => $id,
                                 "Employee_name" => $Employee_name,
                                 "Employee_id" => $Employee_id,
@@ -544,13 +544,13 @@ history.back()
                                 "From" => $From,
                                 "to" => $to,
                                 "Description" => $Description,
-    
+
                             );
-    
+
                             return view("work_expreance_view")
                             ->with('role',$role)
                                 ->with('em_data', $em_data);
-                        }  
+                        }
 
                     } else {
                         ?>
@@ -559,7 +559,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                        
+
                     }
                 }
 
@@ -578,7 +578,7 @@ history.back()
             ->join('all_users', '_work__experience.Employee_id', '=', 'all_users.Employee_id')
     ->select('_work__experience.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
     ->where('_work__experience.id', $id)
-              
+
                 ->get();
 
             if (isset($emergency__contactsData)) {
@@ -617,7 +617,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                    
+
                 }
             }
 
@@ -657,7 +657,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
             } else {
 
                 $emergency__contactsData2 = DB::table('accounts')
@@ -678,7 +678,7 @@ history.back()
                             $Bank_Name = $c_data->Bank_Name;
                             $Account_Number = $c_data->Account_Number;
                             $IFSC_Code = $c_data->IFSC_Code;
-    
+
                             $em_data = array("id" => $id,
                                 "Employee_name" => $Employee_name,
                                 "Employee_id" => $Employee_id,
@@ -686,7 +686,7 @@ history.back()
                                 "Bank_Name" => $Bank_Name,
                                 "Account_Number" => $Account_Number,
                                 "IFSC_Code" => $IFSC_Code,
-    
+
                             );
                             return view("bank_account_view")
                             ->with('role',$role)
@@ -700,7 +700,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                        
+
                     }
                 }
 
@@ -757,7 +757,7 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                    
+
                 }
             }
 
@@ -770,14 +770,14 @@ history.back()
     }
 
 
-  // Basic Salary 
+  // Basic Salary
 public function Basic_Salary(Request $request)
 {
     $id = $request->id;
     $role = session()->get('role'); // Retrieve role from session (if required)
 
 
-    
+
         // Fetch data from the database
         $basicSalaryData = DB::table('basic_salary')
             ->join('all_users', 'basic_salary.Employee_id', '=', 'all_users.Employee_id')
@@ -803,7 +803,7 @@ public function Basic_Salary(Request $request)
                 'message' => 'No data found for the provided ID.',
             ], 404); // Return 404 Not Found
         }
-  
+
 }
 
 
@@ -839,7 +839,7 @@ public function Basic_Salary(Request $request)
     ->select('basic_salary.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
     ->where('basic_salary.id', $id)
     ->get();
-    
+
     if (isset($emergency__contactsData)) {
     $emergency__contactsCount = count($emergency__contactsData);
     if ($emergency__contactsCount == 1) {
@@ -851,7 +851,7 @@ public function Basic_Salary(Request $request)
      $year = $c_data->year;
      $Payslip_Type = $c_data->Payslip_Type;
      $Basic_Salary = $c_data->Basic_Salary;
-    
+
     $em_data = array("id" => $id,
     "Employee_name" => $Employee_name,
     "Employee_id" => $Employee_id,
@@ -859,14 +859,14 @@ public function Basic_Salary(Request $request)
     "year" => $year,
      "Payslip_Type" => $Payslip_Type,
      "Basic_Salary" => $Basic_Salary,
-    
+
     );
-    
+
     return view("edit_basic_salary")
     ->with('role',$role)
     ->with('em_data', $em_data);
     }
-    
+
     } else {
         ?>
 <script>
@@ -874,24 +874,24 @@ alert("data not found")
 history.back()
 </script>
 <?php
-    
+
     }
     }
-    
+
     }
-    
+
     }
     public function delete_Basic_Salary(Request $Contact_req)
     {
-    
+
     }
-    
+
     public function delete_holiday(Request $Contact_req)
     {
-        
+
 
         $id = $Contact_req->id;
-        
+
         if (isset($id)) {
 
             $delete_holiday =  DB::table('holiday_master')->where('id', $id)->delete();
@@ -951,10 +951,10 @@ history.back()
             'message' => 'No data found for the provided ID.',
         ], 404); // Return 404 Not Found
     }
-   
-    
-    
-    
+
+
+
+
     }
     public function edit_alloweance(Request $Contact_req)
     {
@@ -966,7 +966,7 @@ history.back()
         ->select('alloweance.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
         ->where('alloweance.id', $id)
         ->get();
-    
+
     if (isset($emergency__contactsData)) {
     $emergency__contactsCount = count($emergency__contactsData);
     if ($emergency__contactsCount == 1) {
@@ -986,12 +986,12 @@ history.back()
     "Allowance_Ammount_in_INR" => $Allowance_Ammount_in_INR,
     "year" => $year,
     );
-    
+
     return view("edit_alloweance")
     ->with('role',$role)
     ->with('em_data', $em_data);
     }
-    
+
     } else {
         ?>
 <script>
@@ -999,18 +999,18 @@ alert("data not found")
 history.back()
 </script>
 <?php
-    
+
     }
     }
-    
+
     }else{
         echo "error";
     }
-    
+
     }
     public function delete_alloweance(Request $Contact_req)
     {
-    
+
     }
 
 
@@ -1033,7 +1033,7 @@ history.back()
                 'all_users.m_name',
                 'all_users.l_name'
             )
-            ->where('loan.Loan_id', $id)
+            ->where('loan.id', $id)
             ->first(); // Fetch a single result
 
         // Check if data exists
@@ -1049,7 +1049,7 @@ history.back()
                 'message' => 'No loan data found for the provided ID.',
             ], 404); // HTTP 404 Not Found
         }
-  
+
 }
 
 
@@ -1062,7 +1062,7 @@ history.back()
     $id = $Contact_req->id;
     $role = session()->get('role');
     if (isset($id)) {
-    
+
         $emergency__contactsData = DB::table('loan')
         ->where('id', $id)
         ->get();
@@ -1082,16 +1082,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-       
+
         } else {
-        
+
         $emergency__contactsData2 = DB::table('loan')
-        
+
         ->join('all_users', 'loan.Employee_id', '=', 'all_users.Employee_id')
         ->select('loan.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
         ->where('loan.id', $id)
         ->get();
-        
+
         if (isset($emergency__contactsData2)) {
         $emergency__contactsData2Count = count($emergency__contactsData2);
         if ($emergency__contactsData2Count == 1) {
@@ -1108,8 +1108,8 @@ history.back()
                 $Loan_duration = $c_data->Loan_duration;
                 $Reason = $c_data->Reason;
                 $Loan_Remaining = $c_data->Loan_Remaining;
-             
-                
+
+
                 $em_data = array("id" => $id,
                 "Employee_name" => $Employee_name,
                 "Employee_id" => $Employee_id,
@@ -1122,14 +1122,14 @@ history.back()
                 "Loan_duration" => $Loan_duration,
                 "Reason" => $Reason,
                 "Loan_Remaining" => $Loan_Remaining,
-                
+
                 );
                 return view("edit_lone")
                 ->with('role',$role)
                 ->with('em_data', $em_data);
-                
+
                 }
-        
+
         } else {
             ?>
 <script>
@@ -1137,12 +1137,12 @@ alert("data not found")
 history.back()
 </script>
 <?php
-        
+
         }
         }
-        
+
         }
-        
+
         }
     }
 
@@ -1161,7 +1161,7 @@ history.back()
                 )
                 ->where('deductions.id', $id)
                 ->first(); // Fetch a single record
-    
+
             // Check if data exists
             if ($deductionData) {
                 return response()->json([
@@ -1175,9 +1175,9 @@ history.back()
                     'message' => 'No deduction data found for the provided ID.',
                 ], 404); // HTTP 404 Not Found
             }
-       
+
     }
-    
+
 
       // Deductions
       public function edit_deductions(Request $Contact_req)
@@ -1185,11 +1185,11 @@ history.back()
       $id = $Contact_req->id;
       $role = session()->get('role');
       if (isset($id)) {
-      
+
           $emergency__contactsData = DB::table('deductions')
           ->where('id', $id)
           ->get();
-          
+
           $Employee_id = "";
           if (isset($emergency__contactsData)) {
           $emergency__contactsCount = count($emergency__contactsData);
@@ -1206,16 +1206,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-         
+
           } else {
-          
+
           $emergency__contactsData2 = DB::table('deductions')
-          
+
           ->join('all_users', 'deductions.Employee_id', '=', 'all_users.Employee_id')
           ->select('deductions.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
           ->where('deductions.id', $id)
           ->get();
-          
+
           if (isset($emergency__contactsData2)) {
           $emergency__contactsData2Count = count($emergency__contactsData2);
           if ($emergency__contactsData2Count == 1) {
@@ -1239,7 +1239,7 @@ history.back()
                   ->with('role',$role)
                   ->with('em_data', $em_data);
                   }
-          
+
           } else {
              ?>
 <script>
@@ -1247,20 +1247,20 @@ alert("data not found")
 history.back()
 </script>
 <?php
-          
+
           }
           }
-          
+
           }
-          
+
           }
-      
+
       }
 
      // Deductions
 public function view_deductions_api(Request $Contact_req)
 {
-  
+
 
     // Fetch data from the database
     $deductionsData = DB::table('deductions')
@@ -1289,11 +1289,11 @@ public function view_deductions_api(Request $Contact_req)
     ], 200);
 }
 
- 
 
 
 
-     
+
+
      // Other Payment
      public function Other_Payment_function(Request $Contact_req)
      {
@@ -1319,16 +1319,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-        
+
          } else {
-         
+
          $emergency__contactsData2 = DB::table('other_payments')
-         
+
          ->join('all_users', 'other_payments.Employee_id', '=', 'all_users.Employee_id')
          ->select('other_payments.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
          ->where('other_payments.id', $id)
          ->get();
-         
+
          if (isset($emergency__contactsData2)) {
          $emergency__contactsData2Count = count($emergency__contactsData2);
          if ($emergency__contactsData2Count == 1) {
@@ -1352,7 +1352,7 @@ history.back()
                  ->with('role',$role)
                  ->with('em_data', $em_data);
                  }
-         
+
          } else {
             ?>
 <script>
@@ -1361,14 +1361,14 @@ history.back()
 </script>
 <?php
 
-         
+
          }
          }
-         
+
          }
-         
+
          }
-     
+
      }
 
 
@@ -1399,16 +1399,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-        
+
          } else {
-         
+
          $emergency__contactsData2 = DB::table('overtime')
-         
+
          ->join('all_users', 'overtime.Employee_id', '=', 'all_users.Employee_id')
          ->select('overtime.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
          ->where('overtime.id', $id)
          ->get();
-         
+
          if (isset($emergency__contactsData2)) {
          $emergency__contactsData2Count = count($emergency__contactsData2);
          if ($emergency__contactsData2Count == 1) {
@@ -1427,7 +1427,7 @@ history.back()
                  "Employee_id" => $Employee_id,
                  "month" => $month,
                  "year" => $year,
-               
+
                  "Total_Hours" => $Total_Hours,
                  "Rate" => $Rate,
                  "Title" => $Title,
@@ -1437,7 +1437,7 @@ history.back()
                  ->with('role',$role)
                  ->with('em_data', $em_data);
                  }
-                
+
          } else {
             ?>
 <script>
@@ -1445,14 +1445,14 @@ alert("data not found")
 history.back()
 </script>
 <?php
-         
+
          }
          }
-         
+
          }
-         
+
          }
-     
+
      }
 
 
@@ -1482,16 +1482,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-        
+
          } else {
-         
+
          $emergency__contactsData2 = DB::table('overtime')
-         
+
          ->join('all_users', 'overtime.Employee_id', '=', 'all_users.Employee_id')
          ->select('overtime.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
          ->where('overtime.id', $id)
          ->get();
-         
+
          if ($emergency__contactsData2) {
          $emergency__contactsData2Count = count($emergency__contactsData2);
          if ($emergency__contactsData2Count == 1) {
@@ -1519,7 +1519,7 @@ history.back()
                  ->with('role',$role)
                  ->with('em_data', $em_data);
                  }
-                
+
          } else {
             ?>
 <script>
@@ -1527,18 +1527,18 @@ alert("data not found")
 history.back()
 </script>
 <?php
-         
+
          }
          }
-         
+
          }
-         
+
          }
-     
+
      }
 
      //edit_over_time
-// 
+//
 public function edit_over_time(Request $Contact_req)
 {
 $id = $Contact_req->id;
@@ -1563,16 +1563,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-   
+
     } else {
-    
+
     $emergency__contactsData2 = DB::table('overtime')
-    
+
     ->join('all_users', 'overtime.Employee_id', '=', 'all_users.Employee_id')
     ->select('overtime.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
     ->where('overtime.id', $id)
     ->get();
-    
+
     if (isset($emergency__contactsData2)) {
     $emergency__contactsData2Count = count($emergency__contactsData2);
     if ($emergency__contactsData2Count == 1) {
@@ -1591,7 +1591,7 @@ history.back()
             "Employee_id" => $Employee_id,
             "month" => $month,
             "year" => $year,
-          
+
             "Total_Hours" => $Total_Hours,
             "Rate" => $Rate,
             "Title" => $Title,
@@ -1601,7 +1601,7 @@ history.back()
             ->with('role',$role)
             ->with('em_data', $em_data);
             }
-           
+
     } else {
        ?>
 <script>
@@ -1609,26 +1609,26 @@ alert("data not found")
 history.back()
 </script>
 <?php
-    
+
     }
     }
-    
+
     }
-    
+
     }
 
 }
 
 
 
-    // Leave 
+    // Leave
     public function leave_view(Request $request)
     {
-       
-    
+
+
             $id = $request->id;
             $role = session()->get('role'); // Retrieve the user's role from the session (if needed)
-    
+
             // Fetch leave data along with user information
             $leaveData = DB::table('_leave')
                 ->join('all_users', '_leave.Employee_id', '=', 'all_users.Employee_id')
@@ -1642,7 +1642,7 @@ history.back()
                 )
                 ->where('_leave.id', $id)
                 ->first(); // Retrieve a single record
-    
+
             // Check if data exists
             if ($leaveData) {
                 return response()->json([
@@ -1656,11 +1656,11 @@ history.back()
                     'message' => 'No leave data found for the provided ID.',
                 ], 404); // HTTP 404 Not Found
             }
-        
-    }
-    
 
-           // award info 
+    }
+
+
+           // award info
            public function award_view(Request $Contact_req)
            {
            $id = $Contact_req->id;
@@ -1685,11 +1685,11 @@ alert("data not found")
 history.back()
 </script>
 <?php
-              
+
                } else {
-               
+
                $emergency__contactsData2 = DB::table('award_info')
-               
+
                ->join('all_users', 'award_info.Employee_id', '=', 'all_users.Employee_id')
                ->select('award_info.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
                ->where('award_info.id', $id)
@@ -1710,14 +1710,14 @@ history.back()
                        "Employee_id" => $Employee_id,
                        "Award_Name" => $Award_Name,
                        "Gift" => $Gift,
-                       "Award_date" => $Award_date, 
-                       "Award_by" => $Award_by, 
+                       "Award_date" => $Award_date,
+                       "Award_by" => $Award_by,
                        );
                        return view("award_view")
                        ->with('role',$role)
                        ->with('em_data', $em_data);
                        }
-                    
+
                } else {
                 ?>
 <script>
@@ -1725,18 +1725,18 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
                }
                }
-               
+
                }
-               
+
                }
-           
+
            }
 
 
-           // Travel info 
+           // Travel info
            public function Travel_view(Request $Contact_req)
            {
            $id = $Contact_req->id;
@@ -1761,11 +1761,11 @@ alert("data not found")
 history.back()
 </script>
 <?php
-              
+
                } else {
-               
+
                $emergency__contactsData2 = DB::table('travel_info')
-               
+
                ->join('all_users', 'travel_info.Employee_id', '=', 'all_users.Employee_id')
                ->select('travel_info.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
                ->where('travel_info.id', $id)
@@ -1786,15 +1786,15 @@ history.back()
                        "Employee_id" => $Employee_id,
                        "Summary" => $Summary,
                        "Place_Of_Visit" => $Place_Of_Visit,
-                       "Travel_start_date" => $Travel_start_date, 
-                       "Travel_end_date" => $Travel_end_date, 
+                       "Travel_start_date" => $Travel_start_date,
+                       "Travel_end_date" => $Travel_end_date,
                        );
                        return view("travel_view")
                        ->with('role',$role)
                        ->with('em_data', $em_data);
-                       
+
                        }
-                    
+
                } else {
                 ?>
 <script>
@@ -1802,19 +1802,19 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
                }
                }
-               
+
                }
-               
+
                }
-           
+
            }
 
 
 
-            // Training info 
+            // Training info
             public function Training_view(Request $Contact_req)
             {
             $id = $Contact_req->id;
@@ -1839,11 +1839,11 @@ alert("data not found")
 history.back()
 </script>
 <?php
-               
+
                 } else {
-                
+
                 $emergency__contactsData2 = DB::table('training_info')
-                
+
                 ->join('all_users', 'training_info.Employee_id', '=', 'all_users.Employee_id')
                 ->select('training_info.*', 'all_users.f_name', 'all_users.m_name', 'all_users.l_name')
                 ->where('training_info.id', $id)
@@ -1864,14 +1864,14 @@ history.back()
                         "Employee_id" => $Employee_id,
                         "Training_Typ" => $Training_Typ,
                         "Trainer" => $Trainer,
-                        "Travel_start_date" => $Travel_start_date, 
-                        "Travel_end_date" => $Travel_end_date, 
+                        "Travel_start_date" => $Travel_start_date,
+                        "Travel_end_date" => $Travel_end_date,
                         );
                         return view("Training_view")
                         ->with('role',$role)
                         ->with('em_data', $em_data);
                         }
-                     
+
                 } else {
                     ?>
 <script>
@@ -1879,16 +1879,16 @@ alert("data not found")
 history.back()
 </script>
 <?php
-                
+
                 }
                 }
-                
+
                 }
-                
+
                 }
-            
+
             }
-     
+
 
 
 

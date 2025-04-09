@@ -34,9 +34,10 @@
                     </div>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-danger" id="bulk-delete-btn">
-                        <i class="fas fa-trash"></i> Bulk Delete
+                    <button type="button" class="btn btn-danger" id="delet_add_records2">
+                        <i class="fas fa-trash-alt"></i> Delete Selected
                     </button>
+
                     <button type="button" class="btn btn-primary" id="generate-attendance-btn">
                         <i class="fas fa-gears"></i> Generate Attendance
                     </button>
@@ -173,34 +174,38 @@
         </div>
     </div>
 
-
-
-
     <!-- Edit Attendance Modal -->
-    <div class="modal fade" id="edit-attendance-modal">
-        <div class="modal-dialog">
-          <div class="modal-content">
+    <div class="modal fade" id="edit-attendance-modal" tabindex="-1" role="dialog" aria-labelledby="editAttendanceLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
             <div class="modal-header">
-              <h4 class="modal-title">Edit Attendance</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h5 class="modal-title" id="editAttendanceLabel">Edit Attendance</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
-              </button>
+            </button>
             </div>
+
+            <!-- FORM STARTS -->
             <form id="updateAttendanceForm">
-              @csrf
-              <div class="modal-body">
+            @csrf
+            <div class="modal-body">
                 <div id="Attendance_edit_div">
-                  <!-- Attendance details will be loaded here -->
+                <!-- Dynamic form fields will be injected here by JS -->
                 </div>
-              </div>
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Update</button>
-              </div>
+            </div>
             </form>
-          </div>
+            <!-- FORM ENDS -->
+
         </div>
-      </div>
+        </div>
+    </div>
+
 
 @endsection
 
@@ -242,10 +247,50 @@
             lode_data();
         });
 
-        // Select all checkboxes
-        $("#select-all-checkbox").on("click", function() {
-            $(".checkbox_ids").prop("checked", $(this).prop("checked"));
+
+        $(function(e){
+            // Select All checkbox
+            $("#sellect_all_ids2").click(function(){
+                $(".checkbox_ids").prop('checked', $(this).prop('checked'));
+            });
+
+            // Bulk delete button click
+            $('#delet_add_records2').click(function(e){
+                e.preventDefault(); // Prevent default button action
+
+                var all_ids = []; // Make it local to prevent accumulation bug
+
+                var confirmation = confirm("Do you want to remove these?");
+                if (confirmation) {
+                    $('input:checkbox[name="delet_ids"]:checked').each(function(){
+                        all_ids.push($(this).val());
+                    });
+
+                    if (all_ids.length === 0) {
+                        alert("Please select at least one record.");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "{{ route('delete_attendence') }}",
+                        type: "POST",
+                        data: {
+                            ids: all_ids,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response){
+                            alert(response.success || "Deleted successfully.");
+                            location.reload();
+                        },
+                        error: function(xhr){
+                            console.error(xhr.responseText);
+                            alert("An error occurred while deleting.");
+                        }
+                    });
+                }
+            });
         });
+
 
         // Generate Attendance button
         $("#generate-attendance-btn").on("click", function() {
@@ -469,35 +514,6 @@
                 $(this).find("th:eq(" + (parseInt(column) + 1) + "), td:eq(" + (parseInt(column) + 1) + ")").toggle();
             });
         });
-
-        // Form submission handler
-        // $(document).on('submit', '#updateAttendanceForm', function (e) {
-        //     e.preventDefault();
-
-        //     var formData = $(this).serialize();
-
-        //     $.ajax({
-        //         url: '{{URL("/update-attendance")}}',
-        //         type: 'POST',
-        //         data: formData,
-        //         headers: {
-        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //         },
-        //         success: function (response) {
-        //             if (response.success) {
-        //                 alert(response.message);
-        //                 $('#edit-attendance-modal').modal('hide');
-        //                 lode_data();
-        //             } else {
-        //                 alert('Failed to update attendance.');
-        //             }
-        //         },
-        //         error: function (xhr) {
-        //             console.error(xhr.responseText);
-        //             alert('An error occurred while updating attendance.');
-        //         }
-        //     });
-        // });
     });
 
     // Load initial data
@@ -541,7 +557,7 @@
                     all_attendance.forEach(attendance => {
                         table_html_data += `
                             <tr>
-                                <td><input type="checkbox" class="checkbox_ids" value="${attendance.id}"></td>
+                               <td><input type="checkbox" class="checkbox_ids" name="delet_ids" value="${attendance.id}"></td>
                                 <td>${(attendance.f_name || '') + ' ' + (attendance.m_name || '') + ' ' + (attendance.l_name || '')}</td>
                                 <td>${attendance.Employee_id}</td>
                                 <td>${attendance.attendance_time}</td>
@@ -619,81 +635,58 @@
         });
     }
 
-    // Open attendance edit form
-    function open_att_form(id) {
-    $('#edit-attendance-modal').modal('show'); // Show AdminLTE modal
-    $('#Attendance_edit_div').empty().html('<p class="text-center text-info">Loading...</p>'); // Show loading text
+/**
+ * AdminLTE Attendance Edit Modal with Time Input Fix
+ */
 
-    $.ajax({
-        url: '{{ url("/edit-attendance") }}/' + id,
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-            console.log('Success:', response);
-            var emp_data = response.emp_type_Data;
-
-            if (emp_data && emp_data.length > 0) {
-                var attendance = emp_data[0];
-
-                // Format Full Name (Avoid extra spaces)
-                var fullName = [attendance.f_name, attendance.m_name, attendance.l_name].filter(Boolean).join(' ');
-
-                var edit_form_data = `
-                    <form id="updateAttendanceForm">
-                        <input type="hidden" name="attendance_id" value="${attendance.id}">
-
-                        <div class="form-group">
-                            <label>Employee ID:</label>
-                            <input type="text" class="form-control" value="${attendance.Employee_id}" disabled>
+// Add the edit modal container to the page
+$(function() {
+    // Add edit modal container if it doesn't exist
+    if (!$('#attendanceEditModal').length) {
+        $('body').append(`
+            <div class="modal fade" id="attendanceEditModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel">Update Attendance</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-
-                        <div class="form-group">
-                            <label>Employee Name:</label>
-                            <input type="text" class="form-control" value="${fullName}" disabled>
+                        <div class="modal-body" id="attendanceEditContent">
+                            <!-- Content will be loaded dynamically -->
                         </div>
+                        <!-- Form submit buttons will be in the form itself -->
+                    </div>
+                </div>
+            </div>
+        `);
+    }
 
-                        <div class="form-group">
-                            <label>Attendance Date:</label>
-                            <input type="date" name="attendance_date" class="form-control" value="${attendance.attendance_Date}">
-                        </div>
+    // Register form submission event
+    $(document).on('submit', '#updateAttendanceForm', function(e) {
+        e.preventDefault();
 
-                        <div class="form-group">
-                            <label>Attendance Time:</label>
-                            <input type="time" name="attendance_time" class="form-control" value="${attendance.attendance_time}">
-                        </div>
-                    </form>
-                `;
+        // Serialize form data
+        const formData = $(this).serialize();
 
-                $('#Attendance_edit_div').empty().html(edit_form_data); // Clear before adding new content
-            } else {
-                $('#Attendance_edit_div').empty().html('<p class="text-danger">No data found</p>');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error:', error);
-            $('#Attendance_edit_div').empty().html('<p class="text-danger">Error loading data. Please try again.</p>');
-        }
-    });
-}
-
-
-    $(document).on('submit', '#updateAttendanceForm', function (e) {
-        e.preventDefault(); // Prevent default form submission
-
-        var formData = $(this).serialize(); // Serialize form data
-
+        // Send data via Ajax
         $.ajax({
-            url: '{{ url("/update-attendance") }}', // Laravel update route
+            url: '/update-attendance',
             type: 'POST',
             data: formData,
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF Token
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
                 if (response.success) {
                     alert(response.message);
-                    $('#edit-attendance-modal').modal('hide'); // Close modal
-                    location.reload(); // Refresh page to see updated data
+
+                    // Close the modal
+                    $('#attendanceEditModal').modal('hide');
+
+                    // Reload the page to reflect changes
+                    location.reload();
                 } else {
                     alert('Failed to update attendance.');
                 }
@@ -704,6 +697,103 @@
             }
         });
     });
+});
+
+/**
+ * Open attendance edit form with fixed time handling
+ * @param {number} id - The attendance ID
+ */
+function open_att_form(id) {
+    // Show modal
+    $('#attendanceEditModal').modal('show');
+
+    // Set loading indicator
+    $('#attendanceEditContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>');
+
+    // Fetch attendance data
+    $.ajax({
+        url: `/edit-attendance/${id}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Success:', response);
+            if (response.emp_type_Data && response.emp_type_Data.length > 0) {
+                const empData = response.emp_type_Data[0];
+
+                // Format time to match the required format
+                // If the time already has seconds, keep as is, otherwise add ":00" for seconds
+                let timeValue = empData.attendance_time;
+                if (timeValue && timeValue.split(':').length > 2) {
+                    // Remove seconds portion if present
+                    timeValue = timeValue.split(':').slice(0, 2).join(':');
+                }
+
+                // Create the edit form HTML
+                const editForm = `
+                    <form id="updateAttendanceForm">
+                        <input type="hidden" name="id" value="${empData.id}">
+                        <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="attendance_date">Attendance Date*</label>
+                                    <input type="date" class="form-control" id="attendance_date" name="date" value="${empData.attendance_Date}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="attendance_time">Attendance Time*</label>
+                                    <div class="input-group">
+                                        <input type="time" class="form-control" id="attendance_time" name="Time"
+                                            value="${timeValue}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                `;
+
+                // Update the modal content
+                $('#attendanceEditContent').html(editForm);
+
+                // Initialize time input with mask
+                if ($.fn.timepicker) {
+                    $('#attendance_time').timepicker({
+                        showMeridian: false,
+                        showSeconds: false,
+                        defaultTime: timeValue || false
+                    });
+                }
+            } else {
+                $('#attendanceEditContent').html('<div class="alert alert-warning">No attendance data found</div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            $('#attendanceEditContent').html(`
+                <div class="alert alert-danger">
+                    <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                    Failed to load attendance data. Please try again.
+                </div>
+            `);
+        }
+    });
+}
+
+/**
+ * Close the attendance edit modal
+ */
+function close_edit_attandance_form() {
+    $('#attendanceEditModal').modal('hide');
+}
 
 
 </script>

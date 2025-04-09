@@ -28,8 +28,8 @@ $role_masrer = DB::table('role_masrer')
         $OT_Hours = $req->OT_Hours;
         $OT_Amount = $req->OT_Amount;
 
-      
-    
+
+
         // If arrear_month is 0, set it to the current year and month
         if ($arrear_month == 0) {
             $arrear_month = now()->format('Y-m');
@@ -37,26 +37,26 @@ $role_masrer = DB::table('role_masrer')
             $deduction_month=now()->format('F');
             $insert_m =  now()->format('Y-m');
         }
-        
+
         // Extract year and month from arrear_month
         [$year, $month] = explode('-', $arrear_month);
         $insert_m = $year . '-' .$month . '-' . 28 ;
-        
 
-     
+
+
           $formattedDate = Carbon::create($year, $month, 1)->format('F-Y');
 
           $months = array(
-            1 => "January", 2 => "February", 3 => "March", 
-            4 => "April", 5 => "May", 6 => "June", 
-            7 => "July", 8 => "August", 9 => "September", 
+            1 => "January", 2 => "February", 3 => "March",
+            4 => "April", 5 => "May", 6 => "June",
+            7 => "July", 8 => "August", 9 => "September",
             10 => "October", 11 => "November", 12 => "December"
         );
-        
+
         $ddm = $months[01].' ' .$year;
 
 
-        
+
         // Query the arrear_table with the Employee ID, Year, and Month
         $arrearData = DB::table('arrear_table')
             ->where('Employee_id', $req->emp_id)
@@ -78,11 +78,11 @@ foreach ($dudections_ids as $dd_ids) {
         $loanRemaining = DB::table('loan')
         ->where('Loan_id', $dd_ids->Advance_Ids)
         ->value('Loan_Remaining');
-        
+
         $updated = DB::table('loan')
       ->where('Loan_id', $dd_ids->Advance_Ids)
       ->update(['Loan_Remaining' => $loanRemaining - 1000]); // Set to the desired value
-    }  
+    }
 }
 
                 $update_deduction =   DB::table('deductions')
@@ -92,27 +92,27 @@ foreach ($dudections_ids as $dd_ids) {
             }
 
 
-        
 
 
-       
-    
+
+
+
         // Return a JSON response
         $cont = count($arrearData);
         if( $cont == 0){
             $insert_arrear_Data = DB::table('arrear_table')
             ->insertOrIgnore([
-            'Employee_id'=>$req->emp_id, 
+            'Employee_id'=>$req->emp_id,
             'Arrear_Amount'=> 0,
-             'Arrear_Reasons'=> ' ', 
-             'Arrear_Month'=>$insert_m, 
-             'Arrear_Year'=>$year, 
-             'Paid_Amount'=> $paid_amount, 
-             'Paid_Flag'=> 1, 
-             'Salary_amount'=>  $net_amount, 
-             'OT_Hours'=> $OT_Hours, 
-             'OT_Amount'=> $OT_Amount, 
-           
+             'Arrear_Reasons'=> ' ',
+             'Arrear_Month'=>$insert_m,
+             'Arrear_Year'=>$year,
+             'Paid_Amount'=> $paid_amount,
+             'Paid_Flag'=> 1,
+             'Salary_amount'=>  $net_amount,
+             'OT_Hours'=> $OT_Hours,
+             'OT_Amount'=> $OT_Amount,
+
              'Pay_Date'=> now()
 
             ]);
@@ -120,13 +120,13 @@ foreach ($dudections_ids as $dd_ids) {
             $update_quri = DB::table('arrear_table')
             ->where('Employee_id', $req->emp_id)
             ->whereYear('Arrear_Month', $year) // Assuming 'created_at' is the date column
-            ->whereMonth('Arrear_Month', $month) 
-             ->update( [ 
-            'Paid_Flag'=> 1, 
-            'Paid_Amount'=> $paid_amount, 
+            ->whereMonth('Arrear_Month', $month)
+             ->update( [
+            'Paid_Flag'=> 1,
+            'Paid_Amount'=> $paid_amount,
              'Pay_Date'=> now()
-       
-            ]); 
+
+            ]);
         }
 
         if($net_amount - $paid_amount != 0){
@@ -138,7 +138,7 @@ foreach ($dudections_ids as $dd_ids) {
             }else{
               $month = $month + 1  ;
             }
-           
+
             $arrearData2 = DB::table('arrear_table')
             ->where('Employee_id', $req->emp_id)
             ->whereYear('Arrear_Month', $year) // Assuming 'created_at' is the date column
@@ -154,25 +154,25 @@ foreach ($dudections_ids as $dd_ids) {
                 $update_quri2 = DB::table('arrear_table')
                 ->where('Employee_id', $req->emp_id)
                 ->whereYear('Arrear_Month', $year) // Assuming 'created_at' is the date column
-                ->whereMonth('Arrear_Month', $month) 
-                 ->update( [ 
-                
+                ->whereMonth('Arrear_Month', $month)
+                 ->update( [
+
                 'Arrear_Amount'=>  $new_arrear_amt + $net_amount - $paid_amount,
                  'Arrear_Reasons'=> $new_arrear_reason . ' And Previous month remaining amount',
-                ]); 
+                ]);
 
 
             }else{
 
-             
+
                 $insert_arrear_Data = DB::table('arrear_table')
                 ->insertOrIgnore([
-                'Employee_id'=>$req->emp_id, 
+                'Employee_id'=>$req->emp_id,
                 'Arrear_Amount'=> $net_amount - $paid_amount,
-                 'Arrear_Reasons'=> 'Previous month remaining amount', 
-                 'Arrear_Month'=>$insert_m2, 
-                 'Arrear_Year'=>$year, 
-    
+                 'Arrear_Reasons'=> 'Previous month remaining amount',
+                 'Arrear_Month'=>$insert_m2,
+                 'Arrear_Year'=>$year,
+
                 ]);
             }
 
@@ -181,13 +181,13 @@ foreach ($dudections_ids as $dd_ids) {
 
         return response()->json([
             'success' => true,
-            'message' => 'Salary Paid successfully ' 
+            'message' => 'Salary Paid successfully '
         ]);
     }
 
     public function lock_one_click_arrear_data(Request $req)
     {
-       
+
 
 
         $employee_ids = DB::table('all_users')->pluck('Employee_id')->toArray(); // Array of Employee IDs
@@ -195,40 +195,40 @@ foreach ($dudections_ids as $dd_ids) {
         foreach ($employee_ids as $employee_id) {
             $arrear_month = $req->arrear_month;
             $insert_m = $req->arrear_month;
-        
+
             // If arrear_month is 0, set it to the current year and month
             if ($arrear_month == 0) {
                 $arrear_month = now()->format('Y-m');
-    
+
                 $deduction_month=now()->format('F');
                 $insert_m =  now()->format('Y-m');
             }
-            
+
             // Extract year and month from arrear_month
             [$year, $month] = explode('-', $arrear_month);
             $insert_m = $year . '-' .$month . '-' . 28 ;
-    
-         
+
+
               $formattedDate = Carbon::create($year, $month, 1)->format('F-Y');
-    
+
               $months = array(
-                1 => "January", 2 => "February", 3 => "March", 
-                4 => "April", 5 => "May", 6 => "June", 
-                7 => "July", 8 => "August", 9 => "September", 
+                1 => "January", 2 => "February", 3 => "March",
+                4 => "April", 5 => "May", 6 => "June",
+                7 => "July", 8 => "August", 9 => "September",
                 10 => "October", 11 => "November", 12 => "December"
             );
-            
+
             $ddm = $months[01].' ' .$year;
-    
-    
-            
+
+
+
             // Query the arrear_table with the Employee ID, Year, and Month
             $arrearData = DB::table('arrear_table')
                 ->where('Employee_id', $employee_id)
                 ->whereYear('Arrear_Month', $year) // Assuming 'created_at' is the date column
                 ->whereMonth('Arrear_Month', $month)
                 ->get();
-    
+
                 $dudections_ids =  DB::table('deductions')
                 ->where('Employee_id', $employee_id,)
                 ->where('Month', $ddm)
@@ -237,68 +237,68 @@ foreach ($dudections_ids as $dd_ids) {
                 $a = 0;
                 if(count($dudections_ids) >= 1 ){
                     $a = 1;
-    
+
     foreach ($dudections_ids as $dd_ids) {
         if(isset($dd_ids->Advance_Ids)){
             $loanRemaining = DB::table('loan')
             ->where('Loan_id', $dd_ids->Advance_Ids)
             ->value('Loan_Remaining');
-            
+
             $updated = DB::table('loan')
           ->where('Loan_id', $dd_ids->Advance_Ids)
           ->update(['Loan_Remaining' => $loanRemaining - 1000]); // Set to the desired value
-        }  
+        }
     }
-    
+
                     $update_deduction =   DB::table('deductions')
                     ->where('Employee_id', $employee_id,)
-                
+
                     ->where('Month', $ddm)
                     ->update(['Deduction_Paid_Flag' => 1]);
                 }
-    
-    
-            
-    
-    
-           
-        
+
+
+
+
+
+
+
             // Return a JSON response
             $cont = count($arrearData);
             if( $cont == 0){
                 $insert_arrear_Data = DB::table('arrear_table')
                 ->insertOrIgnore([
-                'Employee_id'=>$employee_id, 
+                'Employee_id'=>$employee_id,
                 'Arrear_Amount'=> 0,
-                 'Arrear_Reasons'=> ' ', 
-                 'Arrear_Month'=>$insert_m, 
-                 'Arrear_Year'=>$year, 
-                 'Paid_Flag'=> 1, 
+                 'Arrear_Reasons'=> ' ',
+                 'Arrear_Month'=>$insert_m,
+                 'Arrear_Year'=>$year,
+                 'Paid_Flag'=> 1,
                  'Pay_Date'=> now()
-    
+
                 ]);
             }else {
                 $update_quri = DB::table('arrear_table')
                 ->where('Employee_id', $employee_id)
                 ->whereYear('Arrear_Month', $year) // Assuming 'created_at' is the date column
-                ->whereMonth('Arrear_Month', $month) 
-                 ->update( [ 
-                'Paid_Flag'=> 1, 
+                ->whereMonth('Arrear_Month', $month)
+                 ->update( [
+                'Paid_Flag'=> 1,
                  'Pay_Date'=> now()
-           
-                ]); 
-            }
-           
 
-            
+                ]);
+            }
+
+
+
         }
         return response()->json([
             'success' => true,
             'message' => 'Salary Paid successfully for all employees',
         ]);
     }
-    
-    
+
+
 
     public function  one_user_data_with_id(Request $req){
         // Fetch user data with pagination
@@ -329,44 +329,44 @@ foreach ($dudections_ids as $dd_ids) {
         }
     }
 
-    
+
 
     public function all_users_api(Request $req)
     {
-    
+
         // Fetch user data with pagination
         $userData = DB::table('users')
         ->join('role_masrer', 'users.role', '=', 'role_masrer.id')
             ->paginate($req->limit);
-    
+
         // Return a JSON response
         return response()->json([
             'success' => true,
             'message' => 'Users retrieved successfully.',
             'attandence_data' => $userData, // Current page's user data
-           
+
         ]);
     }
-    
+
     public function all_users_short_api(Request $req){
               // Fetch user data with pagination
               $userData = DB::table('users')
               ->join('role_masrer', 'users.role', '=', 'role_masrer.id')
               ->orderby($req->short_by , $req->method)
                   ->paginate($req->limit);
-          
+
               // Return a JSON response
               return response()->json([
                   'success' => true,
                   'message' => 'Users retrieved successfully.',
                   'attandence_data' => $userData, // Current page's user data
-                 
+
               ]);
     }
 
     public function all_users_search_api(Request $req){
 
-        
+
   // Fetch user data with pagination
 
   $search_by_inp = $req->input;
@@ -388,7 +388,7 @@ foreach ($dudections_ids as $dd_ids) {
   ]);
 
     }
-    
+
 
   public function  single_user(Request $req){
     $user_id =  $req->id;
@@ -474,7 +474,7 @@ foreach ($dudections_ids as $dd_ids) {
         $role_masrer = DB::table('role_masrer')
             ->get();
 
-          
+
           return view("single_user")
           ->with('u_data', $dbData)
           ->with('shift_master', $shift_master)
@@ -499,7 +499,7 @@ history.back();
 <?php
       }
 
-      
+
     }else{
       ?>
 <script>
@@ -509,7 +509,7 @@ history.back();
 <?php
       }
   }
- 
+
 
   public function one_user(Request $req)
   {
@@ -554,7 +554,7 @@ history.back();
                       $can_login = $user->can_login;
                       $Department = $user->Department;
                       $Gate_Off = $user->Gate_Off;
-                      
+
 
                       $dbData = array("name" => $name,
                           "can_login" => $can_login,
@@ -1048,18 +1048,18 @@ history.back()
                 $basic_salary_input_id = $freq->basic_salary_input_id;
 
 if (isset($basic_salary_input_id)) {
-   
-    $update_quri = DB::table('basic_salary') 
-        ->where('id',  $basic_salary_input_id) 
-         ->update( [ 
+
+    $update_quri = DB::table('basic_salary')
+        ->where('id',  $basic_salary_input_id)
+         ->update( [
          'Employee_id' => $emp_id,
         'month' => $month,
         'Year' => $year,
         'Basic_Salary' => $Basic_Salary,
         'updated_at' => now(),
-   
-        ]); 
-     
+
+        ]);
+
 
     if ($update_quri) {
         return response()->json([
@@ -1073,9 +1073,9 @@ return response()->json([
 ], 400); // 400 Bad Request
 }
 
-   
+
 }else {
-    
+
                 $created_by = session()->get('EmployeeID');
                 $Bank_AccountQR = DB::table('basic_salary')
                     ->insertOrIgnore([
@@ -1110,13 +1110,13 @@ return response()->json([
                 ->where('Employee_Id', $emp_id)
                 ->selectRaw("CONCAT(f_name, ' ', COALESCE(m_name, ''), ' ', l_name) AS full_name")
                 ->first();
-            
-           
+
+
                 $fullName = $user->full_name ; // Remove extra spaces if m_name is null
-               
-            
-                
-                
+
+
+
+
                 $Leave_Type = $freq->Leave_Type;
                 $Start_Date = $freq->Start_Date;
                 $End_Date = $freq->End_Date;
@@ -1128,8 +1128,8 @@ return response()->json([
 
                 if (isset($add_leave_id_input)) {
                     $update_quri = DB::table('_leave')
-                    ->where('id',  $add_leave_id_input) 
-                     ->update( [ 
+                    ->where('id',  $add_leave_id_input)
+                     ->update( [
 
                         'Leave_Type' => $Leave_Type,
                         'Start_Date' => $Start_Date,
@@ -1138,10 +1138,10 @@ return response()->json([
                         'Status' => $status,
                         'Total_Days' => $Total_Days,
                         'updated_at' => now(),
-               
-                    ]); 
-                 
-            
+
+                    ]);
+
+
                 if ($update_quri) {
                     return response()->json([
                         'success' => true,
@@ -1200,18 +1200,18 @@ return response()->json([
                 $Allowance_id_input = $freq->Allowance_id_input;
                 if(isset($Allowance_id_input)){
                     $update_quri = DB::table('alloweance')
-                    ->where('id',  $Allowance_id_input) 
-                     ->update( [ 
+                    ->where('id',  $Allowance_id_input)
+                     ->update( [
                         'Employee_id' => $emp_id,
                         'Alloweance_Titel' => $Allowance_Title,
                         'Month' => $Month,
                         'year' => $Year,
                         'Allowance_Ammount_in_INR' => $Allowance_Amount,
                         'updated_at' => now(),
-               
-                    ]); 
-                 
-            
+
+                    ]);
+
+
                 if ($update_quri) {
                     return response()->json([
                         'success' => true,
@@ -1223,9 +1223,9 @@ return response()->json([
             'message' => 'Data not Updated.',
             ], 400); // 400 Bad Request
             }
-            
+
                 }else{
-                    
+
                 $created_by = session()->get('EmployeeID');
                 $Bank_AccountQR = DB::table('alloweance')
                     ->insertOrIgnore([
@@ -1264,39 +1264,39 @@ return response()->json([
                 $Reason = $freq->Reason;
                 $loan_Id_input = $freq->loan_Id_input;
                 $Title = $freq->Title;
-                
+
                 if (isset($loan_Id_input)) {
                     // Update loan data
                     $update_query = DB::table('loan')
                         ->where('Loan_id', $loan_Id_input)
                         ->update([
                             'Month' => $Month,
-                            'Loan_type' => $Loan_Option,
+                            'Loan_type' => $Loan_Option ?? null,
                             'Loan_Amount_in_INR' => $Amount,
                             'Number_of_installment' => $Number_of_installment,
                             'Title' => $Title,
                             'Reason' => $Reason,
                             'updated_at' => now(),
                         ]);
-                
+
                     if ($update_query) {
                         // Delete existing deductions related to the loan
                         DB::table('deductions')->where('Advance_Ids', $loan_Id_input)->delete();
-                
+
                         // Recalculate and insert updated deductions
                         $year = date('Y', strtotime($Month));
                         $month = date('n', strtotime($Month));
                         $deduction_amount = $Amount / $Number_of_installment;
                         $months = [];
-                
+
                         for ($i = 1; $i <= $Number_of_installment; $i++) {
                             $currentMonth = ($month + $i - 1) % 12;
                             $currentYear = $year + floor(($month + $i - 1) / 12);
                             $currentMonth = $currentMonth === 0 ? 12 : $currentMonth;
-                
+
                             $monthName = date('F', mktime(0, 0, 0, $currentMonth, 1, $currentYear));
                             $formattedDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, 12, $currentYear));
-                
+
                             DB::table('deductions')->insertOrIgnore([
                                 'Employee_id' => $emp_id,
                                 'Month' => $monthName . " " . $currentYear,
@@ -1309,7 +1309,7 @@ return response()->json([
                                 'Advance_Ids' => $loan_Id_input,
                             ]);
                         }
-                
+
                         return response()->json([
                             'success' => true,
                             'message' => 'Loan and related deductions updated successfully.',
@@ -1328,7 +1328,7 @@ return response()->json([
                         'Employee_id' => $emp_id,
                         'Month' => $Month,
                         'Year' => date('Y'),
-                        'Loan_type' => $Loan_Option,
+                        'Loan_type' => $Loan_Option ?? null,
                         'Loan_Amount_in_INR' => $Amount,
                         'Number_of_installment' => $Number_of_installment,
                         'Loan_duration' => '',
@@ -1340,20 +1340,20 @@ return response()->json([
                         'updated_at' => now(),
                         'Loan_id' => $Loan_id,
                     ]);
-                
+
                     // Generate deductions and insert into the database
                     $year = date('Y', strtotime($Month));
                     $month = date('n', strtotime($Month));
                     $deduction_amount = $Amount / $Number_of_installment;
-                
+
                     for ($i = 1; $i <= $Number_of_installment; $i++) {
                         $currentMonth = ($month + $i - 1) % 12;
                         $currentYear = $year + floor(($month + $i - 1) / 12);
                         $currentMonth = $currentMonth === 0 ? 12 : $currentMonth;
-                
+
                         $monthName = date('F', mktime(0, 0, 0, $currentMonth, 1, $currentYear));
                         $formattedDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, 12, $currentYear));
-                
+
                         DB::table('deductions')->insertOrIgnore([
                             'Employee_id' => $emp_id,
                             'Month' => $monthName . " " . $currentYear,
@@ -1366,13 +1366,13 @@ return response()->json([
                             'Advance_Ids' => $Loan_id,
                         ]);
                     }
-                
+
                     return response()->json([
                         'success' => true,
                         'message' => 'Loan and related deductions inserted successfully.',
                     ], 201); // 201 Created
                 }
-                
+
 
 
 
@@ -1380,14 +1380,14 @@ return response()->json([
 
 
             } else if ($formType == "Deduction_form") {
-                
+
                 $emp_id = $freq->Employee_Id;
                 $Month_Year = $freq->Month_Year;
                 $Deduction_Title = $freq->Deduction_Title;
                 $Deduction_Amount = $freq->Deduction_Amount;
                 $Deduction_id_input = $freq->Deduction_id_input;
                 if (isset($Deduction_id_input)) {
-                    
+
 // Extract Year and Month
 $Month_Year = $freq->Month_Year; // Example: '2025-01'
 if (!preg_match('/^\d{4}-\d{2}$/', $Month_Year)) {
@@ -1438,8 +1438,8 @@ if ($updated) {
     ], 400); // 400 Bad Request
 }
                 }else{
-                    
-                  
+
+
 // Extract Year and Month
 $Month_Year = $freq->Month_Year; // Example: '2025-01'
 if (!preg_match('/^\d{4}-\d{2}$/', $Month_Year)) {
@@ -1502,8 +1502,8 @@ if ($inserted) {
 }
                 }
             } else if ($formType == "Other_Payment_form") {
-               
-                
+
+
 
                 $emp_id = $freq->Employee_Id;
                 $Month_Year = $freq->Month_Year;
@@ -1513,7 +1513,7 @@ if ($inserted) {
                 $Bank_AccountQR = DB::table('other_payments')
                     ->insertOrIgnore([
                         'Employee_id' => $emp_id,
-                        'Month' => $Month_Year , 
+                        'Month' => $Month_Year ,
                         'Year' => date('Y'),
                         'Titel' => $Title,
                         'Amount_in_INR' => $Amount,

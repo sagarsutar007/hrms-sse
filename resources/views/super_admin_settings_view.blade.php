@@ -15,27 +15,19 @@
             </button>
             <button class="btn btn-info" data-toggle="modal" data-target="#addDepartmentModal">Department</button>
          </div>
-         <div class="btn-group ml-2">
-            <button class="btn btn-primary" onclick="window.location.href='/admin-settings/{role_name}'">Admin Settings</button>
+         <div class="btn-group ml-2 mb-2">
+            @foreach ($roler_permissions as $rol_permiss)
+                <button class="btn btn-primary"
+                    onclick="window.location.href='{{ url('admin-settings/' . $rol_permiss->role_name) }}'">
+                    <i class="fas fa-cogs"></i> {{ ucfirst($rol_permiss->role_name) }} Settings
+                </button>
+            @endforeach
+         </div>
+         <div class="btn-group ml-2 mb-2">
             <button class="btn btn-secondary" data-toggle="modal" data-target="#addRoleModal">Add Role</button>
-         </div>
-         <div class="btn-group ml-2">
-            <button class="btn btn-primary" onclick="window.location.href='/admin-settings/{role_name}'">Employee Settings</button>
-            <button class="btn btn-secondary" data-toggle="modal" data-target="#leaveMasterModal">
-            Add Leave Master
-            </button>
-         </div>
-         <div class="btn-group ml-2">
-            <button class="btn btn-primary" onclick="window.location.href='/admin-settings/{role_name}'">Guard Settings</button>
-            <button class="btn btn-secondary" data-toggle="modal" data-target="#addShiftModal">
-            Add Shift
-            </button>
-         </div>
-         <div class="btn-group ml-2">
-            <button class="btn btn-primary" onclick="window.location.href='/admin-settings/{role_name}'">HR Settings</button>
-            <button class="btn btn-secondary" data-toggle="modal" data-target="#addEmployeeTypeModal">
-            Add Employee Type
-            </button>
+            <button class="btn btn-secondary" data-toggle="modal" data-target="#leaveMasterModal">Add Leave Master</button>
+            <button class="btn btn-secondary" data-toggle="modal" data-target="#addShiftModal">Add Shift</button>
+            <button class="btn btn-secondary" data-toggle="modal" data-target="#addEmployeeTypeModal">Add Employee Type</button>
          </div>
       </div>
    </div>

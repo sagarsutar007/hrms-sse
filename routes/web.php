@@ -134,7 +134,7 @@ Route::get('/delete-bank-account/{id}',[formsController::class,'delete_Bank_Acco
 //Basic_Salary
 Route::get('/basic-salary/{id}',[formsController::class,'Basic_Salary'])->name('Basic_Salary');
 Route::get('/edit-basic-salary/{id}',[formsController::class,'edit_Basic_Salary'])->name('edit_Basic_Salary');
-Route::get('/delete-basic-salary/{id}',[formsController::class,'delete_Basic_Salary'])->name('delete_Basic_Salary');
+Route::post('/delete-basic-salary/{id}',[formsController::class,'delete_Basic_Salary'])->name('delete_Basic_Salary');
 
 //Basic_Salary
 Route::get('/alloweance/{id}',[formsController::class,'alloweance'])->name('alloweance');

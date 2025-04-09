@@ -329,13 +329,13 @@
 
                                 // Create the actions cell with view opening modal
                                 var actionsCell = '<div class="action-btns">' +
-                                '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
-                                '<i class="fas fa-eye"></i></a> ' +
-                                '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
-                                '<i class="fas fa-pencil-alt"></i></a> ' +
-                                '<a href="javascript:void(0);" class="text-success download-id-card" data-id="' + user.id + '" title="Download ID Card">' +
-                                '<i class="fas fa-download"></i></a>' +
-                                '</div>'
+                                    '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
+                                    '<i class="fas fa-eye"></i></a> ' +
+                                    '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
+                                    '<i class="fas fa-pencil-alt"></i></a> ' +
+                                    '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
+                                    '<i class="fas fa-download"></i></a>' +
+                                    '</div>';
 
                                 // Push the formatted row data
                                 data.push({
@@ -659,7 +659,7 @@
             });
 
             if (selectedIds.length > 0) {
-                window.location.href = "{{ url('downloade-selected-id-cards') }}/" + selectedIds.join(',');
+                window.location.href = "{{ url('dounloade-user-id-catd') }}/" + selectedIds.join(',');
             } else {
                 Swal.fire({
                     icon: 'warning',

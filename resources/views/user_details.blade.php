@@ -680,7 +680,7 @@
                                                     </button>
                                                 </div>
 
-                                                <!-- Modal -->
+                                                <!-- Basic Salary Modal -->
                                                 <div class="modal fade" id="BasicSalaryModal" tabindex="-1" role="dialog" aria-labelledby="BasicSalaryModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog modal-lg" role="document">
                                                     <div class="modal-content">
@@ -723,14 +723,41 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- Basic Salary View Modal -->
+                                                <div class="modal fade" id="basicSalaryModal" tabindex="-1" role="dialog" aria-labelledby="basicSalaryModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-md" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-primary">
+                                                                <h5 class="modal-title" id="basicSalaryModalLabel">Basic Salary View</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true" style="font-size: 26px;">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body" id="basic_salary_modal_body">
+                                                                <p class="text-muted text-center">Loading...</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Delete Confirmation Modal -->
+                                                <x-adminlte-modal id="deleteSalaryModal" title="Confirm Deletion" theme="danger" icon="fas fa-trash" static-backdrop>
+                                                    <p>Are you sure you want to delete this salary record?</p>
+
+                                                    <x-slot name="footerSlot">
+                                                        <form id="deleteSalaryForm" method="GET">
+                                                            @csrf
+                                                            <x-adminlte-button class="mr-auto" theme="secondary" label="Cancel" data-dismiss="modal" />
+                                                            <x-adminlte-button theme="danger" type="submit" label="Delete" />
+                                                        </form>
+                                                    </x-slot>
+                                                </x-adminlte-modal>
                                             </div>
 
 
                                             <!-- Allowances Tab -->
                                             <div class="tab-pane fade" id="nav-allowances" role="tabpanel">
-                                                <button class="btn btn-sm btn-success mb-3" onclick="open_Allowance_form()">
-                                                    <i class="fas fa-plus mr-1"></i>Add Allowance
-                                                </button>
+                                                <x-adminlte-button label="Add Allowance" theme="success" icon="fas fa-plus" class="mb-3" data-toggle="modal" data-target="#addAllowanceModal" />
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped" id="allowances_table">
                                                         <thead>
@@ -749,13 +776,68 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Add Allowance Modal -->
+                                            <x-adminlte-modal id="addAllowanceModal" title="Add Allowance" size="lg" theme="success" icon="fas fa-plus" static-backdrop>
+                                                <form id="add_Allowance_form">
+                                                    @csrf
+                                                    <input type="hidden" name="form_type" value="Allowanceform">
+                                                    <input type="hidden" id="Allowance_id_input" name="Allowance_id_input" value="">
+                                                    <input type="hidden" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}">
+
+                                                    <x-adminlte-input name="Allowance_Title" label="Allowance Title" placeholder="Enter Allowance Title" required />
+                                                    <x-adminlte-input name="Allowance_Amount" label="Allowance Amount (₹)" placeholder="Enter Amount" type="number" required />
+
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <x-adminlte-input name="Month" label="Month" type="month" required />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <x-adminlte-input name="Year" label="Year" placeholder="Enter Year" required />
+                                                        </div>
+                                                    </div>
+
+                                                    <x-slot name="footerSlot">
+                                                        <x-adminlte-button label="Submit" class="mr-auto" id="Allowance_form_submit_btn" theme="primary" />
+                                                        <x-adminlte-button label="Close" data-dismiss="modal" theme="secondary" />
+                                                    </x-slot>
+                                                </form>
+                                            </x-adminlte-modal>
+
+                                            <!-- Allowance view modal -->
+                                            <x-adminlte-modal id="viewAllowanceModal" title="Allowance Details" size="lg" theme="info" icon="fas fa-eye" static-backdrop>
+                                                <div id="viewAllowanceContent">
+                                                    <!-- Dynamic content will be injected here -->
+                                                    <p>Loading...</p>
+                                                </div>
+                                            </x-adminlte-modal>
+
+                                            <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger">
+                                                        <h5 class="modal-title">Confirm Delete</h5>
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete this allowance?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Yes, Delete</a>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
                                             <!-- Deductions Tab -->
                                             <div class="tab-pane fade" id="nav-deductions" role="tabpanel">
-                                                <button class="btn btn-sm btn-success mb-3" onclick="open_Deduction_form()">
+                                                <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#deductionModal">
                                                     <i class="fas fa-plus mr-1"></i>Add Deduction
                                                 </button>
                                                 <div class="table-responsive">
-                                                    <table class="table table-bordered table-striped" id="deductions_table">
+                                                    <table class="table table-bordered table-striped" id="Deductions_table">
                                                         <thead>
                                                             <tr>
                                                                 <th><input type="checkbox" name="delet_data" id=""></th>
@@ -772,16 +854,94 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Deduction Form Modal -->
+                                            <div class="modal fade" id="deductionModal" tabindex="-1" role="dialog" aria-labelledby="deductionModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+
+                                                    <form action="{{ route('form_request') }}" method="post" id="add_deductions_form">
+                                                    @csrf
+                                                    <input type="text" name="form_type" value="Deduction_form" hidden>
+                                                    <input type="number" name="Deduction_id_input" id="Deduction_id_input" hidden>
+                                                    <input type="text" name="Employee_Id" style="padding: 5px 10px; width:100%;" value="<?php if(isset($u_data['Employee_id'])){ echo $u_data['Employee_id']; } ?>" hidden>
+
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header bg-primary">
+                                                        <h5 class="modal-title text-white" id="add_deductions_form_header">
+                                                        <i class="fas fa-minus-circle mr-2"></i> Add Deduction
+                                                        </h5>
+                                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" onclick="close_Deduction_form()">
+                                                        <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- Modal Body -->
+                                                    <div class="modal-body">
+
+                                                        <div class="form-group row">
+                                                        <div class="col-md-6">
+                                                            <label class="input_lable_p">Month *</label>
+                                                            <input type="month" class="form-control" id="Deduction_month" name="Month_Year" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="input_lable_p">Deduction Title *</label>
+                                                            <input type="text" class="form-control" name="Deduction_Title" id="Deduction_Title" placeholder="Deduction Title *" required>
+                                                        </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                        <label class="input_lable_p">(₹) Deduction Amount *</label>
+                                                        <input type="text" class="form-control" name="Deduction_Amount" id="Deduction_Amount" placeholder="Deduction Amount" required>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <!-- Modal Footer -->
+                                                    <div class="modal-footer justify-content-between">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="close_Deduction_form()">
+                                                        <i class="fas fa-times mr-1"></i> Cancel
+                                                        </button>
+                                                        <input type="submit" value="Submit" class="btn btn-success" id="_submit_btn">
+                                                    </div>
+
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Deduction View Modal -->
+                                            <div class="modal fade" id="deductionViewModal" tabindex="-1" role="dialog" aria-labelledby="deductionViewLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-top-centered" role="document">
+                                                  <div class="modal-content">
+                                                    <div class="modal-header bg-info">
+                                                      <h5 class="modal-title" id="deductionViewLabel">Deduction Details</h5>
+                                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                      </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                      <!-- Filled dynamically by JS -->
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+
+
+
                                             <!-- Advances Tab -->
                                             <div class="tab-pane fade" id="nav-loan" role="tabpanel">
-                                                <button class="btn btn-sm btn-success mb-3" onclick="open_loan_form()">
+                                                <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#loanModal">
                                                     <i class="fas fa-plus mr-1"></i>Add Advance
                                                 </button>
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped" id="loan_table">
                                                         <thead>
                                                             <tr>
-                                                                <th><input type="checkbox" name="delet_data" id=""></th>
+                                                                <th><input type="checkbox" name="delet_data"></th>
                                                                 <th>Advance Title</th>
                                                                 <th>Month-Year</th>
                                                                 <th>Reason</th>
@@ -791,12 +951,144 @@
                                                                 <th width="15%">Actions</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
-                                                            <!-- Data will be loaded via AJAX -->
+                                                        <tbody id="loan_view_table">
+                                                            <!-- AJAX data will load here -->
                                                         </tbody>
                                                     </table>
                                                 </div>
                                             </div>
+
+                                            <!-- Loan / Advance Modal -->
+                                            <div class="modal fade" id="loanModal" tabindex="-1" role="dialog" aria-labelledby="loanModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-xl" role="document">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('form_request') }}" method="post" id="add_loan_form">
+                                                        @csrf
+                                                        <input type="hidden" name="form_type" value="Loan_form">
+                                                        <input type="hidden" name="loan_Id_input" id="loan_Id_input">
+                                                        <input type="hidden" name="Employee_Id" value="{{ $u_data['Employee_id'] }}">
+
+                                                        <div class="modal-header bg-primary">
+                                                            <h5 class="modal-title text-white" id="loanModalLabel"><i class="fas fa-money-check-alt mr-1"></i> Add Advance</h5>
+                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="loan_month">Month <span class="text-danger">*</span></label>
+                                                                    <input type="month" name="Month" id="loan_month" class="form-control" onchange="genrate_table()" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="loan_reason">Reason <span class="text-danger">*</span></label>
+                                                                    <textarea class="form-control" name="Reason" id="loan_reason" rows="1" required></textarea>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="loan_title">Title <span class="text-danger">*</span></label>
+                                                                    <input type="text" name="Title" id="loan_title" class="form-control" placeholder="Advance title" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="loan_amount">(₹) Amount <span class="text-danger">*</span></label>
+                                                                    <input type="number" name="Amount" id="loan_amount" class="form-control" placeholder="Amount in INR" onkeyup="genrate_table()" required>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="number_of_loan_installment">Number of Installments <span class="text-danger">*</span></label>
+                                                                    <input type="number" name="Number_of_installment" id="number_of_loan_installment" class="form-control" placeholder="Installments" onkeyup="genrate_table()" required>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+
+                                                            <hr>
+                                                            <h6 class="text-muted mb-2">Installment Breakdown</h6>
+                                                            <div class="table-responsive">
+                                                            <table class="table table-bordered table-striped">
+                                                                <thead class="thead-dark">
+                                                                    <tr>
+                                                                        <th>Sr. No</th>
+                                                                        <th>Month - Year</th>
+                                                                        <th>Amount</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="monthList">
+                                                                    <!-- Auto-filled installment rows -->
+                                                                </tbody>
+                                                            </table>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                            <i class="fas fa-times mr-1"></i> Cancel
+                                                            </button>
+                                                            <button type="submit" class="btn btn-primary" id="loan_form_submit_btn">
+                                                            <i class="fas fa-save mr-1"></i> Submit
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- View Advance (Loan) Modal -->
+                                            <div class="modal fade" id="loanViewModal" tabindex="-1" aria-labelledby="loanViewModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- center & large -->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-info">
+                                                            <h5 class="modal-title text-white" id="loanViewModalLabel">View Advance Details</h5>
+                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body" id="loanViewModalContent">
+                                                            <!-- Dynamic content will be injected here -->
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- Delete Confirmation Modal -->
+                                            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content bg-danger text-white">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="confirmDeleteLabel">Confirm Delete</h5>
+                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Are you sure you want to delete this advance record?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancel</button>
+                                                            <a href="#" class="btn btn-light" id="confirmDeleteBtn">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
 
                                             @if ($role == '1')
                                             <!-- Other Payments Tab -->
@@ -866,82 +1158,162 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6 col-md-3">
-                                        <div class="info-box bg-success">
-                                            <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Annual Leave</span>
-                                                <span class="info-box-number">{{ $u_data['annual_leave_balance'] ?? '0' }} / {{ $u_data['annual_leave_total'] ?? '0' }}</span>
-                                                <div class="progress">
-                                                    <div class="progress-bar" style="width: {{ $u_data['annual_leave_balance'] ?? 0 / ($u_data['annual_leave_total'] ?? 1) * 100 }}%"></div>
-                                                </div>
-                                                <span class="progress-description">Available days</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6 col-md-3">
-                                        <div class="info-box bg-info">
-                                            <span class="info-box-icon"><i class="fas fa-first-aid"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Sick Leave</span>
-                                                <span class="info-box-number">{{ $u_data['sick_leave_balance'] ?? '0' }} / {{ $u_data['sick_leave_total'] ?? '0' }}</span>
-                                                <div class="progress">
-                                                    <div class="progress-bar" style="width: {{ $u_data['sick_leave_balance'] ?? 0 / ($u_data['sick_leave_total'] ?? 1) * 100 }}%"></div>
-                                                </div>
-                                                <span class="progress-description">Available days</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6 col-md-3">
-                                        <div class="info-box bg-warning">
-                                            <span class="info-box-icon"><i class="fas fa-house-user"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Personal Leave</span>
-                                                <span class="info-box-number">{{ $u_data['personal_leave_balance'] ?? '0' }} / {{ $u_data['personal_leave_total'] ?? '0' }}</span>
-                                                <div class="progress">
-                                                    <div class="progress-bar" style="width: {{ $u_data['personal_leave_balance'] ?? 0 / ($u_data['personal_leave_total'] ?? 1) * 100 }}%"></div>
-                                                </div>
-                                                <span class="progress-description">Available days</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6 col-md-3">
-                                        <div class="info-box bg-danger">
-                                            <span class="info-box-icon"><i class="fas fa-calendar-times"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">Unpaid Leave</span>
-                                                <span class="info-box-number">{{ $u_data['unpaid_leave_count'] ?? '0' }} days</span>
-                                                <div class="progress">
-                                                    <div class="progress-bar" style="width: 100%"></div>
-                                                </div>
-                                                <span class="progress-description">Taken this year</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button class="btn btn-sm btn-success mb-3" onclick="open_leave_form()">
-                                    <i class="fas fa-plus mr-1"></i>Apply for Leave
+                                <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#leaveModal">
+                                    <i class="fas fa-plus mr-1"></i> Apply for Leave
                                 </button>
 
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-hover" id="leave_table">
+                                    <table class="table table-bordered table-striped table-hover">
                                         <thead>
                                             <tr>
+                                                <th><input type="checkbox" name="delet_data" /></th>
                                                 <th>Leave Type</th>
                                                 <th>Start Date</th>
                                                 <th>End Date</th>
+                                                <th>Department</th>
                                                 <th>Duration</th>
                                                 <th>Applied On</th>
-                                                <th>Status</th>
                                                 <th width="15%">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="leave_table">
                                             <!-- Data will be loaded via AJAX -->
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Leave Application Modal --}}
+                    <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="leaveModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document"> {{-- Use modal-xl for even more width --}}
+                            <div class="modal-content">
+                                <form action="{{ route('form_request') }}" method="post" id="add_leave_form">
+                                    @csrf
+                                    <input type="hidden" name="form_type" value="leave_form">
+                                    <input type="hidden" id="add_leave_id_input" name="add_leave_id_input">
+                                    <input type="hidden" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}">
+
+                                    <div class="modal-header bg-primary">
+                                        <h5 class="modal-title text-white" id="leaveModalLabel">
+                                            <i class="fas fa-plane-departure mr-1"></i> Apply for Leave
+                                        </h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body">
+
+                                        {{-- Leave Type and Dates --}}
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="leave_type_select">Leave Type <span class="text-danger">*</span></label>
+                                                <select id="leave_type_select" class="form-control" name="Leave_Type" required>
+                                                    <option value="">Select Leave Type</option>
+                                                    @isset($leave_type_master)
+                                                        @foreach ($leave_type_master as $ltm)
+                                                            <option value="{{ $ltm->id }}">{{ $ltm->Name }}</option>
+                                                        @endforeach
+                                                    @endisset
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group col-md-3">
+                                                <label for="leave_start_date">Start Date <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" name="Start_Date" id="leave_start_date" required>
+                                            </div>
+
+                                            <div class="form-group col-md-3">
+                                                <label for="leave_end_date">End Date <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" name="End_Date" id="leave_end_date" required>
+                                            </div>
+                                        </div>
+
+                                        {{-- Duration and Status --}}
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="leave_total_days">Total Days <span class="text-danger">*</span></label>
+                                                <input type="number" step="0.5" class="form-control" name="Total_Days" id="leave_total_days" placeholder="Enter total leave days" required>
+                                            </div>
+
+                                            <div class="form-group col-md-6">
+                                                <label for="leave_Status">Status <span class="text-danger">*</span></label>
+                                                <select id="leave_Status" class="form-control" name="status" required>
+                                                    <option value="">Select Status</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="approved">Approved</option>
+                                                    <option value="Rejected">Rejected</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {{-- Descriptions --}}
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="leave_description">Description <span class="text-danger">*</span></label>
+                                                <textarea class="form-control" name="Description" id="leave_description" rows="3" required></textarea>
+                                            </div>
+
+                                            <div class="form-group col-md-6">
+                                                <label for="leave_Remarks_by_Approver">Remarks by Approver <span class="text-danger">*</span></label>
+                                                <textarea class="form-control" name="Remarks_by_Approver" id="leave_Remarks_by_Approver" rows="3" required></textarea>
+                                            </div>
+                                        </div>
+
+                                        {{-- Notification --}}
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="half_daY_check_box" name="notifaction" value="yes">
+                                                <label class="form-check-label" for="half_daY_check_box">Notify via Email/SMS</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-check-circle mr-1"></i> Submit
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            <i class="fas fa-times mr-1"></i> Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leave View Modal Placeholder -->
+                    <div class="modal fade" id="leaveViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <!-- Content gets filled by JS -->
+                    </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" role="document">
+                            <div class="modal-content border-danger">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="deleteConfirmLabel">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Confirm Delete
+                                    </h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p class="mb-3">Are you sure you want to delete this leave entry?</p>
+                                    <form id="deleteForm" method="POST" action="">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-block">
+                                            <i class="fas fa-trash-alt mr-1"></i> Yes, Delete
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-block mt-2" data-dismiss="modal">
+                                            <i class="fas fa-times mr-1"></i> Cancel
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -959,113 +1331,58 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-4">
-                                    <div class="col-12">
-                                        <div class="small-box bg-info">
-                                            <div class="inner">
-                                                <div class="row">
-                                                    <div class="col-md-3 text-center">
-                                                        <h3>{{ $u_data['on_time_percentage'] ?? '0' }}%</h3>
-                                                        <p>On-Time Arrival</p>
-                                                    </div>
-                                                    <div class="col-md-3 text-center">
-                                                        <h3>{{ $u_data['present_days'] ?? '0' }}</h3>
-                                                        <p>Present Days</p>
-                                                    </div>
-                                                    <div class="col-md-3 text-center">
-                                                        <h3>{{ $u_data['late_days'] ?? '0' }}</h3>
-                                                        <p>Late Arrivals</p>
-                                                    </div>
-                                                    <div class="col-md-3 text-center">
-                                                        <h3>{{ $u_data['absent_days'] ?? '0' }}</h3>
-                                                        <p>Absent Days</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="icon">
-                                                <i class="far fa-clock"></i>
-                                            </div>
-                                            <a href="#" class="small-box-footer">
-                                                Current Month Statistics
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Filter by Month:</label>
-                                            <select class="form-control" id="attendance-month-filter">
-                                                <option value="">All Months</option>
-                                                <option value="1">January</option>
-                                                <option value="2">February</option>
-                                                <option value="3">March</option>
-                                                <option value="4">April</option>
-                                                <option value="5">May</option>
-                                                <option value="6">June</option>
-                                                <option value="7">July</option>
-                                                <option value="8">August</option>
-                                                <option value="9">September</option>
-                                                <option value="10">October</option>
-                                                <option value="11">November</option>
-                                                <option value="12">December</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Filter by Year:</label>
-                                            <select class="form-control" id="attendance-year-filter">
-                                                <option value="">All Years</option>
-                                                <option value="2023">2023</option>
-                                                <option value="2024">2024</option>
-                                                <option value="2025">2025</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Filter by Status:</label>
-                                            <select class="form-control" id="attendance-status-filter">
-                                                <option value="">All Status</option>
-                                                <option value="on-time">On Time</option>
-                                                <option value="late">Late</option>
-                                                <option value="absent">Absent</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 d-flex align-items-end">
-                                        <button class="btn btn-primary" id="attendance-filter-btn">
-                                            <i class="fas fa-filter mr-1"></i>Filter
-                                        </button>
-                                        <button class="btn btn-default ml-2" id="attendance-reset-btn">
-                                            <i class="fas fa-redo mr-1"></i>Reset
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <button class="btn btn-sm btn-success mb-3" onclick="open_Attendance_form()">
+                                <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#attendanceModal">
                                     <i class="fas fa-plus mr-1"></i>Add Attendance Record
                                 </button>
 
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped" id="attendance_table">
+                                    <table class="table table-bordered table-striped" id="Attendance_table">
                                         <thead>
                                             <tr>
-                                                <th>Date</th>
-                                                <th>Clock In</th>
-                                                <th>Clock Out</th>
-                                                <th>Status</th>
-                                                <th>Working Hours</th>
-                                                <th width="15%">Actions</th>
+                                                <th><input type="checkbox" /></th>
+                                                <th>Attendance Date</th>
+                                                <th>In Time</th>
+                                                <th>Out Time</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- Data will be loaded via AJAX -->
+                                            <!-- Data will be dynamically loaded here via AJAX -->
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Attendance Modal --}}
+
+                    <div class="modal fade" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-md" role="document">
+                            <div class="modal-content">
+                                <form action="{{ route('form_request') }}" method="post">
+                                    @csrf
+                                    <input type="hidden" name="form_type" value="Attendance_form">
+                                    <input type="hidden" name="Employee_Id" value="{{ $u_data['Employee_id'] ?? '' }}">
+
+                                    <div class="modal-header bg-success">
+                                        <h5 class="modal-title" id="attendanceModalLabel">Add Attendance</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true" style="font-size: 28px;">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="attendance_date">Attendance Date <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="date" id="attendance_date" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-success">Submit</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -1161,6 +1478,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
 <script>
+    function open_Deduction_form() {
+        $('#deductionModal').modal('show');
+    }
+
+    function close_Deduction_form() {
+        $('#deductionModal').modal('hide');
+    }
     $(function () {
         // Initialize date picker
         $('.date').datetimepicker({
@@ -1432,65 +1756,33 @@
         $('#bankAccountModal').modal('show');
     }
 
-    $(document).ready(function() {
-        load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}});
-    });
+    $('#Allowance_form_submit_btn').on('click', function(event) {
+        event.preventDefault();
+        // Serialize form data
+        var formData = $('#add_Allowance_form').serialize();
 
-    function load_basic_salary_data(url_input) {
-        console.log("Function called with URL:", url_input);
-
-
+        // Make AJAX POST request
         $.ajax({
-            url: url_input,
-            type: "GET",
-            dataType: "json",
+            url: "{{ route('form_request') }}", // Laravel route
+            method: "POST",
+            data: formData,
             headers: {
-                "Content-Type": "application/json"
+                'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
             },
             success: function(response) {
-                console.log("Response received:", response);
+                // Handle success response
+                alert(response.message);
+                close_Allowance_form() // Hide the form
+                $('#add_Allowance_form')[0].reset(); // Reset the form
 
-                // Check if response.data exists and has items
-                if (!response.data || response.data.length === 0) {
-                    console.log("No data found in response or empty array");
-                    $("#basic_salary_table tbody").html("<tr><td colspan='5' class='text-center'>No data available</td></tr>");
-
-                    return;
-                }
-
-                // Table Header - leave in place, don't recreate thead
-                var table_html_data = "";
-
-                // Populate Table Rows
-                response.data.forEach(function(salary) {
-                    console.log("Processing salary item:", salary);
-                    table_html_data += `
-                        <tr>
-                            <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${salary.month} ${salary.year}</td>
-                            <td>${salary.Payslip_Type}</td>
-                            <td>${salary.Basic_Salary}</td>
-                            <td>
-                                <span onclick="basic_salary_view('${salary.id}')"><i class="fa-regular fa-eye"></i></span>
-                                <span onclick="open_basic_salary_update_form('${salary.id}')" class="B_Salary_a"><i class="fa-solid fa-pencil"></i></span>
-                                <a href="{{url('/delete')}}/${salary.id}/basic_salary" class="Delete_Set_Salary_a"><i class="fa-solid fa-trash-can"></i></a>
-                            </td>
-                        </tr>`;
-                });
-
-                // Only update the tbody, not the whole table
-                console.log("Generated HTML:", table_html_data);
-                $("#basic_salary_table tbody").html(table_html_data);
-
+                load_allowances_data("{{url('allowances_view_api/')}}/" + {{$u_data['Employee_id']}});
             },
             error: function(xhr, status, error) {
-                console.error("AJAX Error:", xhr.status, error);
-                console.error("Response text:", xhr.responseText);
-                $("#basic_salary_table tbody").html(`<tr><td colspan='5' class='text-center'>Error loading data: ${error}</td></tr>`);
-
+                // Handle error response
+                alert('An error occurred: ' + xhr.responseText);
             }
         });
-    }
+    });
 
     $(document).ready(function() {
         load_allowances_data("{{url('allowances_view_api/')}}/" + {{$u_data['Employee_id']}});
@@ -1519,15 +1811,21 @@
                             <td>${$allowance.Alloweance_Titel}</td>
                             <td>${$allowance.Allowance_Ammount_in_INR}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-info" onclick="Allowances_view('${$allowance.id}')">
+                               <button type="button" class="btn btn-sm btn-info" onclick="Allowances_view('${$allowance.id}')">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
+
                                 <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Allowance_form('${$allowance.id}')">
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
-                                <a href="{{url('/delete')}}/${$allowance.id}/alloweance" class="btn btn-sm btn-danger">
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#confirmDeleteModal"
+                                        data-href="/delete/${$allowance.id}/alloweance">
                                     <i class="fa-solid fa-trash-can"></i>
-                                </a>
+                                </button>
+
                             </td>
                         </tr>`;
                     $("#allowances_table tbody").append(row);
@@ -1541,54 +1839,80 @@
         });
     }
 
-    $(document).ready(function() {
-        load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
-    });
-
-    function load_deductions_data(url_input) {
-
+    function Allowances_view(id) {
         $.ajax({
-            url: url_input, // API endpoint URL
-            type: "GET", // HTTP method
+            type: "GET",
+            url: "/alloweance/" + id,
             dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
             success: function(response) {
-                console.log("Response:", response); // Log the successful response
-                $("#deductions_table tbody").empty();
+                console.log("Single Allowance Response:", response);
+                var r_data = response.data;
 
-                // Populate Table Rows
-                var all_data = response.data;
-                all_data.forEach($deduction => {
-                    var row = `
-                        <tr>
-                            <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$deduction.Month}</td>
-                            <td>${$deduction.deduction_Titel}</td>
-                            <td>${$deduction.deduction_Amount_in_INR}</td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </button>
-                                <a href="{{url('/delete')}}/${$deduction.id}/deductions" class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </a>
-                            </td>
-                        </tr>`;
-                    $("#deductions_table tbody").append(row);
-                });
+                var modalContent = `
+                    <div style="display: flex; padding:20px 10px;">
+                        <div>
+                            <h5>Allowance Title: ${r_data.Alloweance_Titel}</h5>
+                            <h5>Amount: ₹ ${r_data.Allowance_Ammount_in_INR}</h5>
+                        </div>
+                        <div style="margin-left: 40px">
+                            <h5>Year: ${r_data.year}</h5>
+                            <h5>Month: ${r_data.Month}</h5>
+                        </div>
+                    </div>
+                `;
 
+                $("#viewAllowanceContent").html(modalContent);
+                $("#viewAllowanceModal").modal('show');
             },
-            error: function(xhr, status, error) {
-                console.error("Error:", error); // Log the error
-
+            error: function(xhr) {
+                $("#viewAllowanceContent").html("<p class='text-danger'>Failed to load data.</p>");
+                $("#viewAllowanceModal").modal('show');
             }
         });
     }
+
+    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var href = button.data('href');
+
+        // Set the href on the delete button inside modal
+        $(this).find('#confirmDeleteBtn').attr('href', href);
+    });
+
+
+    function open_Update_Allowance_form(id) {
+        // Update the header text
+        $("#addAllowanceModal .modal-title").text("Update Allowance");
+
+        // Set the ID field
+        $("#Allowance_id_input").val(id);
+
+        // Open modal
+        $('#addAllowanceModal').modal('show');
+
+        // Fetch data and populate the form
+        $.ajax({
+            type: "GET",
+            url: "/alloweance/" + id,
+            dataType: "json",
+            success: function(response) {
+                var r = response.data;
+                $("#Allowance_Title").val(r.Alloweance_Titel);
+                $("#Allowance_Amount").val(r.Allowance_Ammount_in_INR);
+                $("#Month").val(r.Month);
+                $("#Year").val(r.year);
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+
+
+    $(document).ready(function() {
+        load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
+    });
 
     $(document).ready(function() {
         load_loan_data("{{url('loan_view_api/')}}/" + {{$u_data['Employee_id']}});
@@ -1625,16 +1949,26 @@
                             <td>${$loan.Loan_Amount_in_INR}</td>
                             <td>${$loan.Loan_Remaining}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-info" onclick="loan_view('${$loan.id}')">
+                                <!-- View Advance -->
+                                <button type="button" class="btn btn-sm btn-info" onclick="loan_view('${$loan.Loan_id}')">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
+
+                                <!-- Update Advance -->
                                 <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Loan_form('${$loan.Loan_id}')">
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
-                                <a href="{{url('/delete')}}/${$loan.id}/loan" class="btn btn-sm btn-danger">
+
+                                <!-- Delete Advance with confirmation modal -->
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#confirmDeleteModal"
+                                        data-href="/delete/${$loan.Loan_id}/loan">
                                     <i class="fa-solid fa-trash-can"></i>
-                                </a>
+                                </button>
                             </td>
+
                         </tr>`;
                     $("#loan_table tbody").append(row);
                 });
@@ -1646,6 +1980,83 @@
             }
         });
     }
+
+    function open_Update_Loan_form(id) {
+        $("#loanModal").modal("show");
+        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
+        $("#loan_Id_input").val(id);
+
+        $.ajax({
+            type: "GET",
+            url: "/Loan/" + id,
+            dataType: "json",
+            success: function(response) {
+                if (response.success) {
+                    const r_data = response.data;
+
+                    $("#loan_month").val(r_data.Month.slice(0, 7)); // Ensure correct format
+                    $("#loan_reason").val(r_data.Reason);
+                    $("#loan_title").val(r_data.Title);
+                    $("#loan_amount").val(r_data.Loan_Amount_in_INR);
+                    $("#number_of_loan_installment").val(r_data.Number_of_installment);
+
+                    genrate_table();
+                } else {
+                    console.warn("No data found for this loan");
+                }
+            },
+            error: function(xhr) {
+                console.error("Loan fetch error:", xhr.responseText);
+            }
+        });
+    }
+
+    function loan_view(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Loan/" + id,
+            dataType: "json",
+            success: function(response) {
+                console.log("Loan Response:", response);
+
+                if (response.success) {
+                    var r_data = response.data;
+
+                    var modalContent = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><strong>Title:</strong> ${r_data.Title}</h5>
+                                <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
+                                <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><strong>Month:</strong> ${r_data.Month}</h5>
+                                <h5><strong>Year:</strong> ${r_data.Year}</h5>
+                                <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
+                            </div>
+                        </div>
+                    `;
+
+                    $("#loanViewModalContent").html(modalContent);
+                    $("#loanViewModal").modal("show");
+                } else {
+                    $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
+                    $("#loanViewModal").modal("show");
+                }
+            },
+            error: function(xhr) {
+                console.log("Error:", xhr.responseText);
+                $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
+                $("#loanViewModal").modal("show");
+            }
+        });
+    }
+
+    $('#confirmDeleteModal').on('show.bs.modal', function(e) {
+        var href = $(e.relatedTarget).data('href');
+        $('#confirmDeleteBtn').attr('href', href);
+    });
+
 
     $(document).ready(function() {
         load_other_payments_data("{{url('other_payments_view_api/')}}/" + {{$u_data['Employee_id']}});
@@ -1747,10 +2158,6 @@
         });
     }
 
-</script>
-
-<script>
-
     load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
 
     function load_basic_salary_data(url_input) {
@@ -1788,11 +2195,22 @@
                             <td>${$salary.month} ${$salary.year}</td>
                             <td>${$salary.Payslip_Type}</td>
                             <td>${$salary.Basic_Salary}</td>
-                            <td>
-                                <span onclick="basic_salary_view('${$salary.id}')"><i class="fa-regular fa-eye"></i></span>
-                                <span onclick="open_basic_salary_update_form('${$salary.id}')" class="B_Salary_a"><i class="fa-solid fa-pencil"></i></span>
-                                <a href="{{url('/delete')}}/${$salary.id}/basic_salary" class="Delete_Set_Salary_a"><i class="fa-solid fa-trash-can"></i></a>
+                           <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Basic Salary Actions">
+                                    <button type="button" class="btn btn-info" onclick="basic_salary_view('${$salary.id}')">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-warning B_Salary_a" onclick="open_basic_salary_update_form('${$salary.id}')">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-danger" onclick="confirmDeleteSalary('${$salary.id}')">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
                             </td>
+
                         </tr>`;
                 });
 
@@ -1806,6 +2224,42 @@
             }
         });
     }
+
+    function basic_salary_view(id) {
+        $("#basicSalaryModal").modal('show'); // Open modal
+        $("#basic_salary_modal_body").html('<p class="text-muted text-center">Loading...</p>');
+
+        $.ajax({
+            type: "GET",
+            url: "{{ url('/basic-salary') }}/" + id,
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                var r = response.data;
+
+                let html = `
+                    <div class="px-2">
+                        <h5><strong>Basic Salary:</strong> ₹${r.Basic_Salary}</h5>
+                        <h5><strong>Month:</strong> ${r.month}</h5>
+                        <h5><strong>Year:</strong> ${r.year}</h5>
+                    </div>
+                `;
+
+                $("#basic_salary_modal_body").html(html);
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                $("#basic_salary_modal_body").html('<div class="text-danger">Failed to load data.</div>');
+            }
+        });
+    }
+
+    function confirmDeleteSalary(id) {
+        const form = document.getElementById("deleteSalaryForm");
+        form.action = `{{ url('/delete') }}/${id}/basic_salary`;
+        $('#deleteSalaryModal').modal('show');
+    }
+
 
     $(document).ready(function() {
         // Handle form submission
@@ -1895,6 +2349,458 @@
            });
        });
    });
+
+   load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
+
+    function load_deductions_data(url_input) {
+        $.ajax({
+            url: url_input, // API endpoint URL
+            type: "GET", // HTTP method
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Deduction Response:", response); // Log the successful response
+                $("#Deductions_table").empty();
+
+                // Table Header
+                var table_html_data = `
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="delet_data" id=""></th>
+                            <th>Month-Year</th>
+                            <th>Title</th>
+                            <th>(₹) Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                // Populate Table Rows
+                var all_data = response.data;
+                all_data.forEach($deduction => {
+                    table_html_data += `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data" id=""></td>
+                            <td>${$deduction.Month} </td>
+                            <td>${$deduction.deduction_Titel}</td>
+                            <td>${$deduction.deduction_Amount_in_INR}</td>
+                           <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+
+                                <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#confirmDeleteModal"
+                                    data-href="/delete/${$deduction.id}/deductions">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+
+                        </tr>`;
+                });
+
+                table_html_data += `</tbody>`;
+                $("#Deductions_table").html(table_html_data);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error); // Log the error
+            }
+        });
+    }
+
+    function Deductions_view(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Deductions/" + id,
+            dataType: "json",
+            success: function(response) {
+                var r_data = response.data;
+                var modalBody = `
+                    <div>
+                        <p><strong>Deduction Title:</strong> ${r_data.deduction_Titel}</p>
+                        <p><strong>Deduction Amount:</strong> ₹${r_data.deduction_Amount_in_INR}</p>
+                        <p><strong>Month:</strong> ${r_data.Month}</p>
+                        <p><strong>Year:</strong> ${r_data.Year}</p>
+                    </div>
+                `;
+
+                $('#deductionViewModal .modal-body').html(modalBody);
+                $('#deductionViewModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+
+    function open_Update_Deduction_form(id) {
+        open_Deduction_form()
+        $("#add_deductions_form_header").text("Update Deduction");
+        $("#Deduction_id_input").val(id);
+        $.ajax({
+        type: "GET",
+        url: "{{url("/Deductions/")}}/"+id,
+        dataType: "json",
+        success: function(response) {
+        console.log(response);
+        var r_data = response.data
+        $("#Deduction_Title").val(r_data.deduction_Titel);
+        $("#Deduction_Amount").val(r_data.deduction_Amount_in_INR);
+        // Extract the 'YYYY-MM' part from 'YYYY-MM-DD'
+        const deductionMonth = r_data.deductions_Month.substring(0, 7); // This will extract '2025-06'
+
+        // Set the value of the month input
+        $("#Deduction_month").val(deductionMonth);
+
+        },
+        error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+        // Handle the error here
+        }
+        });
+
+    }
+
+    load_loan_data("{{ url('loan_view_api/' . $u_data['Employee_id']) }}");
+
+    function load_loan_data(url_input) {
+        $.ajax({
+            url: url_input,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function (response) {
+                console.log("Loan Response:", response);
+                $("#loan_view_table").empty(); // tbody only
+
+                let table_html_data = ``;
+                let all_data = response.data;
+
+                all_data.forEach(loan => {
+                    const date = new Date(loan.Month);
+                    const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+                    table_html_data += `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data"></td>
+                            <td>${loan.Title}</td>
+                            <td>${formattedDate}</td>
+                            <td>${loan.Reason}</td>
+                            <td>${loan.Number_of_installment}</td>
+                            <td>₹ ${loan.Loan_Amount_in_INR}</td>
+                            <td>₹ ${loan.Loan_Remaining}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="loan_view('${loan.id}')"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-sm btn-warning" onclick="open_Update_Loan_form('${loan.Loan_id}')"><i class="fas fa-edit"></i></button>
+                                <a href="{{ url('/delete') }}/${loan.id}/loan" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>`;
+                });
+
+                $("#loan_view_table").html(table_html_data);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    function open_Update_Loan_form(id) {
+        // Open the modal
+        $("#loanModal").modal("show");
+
+        // Change modal title to "Update Advance"
+        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
+
+        // Set hidden input value for form processing
+        $("#loan_Id_input").val(id);
+
+        // Fetch loan data using AJAX
+        $.ajax({
+            type: "GET",
+            url: "/Loan/" + id,
+            dataType: "json",
+            success: function(response) {
+                console.log("Loan Response:", response);
+                var r_data = response.data;
+
+                // Fill the form fields with fetched data
+                $("#loan_month").val(r_data.Month);
+                $("#loan_reason").val(r_data.Reason);
+                $("#loan_title").val(r_data.Title);
+                $("#loan_amount").val(r_data.Loan_Amount_in_INR);
+                $("#number_of_loan_installment").val(r_data.Number_of_installment);
+
+                // Regenerate the installment table
+                genrate_table();
+            },
+            error: function(xhr) {
+                console.log("Error fetching loan:", xhr.responseText);
+            }
+        });
+    }
+
+    function genrate_table() {
+    // Clear the previous results
+        $("#monthList").empty();
+        // Get the selected date
+        const selectedDate = $("#loan_month").val();
+        const number_of_loop = $("#number_of_loan_installment").val();
+        const advance_amount = $("#loan_amount").val();
+        if (selectedDate != "" && number_of_loop != "" && advance_amount != "")
+            if (selectedDate) {
+                const startDate = new Date(selectedDate);
+                const year = startDate.getFullYear();
+                const startMonth = startDate.getMonth() + 1; // Start from the next month
+                // Loop through the desired number of months
+                for (let i = 0; i < number_of_loop; i++) {
+                    const monthDate = new Date(year, startMonth + i, 1); // Increment months from startMonth
+                    const monthName = monthDate.toLocaleString("default", {
+                        month: "long"
+                    });
+                    const displayYear = monthDate.getFullYear(); // Handle year overflow
+                    // Append the month name and other details to the list
+                    $("#monthList").append(`
+    <tr>
+    <td>${i + 1}</td>
+    <td>${monthName} ${displayYear}</td>
+    <td>${(advance_amount / number_of_loop).toFixed(2)}</td>
+    </tr>
+    `);
+                }
+            }
+    }
+
+
+
+    load_leave_data("{{ url('Leave_view_api/' . $u_data['Employee_id']) }}");
+
+    function load_leave_data(url_input) {
+        $.ajax({
+            url: url_input,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Leave Response:", response);
+                $("#leave_table").empty();
+
+                let table_rows = '';
+                const all_data = response.data;
+
+                all_data.forEach($leave => {
+                    table_rows += `
+                        <tr>
+                            <td><input type="checkbox" name="delet_data"></td>
+                            <td>${$leave.Leave_Type}</td>
+                            <td>${$leave.Start_Date}</td>
+                            <td>${$leave.End_Date}</td>
+                            <td>${$leave.notification}</td>
+                            <td>${$leave.Total_Days}</td>
+                            <td>${$leave.created_at}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-info" onclick="Leave_view('${$leave.id}')" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-warning" onclick="open_Update_leave_form('${$leave.id}')" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <a href="{{ url('/delete') }}/${$leave.id}/_leave" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+
+                $("#leave_table").html(table_rows);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    function Leave_view(id) {
+        $.ajax({
+            type: "GET",
+            url: "{{ url('/leave-view') }}/" + id,
+            dataType: "json",
+            success: function (response) {
+                const r = response.data;
+
+                const modalHtml = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title text-white"><i class="fas fa-eye mr-1"></i> Leave Details</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Start Date</label>
+                                                <input type="text" class="form-control" value="${r.Start_Date}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>End Date</label>
+                                                <input type="text" class="form-control" value="${r.End_Date}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Remarks By Approver</label>
+                                                <textarea class="form-control" rows="2" readonly>${r.Remarks_by_Approve}</textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Half Day</label>
+                                                <input type="text" class="form-control" value="${r.Half_Day}" readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <input type="text" class="form-control" value="${r.Status}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Total Days</label>
+                                                <input type="text" class="form-control" value="${r.Total_Days}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Leave Type</label>
+                                                <input type="text" class="form-control" value="${r.Leave_Type}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Description</label>
+                                                <textarea class="form-control" rows="2" readonly>${r.Description}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    <i class="fas fa-times mr-1"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                $("#leaveViewModal").html(modalHtml);
+                $("#leaveViewModal").modal("show");
+            },
+            error: function (xhr) {
+                console.error("Error loading leave data:", xhr.responseText);
+            }
+        });
+    }
+
+    function open_Update_leave_form(id) {
+        // Clear previous errors and form
+        $('#add_leave_form')[0].reset();
+        $('#add_leave_id_input').val(id); // set hidden field
+
+        $.ajax({
+            type: "GET",
+            url: `/leave-view/${id}`, // update as per your route
+            dataType: "json",
+            success: function(response) {
+                const data = response.data;
+
+                // Fill form fields
+                $('#leave_type_select').val(data.Leave_Type);
+                $('#leave_start_date').val(data.Start_Date);
+                $('#leave_end_date').val(data.End_Date);
+                $('#leave_total_days').val(data.Total_Days);
+                $('#leave_Status').val(data.Status);
+                $('#leave_description').val(data.Description);
+                $('#leave_Remarks_by_Approver').val(data.Remarks_by_Approve);
+
+                if (data.Half_Day === 'yes') {
+                    $('#half_daY_check_box').prop('checked', true);
+                } else {
+                    $('#half_daY_check_box').prop('checked', false);
+                }
+
+                // Update Modal Title & Button (Optional but clean)
+                $('#leaveModalLabel').html('<i class="fas fa-edit mr-1"></i> Update Leave');
+                $('#add_leave_form button[type="submit"]').html('<i class="fas fa-save mr-1"></i> Update');
+
+                // Show modal
+                $('#leaveModal').modal('show');
+            },
+            error: function(xhr) {
+                console.error('Error fetching data:', xhr.responseText);
+            }
+        });
+    }
+
+    load_attendance_data("{{url('Attendance_view_user_api/')}}/" + {{$u_data['Employee_id']}});
+
+      function load_attendance_data(url_input) {
+
+        $.ajax({
+            url: url_input,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(response) {
+                console.log("Attendance Response:", response);
+
+                // Build table rows only
+                var table_html_data = "";
+                var all_data = response.data;
+
+                if (all_data.length > 0) {
+                    all_data.forEach($attendance => {
+                        table_html_data += `
+                            <tr>
+                                <td><input type="checkbox" /></td>
+                                <td>${$attendance.attandence_Date}</td>
+                                <td>${$attendance.in_time}</td>
+                                <td>${$attendance.out_time}</td>
+                            </tr>`;
+                    });
+                } else {
+                    table_html_data += `
+                        <tr>
+                            <td colspan="4" class="text-center">No attendance records found</td>
+                        </tr>`;
+                }
+
+                // Inject only <tbody>
+                $("#Attendance_table tbody").html(table_html_data);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
 
 </script>
 @stop

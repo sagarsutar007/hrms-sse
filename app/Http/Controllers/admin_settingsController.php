@@ -344,8 +344,7 @@ public function delete_any_data(Request $req) {
   $EmployeesID = session()->get('EmployeeID');
   $role = session()->get('role');
   if(isset( $EmployeesID)){
-
-  $deleteQuri =  DB::table($req->table_name)->where('id', $req->id)->delete();
+    $deleteQuri =  DB::table($req->table_name)->where('id', $req->id)->delete();
 
    if($deleteQuri){
     ?>
