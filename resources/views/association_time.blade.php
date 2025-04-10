@@ -15,8 +15,12 @@
 
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-3">
-                    <div class="form-group">
+                <div class="col-md-6">
+                    <!-- Export buttons will be placed here automatically by DataTables -->
+                    <div id="export-buttons" class="d-inline-block"></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group float-right">
                         <label>Filter by Date</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -38,7 +42,6 @@
                             <th>Employee Name</th>
                             <th>Date of Joining</th>
                             <th>Years Months Difference</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                 </table>
@@ -47,145 +50,102 @@
     </div>
 </div>
 
-{{-- Leave Details Modal --}}
-<div class="modal fade" id="leaveDetailsModal" tabindex="-1" role="dialog" aria-labelledby="leaveDetailsModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-info">
-                <h5 class="modal-title" id="leaveDetailsModalLabel">
-                    <i class="fas fa-info-circle mr-2"></i>Leave Details
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="leaveDetailsContent">
-                {{-- Dynamic content will be loaded here --}}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <input type="hidden" value="{{session('role_number')}}" id="role_number">
 @endsection
 
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+    <style>
+        #export-buttons .dt-buttons {
+            margin-bottom: 10px;
+        }
+
+        .dt-button {
+            margin-right: 5px;
+        }
+
+        .dataTables_paginate {
+            margin-top: 15px;
+        }
+    </style>
+@endsection
+
 @section('js')
-<script>
-$(document).ready(function() {
-    // DataTable initialization remains largely the same as in the original script
-    var table = $('#association-time-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{url('/association_time_api')}}",
-            type: 'GET',
-            data: function(d) {
-                d.date = $('#date_input').val();
-            },
-            dataSrc: function(json) {
-                return json.data || [];
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const table = $('#association-time-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ url('/association_time_api') }}",
+                    type: 'GET',
+                    data: function (d) {
+                        d.date = $('#date_input').val();
+                    },
+                    dataSrc: function (json) {
+                        return json.data || [];
+                    }
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name', name: 'name' },
+                    { data: 'DOJ', name: 'DOJ' },
+                    { data: 'years_months_diff', name: 'years_months_diff' }
+                ],
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                order: [[0, 'asc']],
+                dom: '<"#export-buttons"B>frtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        className: 'btn btn-info btn-sm'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger btn-sm'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Print',
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
+                        extend: 'colvis',
+                        text: 'Column visibility',
+                        className: 'btn btn-light btn-sm'
+                    }
+                ]
+            });
+
+            $('#date_input').on('change', function () {
+                table.draw();
+            });
+
+            // Set current date
+            function setCurrentDate() {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0];
+                $('#date_input').val(formattedDate);
             }
-        },
-        columns: [
-            {
-                data: null,
-                render: function (data, type, row, meta) {
-                    return meta.row + 1;
-                }
-            },
-            { data: 'name', name: 'name' },
-            { data: 'DOJ', name: 'DOJ' },
-            { data: 'years_months_diff', name: 'years_months_diff' },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    return `
-                        <button class="btn btn-sm btn-info view-leave" data-id="${row.id}">
-                            <i class="fas fa-eye mr-1"></i>View Leaves
-                        </button>
-                    `;
-                }
-            }
-        ],
-        responsive: true,
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        order: [[0, 'asc']]
-    });
-
-    // Date filter
-    $('#date_input').on('change', function() {
-        table.draw();
-    });
-
-    // Leave view event delegation (remains the same as original)
-    $(document).on('click', '.view-leave', function() {
-        var employeeId = $(this).data('id');
-
-        $.ajax({
-            type: "GET",
-            url: "{{url('/leave-view')}}/" + employeeId,
-            dataType: "json",
-            success: function(response) {
-                if (response.data) {
-                    var r_data = response.data;
-                    var leaveDetailsHtml = `
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card card-info">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Personal Details</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <p><strong>Name:</strong> ${r_data.Name || 'N/A'}</p>
-                                        <p><strong>Employee ID:</strong> ${r_data.Employee_id || 'N/A'}</p>
-                                        <p><strong>Description:</strong> ${r_data.Description || 'N/A'}</p>
-                                        <p><strong>Remarks by Approve:</strong> ${r_data.Remarks_by_Approve || 'N/A'}</p>
-                                        <p><strong>Total Days:</strong> ${r_data.Total_Days || 'N/A'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card card-primary">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Leave Details</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <p><strong>Leave Type:</strong> ${r_data.Leave_Type_name || 'N/A'}</p>
-                                        <p><strong>Start Date:</strong> ${r_data.Start_Date || 'N/A'}</p>
-                                        <p><strong>End Date:</strong> ${r_data.End_Date || 'N/A'}</p>
-                                        <p><strong>Status:</strong> ${r_data.Status || 'N/A'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    $('#leaveDetailsContent').html(leaveDetailsHtml);
-                    $('#leaveDetailsModal').modal('show');
-                } else {
-                    $('#leaveDetailsContent').html('<div class="alert alert-warning">No leave details found.</div>');
-                    $('#leaveDetailsModal').modal('show');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $('#leaveDetailsContent').html('<div class="alert alert-danger">Error loading leave details.</div>');
-                $('#leaveDetailsModal').modal('show');
-            }
+            setCurrentDate();
         });
-    });
-
-    // Set current date
-    function setCurrentDate() {
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
-        $('#date_input').val(formattedDate);
-    }
-    setCurrentDate();
-});
-</script>
+    </script>
 @endsection

@@ -1525,80 +1525,68 @@ public function totall_salary_amount_department_wise(Request $req) {
 
 //totall salary amount month wise
 public function totall_salary_amount(Request $req) {
-    echo "<pre>";
-    print_r($req->all());
-    echo "</pre>";
-    exit;
-  try {
-      // Define the target year and month (defaulting to November 2024 if not provided)
+    try {
+        // Define the target year and month
+        $parsedDate = $req->date ? Carbon::parse($req->date) : Carbon::now();
+        $year = $parsedDate->year;
+        $month = $parsedDate->format('m');
 
-      $parsedDate = $req->date ? Carbon::parse($req->date) : Carbon::now();
+        // Execute the query using raw SQL
+        $arrearData = DB::table('arrear_table as a')
+            ->join('all_users as u', 'u.Employee_id', '=', 'a.Employee_id')
+            ->join('shift_master as s', 'u.shift_time', '=', 's.id')
+            ->join('shift__employee_type_master as et', 'u.employee_type', '=', 'et.id')
+            ->join('department_master as d', 'u.Department', '=', 'd.id')
+            ->join('role_masrer as r', 'u.role', '=', 'r.id')
+            ->select([
+                's.shift_name',
+                'et.EmpTypeName',
+                'd.Department_name',
+                'r.roles',
+                DB::raw("CONCAT(MONTHNAME(a.Arrear_Month), ' ', a.Arrear_Year) AS MonthYear"),
+                'a.Employee_id',
+                DB::raw("MAX(a.OT_Amount) as OT_Amount"),
+                DB::raw("MAX(a.Salary_amount) as Salary_amount"),
+                DB::raw("MAX(a.OT_Hours) as OT_Hours"),
+                DB::raw("COALESCE(SUM(a.Paid_Amount), 0) AS Total_Paid_Amount"),
+                DB::raw("MAX(
+                    TRIM(
+                        REGEXP_REPLACE(
+                            CONCAT_WS(
+                                ' ',
+                                COALESCE(CONCAT(UPPER(LEFT(u.f_name, 1)), LOWER(SUBSTRING(u.f_name, 2))), ''),
+                                COALESCE(CONCAT(UPPER(LEFT(u.m_name, 1)), LOWER(SUBSTRING(u.m_name, 2))), ''),
+                                COALESCE(CONCAT(UPPER(LEFT(u.l_name, 1)), LOWER(SUBSTRING(u.l_name, 2))), '')
+                            ),
+                            '\\s+',
+                            ' '
+                        )
+                    )
+                ) AS name")
+            ])
+            ->whereYear('a.Arrear_Month', $year)
+            ->whereMonth('a.Arrear_Month', $month)
+            ->groupBy('s.shift_name', 'et.EmpTypeName', 'd.Department_name', 'r.roles', 'a.Arrear_Year', 'a.Arrear_Month', 'a.Employee_id')
+            ->orderBy('s.shift_name')
+            ->orderBy('et.EmpTypeName')
+            ->orderBy('d.Department_name')
+            ->orderBy('r.roles')
+            ->orderBy('a.Arrear_Year')
+            ->orderBy('a.Arrear_Month')
+            ->orderBy('name')
+            ->get();
 
-      $year = $parsedDate->year;  // Extracts the year
-     $month = $parsedDate->format('m'); // Extracts the month in two-digit format (e.g., "01" for January)
+        return response()->json([
+            'status' => 'success',
+            'data' => $arrearData
+        ]);
 
-
-
-
-      // Execute the query using raw SQL
-      $arrearData = DB::table('arrear_table as a')
-      ->join('all_users as u', 'u.Employee_id', '=', 'a.Employee_id')
-      ->join('shift_master as s', 'u.shift_time', '=', 's.id')
-      ->join('shift__employee_type_master as et', 'u.employee_type', '=', 'et.id')
-      ->join('department_master as d', 'u.Department', '=', 'd.id')
-      ->join('role_masrer as r', 'u.role', '=', 'r.id')
-      ->select([
-          's.shift_name',
-          'et.EmpTypeName',
-          'd.Department_name',
-          'r.roles',
-          DB::raw("CONCAT(MONTHNAME(a.Arrear_Month), ' ', a.Arrear_Year) AS MonthYear"),
-          'a.Employee_id',
-          'a.OT_Amount',
-          'a.Salary_amount',
-          'a.OT_Hours',
-          DB::raw("COALESCE(SUM(a.Paid_Amount), 0) AS Total_Paid_Amount"),
-          DB::raw("
-              TRIM(
-                  REGEXP_REPLACE(
-                      CONCAT_WS(
-                          ' ',
-                          COALESCE(CONCAT(UPPER(LEFT(u.f_name, 1)), LOWER(SUBSTRING(u.f_name, 2))), ''),
-                          COALESCE(CONCAT(UPPER(LEFT(u.m_name, 1)), LOWER(SUBSTRING(u.m_name, 2))), ''),
-                          COALESCE(CONCAT(UPPER(LEFT(u.l_name, 1)), LOWER(SUBSTRING(u.l_name, 2))), '')
-                      ),
-                      '\\s+',
-                      ' '
-                  )
-              ) AS name
-          ")
-      ])
-      ->whereYear('a.Arrear_Month', $year)
-      ->whereMonth('a.Arrear_Month', $month)
-      ->groupBy('s.shift_name', 'et.EmpTypeName', 'd.Department_name', 'r.roles', 'a.Arrear_Year', 'a.Arrear_Month', 'a.Employee_id')
-      ->orderBy('s.shift_name')
-      ->orderBy('et.EmpTypeName')
-      ->orderBy('d.Department_name')
-      ->orderBy('r.roles')
-      ->orderBy('a.Arrear_Year')
-      ->orderBy('a.Arrear_Month')
-      ->orderBy('name')
-      ->get();
-
-
-
-      // Return the response in JSON format
-      return response()->json([
-          'status' => 'success',
-          'data' => $arrearData
-      ]);
-
-  } catch (\Exception $e) {
-      return response()->json([
-          'status' => 'error',
-          'message' => $e->getMessage()
-      ], 500);
-  }
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
 }
 
 
