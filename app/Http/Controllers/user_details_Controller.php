@@ -38,9 +38,16 @@ $role_masrer = DB::table('role_masrer')
             $insert_m =  now()->format('Y-m');
         }
 
-        // Extract year and month from arrear_month
-        [$year, $month] = explode('-', $arrear_month);
-        $insert_m = $year . '-' .$month . '-' . 28 ;
+        if (strpos($arrear_month, '-') !== false) {
+            [$year, $month] = explode('-', $arrear_month);
+            $insert_m = $year . '-' . $month . '-' . '28';
+        } else {
+            return response()->json([
+                'error' => 'Invalid arrear_month format. Expected YYYY-MM.',
+                'value_received' => $arrear_month
+            ], 400);
+        }
+
 
 
 

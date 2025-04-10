@@ -1525,6 +1525,10 @@ public function totall_salary_amount_department_wise(Request $req) {
 
 //totall salary amount month wise
 public function totall_salary_amount(Request $req) {
+    echo "<pre>";
+    print_r($req->all());
+    echo "</pre>";
+    exit;
   try {
       // Define the target year and month (defaulting to November 2024 if not provided)
 
@@ -1580,6 +1584,8 @@ public function totall_salary_amount(Request $req) {
       ->orderBy('a.Arrear_Month')
       ->orderBy('name')
       ->get();
+
+
 
       // Return the response in JSON format
       return response()->json([
