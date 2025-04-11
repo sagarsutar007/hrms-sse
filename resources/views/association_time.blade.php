@@ -14,23 +14,21 @@
         </div>
 
         <div class="card-body">
-            <div class="row mb-3">
+            <div class="row mb-3 align-items-end">
                 <div class="col-md-6">
-                    <!-- Export buttons will be placed here automatically by DataTables -->
-                    <div id="export-buttons" class="d-inline-block"></div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group float-right">
-                        <label>Filter by Date</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="fas fa-calendar"></i>
-                                </span>
-                            </div>
-                            <input type="date" id="date_input" class="form-control">
+                    <label for="date_input"><strong>Filter by Date</strong></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        </div>
+                        <input type="date" id="date_input" class="form-control">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" id="search_btn"><i class="fas fa-search"></i> Search</button>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                    <div id="export-buttons" class="d-inline-block"></div>
                 </div>
             </div>
 
@@ -50,7 +48,7 @@
     </div>
 </div>
 
-<input type="hidden" value="{{session('role_number')}}" id="role_number">
+<input type="hidden" value="{{ session('role_number') }}" id="role_number">
 @endsection
 
 @section('css')
@@ -82,24 +80,29 @@
 
     <script>
         $(document).ready(function () {
+            function getFormattedToday() {
+                const today = new Date();
+                return today.toISOString().split('T')[0];
+            }
+
+            $('#date_input').val(getFormattedToday());
+
             const table = $('#association-time-table').DataTable({
                 processing: true,
                 serverSide: true,
+                info: false,
                 ajax: {
                     url: "{{ url('/association_time_api') }}",
                     type: 'GET',
                     data: function (d) {
                         d.date = $('#date_input').val();
-                    },
-                    dataSrc: function (json) {
-                        return json.data || [];
                     }
                 },
                 columns: [
                     {
                         data: null,
                         render: function (data, type, row, meta) {
-                            return meta.row + 1;
+                            return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
                     { data: 'name', name: 'name' },
@@ -115,7 +118,7 @@
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel',
-                        className: 'btn btn-info btn-sm'
+                        className: 'btn btn-success btn-sm'
                     },
                     {
                         extend: 'pdf',
@@ -125,7 +128,7 @@
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print',
-                        className: 'btn btn-secondary btn-sm'
+                        className: 'btn btn-dark btn-sm'
                     },
                     {
                         extend: 'colvis',
@@ -135,17 +138,9 @@
                 ]
             });
 
-            $('#date_input').on('change', function () {
+            $('#search_btn').on('click', function () {
                 table.draw();
             });
-
-            // Set current date
-            function setCurrentDate() {
-                const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0];
-                $('#date_input').val(formattedDate);
-            }
-            setCurrentDate();
         });
     </script>
 @endsection

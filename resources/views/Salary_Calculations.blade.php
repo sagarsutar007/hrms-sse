@@ -648,99 +648,99 @@
         }
 
         function attendance_data_set(url_input) {
-            show_animation();
-            $.ajax({
-                url: url_input,
-                type: "GET",
-                dataType: "json",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                success: function(response) {
-                    console.log("Response:", response);
-                    $("#result").empty();
-                    var count_flag = 1;
-                    var all_data = response.data;
-                    var role_number = $("#role_number").val();
-                    var Work, Absent, Over_Time, Over_Time_in_INR, Advance, Deduction, Penalty, Monthly_Salary, Net_Salary;
-                    Work = 0;
-                    Over_Time = 0;
-                    Over_Time_in_INR = 0;
-                    Working_Day = 0;
-                    var deductions_amount = 0;
-                    var month_deductions_amount = 0;
-                    var Penalty = 0;
-                    var advance = 0;
-                    var monthaly_salary = 0;
-                    var net_salary = 0;
-                    var Day_Total_Amount = 0;
-                    var Over_Ttime_Rate = 0;
-                    var Swap_Day_array_data = 0;
-                    var Public_Holiday_array_data = 0;
-                    var Daily_Rate = 0;
-                    var Over_Ttime_Rate = 0;
-                    var leave_color = "";
-                    var Half_Day_Leave = 0;
-                    var Payment_Status = "";
-                    var Short_Name = "";
-                    var OT_Amt = 0;
-                    var Daily_Amt = 0;
-                    var Total_OT_Amount = 0;
-                    var Total_Amount = 0;
-                    var Total_all_day_Amount = 0;
-                    var Weekly_Off_array_data = 0;
-                    var data_count = 1;
-                    var top_table_content = 0;
-                    var one_user_monthly_in_out = '';
-                    var one_user_monthly_total_amount = 0;
-                    var month_and_year_var;
-                    var month_year;
-                    var leave_holiday_weakly_off_count = 0;
-                    var all_users_data = response.all_users.data;
-                    var all_attandance_data = response.attendance_info_data;
-                    var deductions_data = response.deductions_data;
-                    var penalty_data = response.penalty_data;
-                    var advance_data = response.advance_data;
-                    var public_holiday_data = response.holiday_data;
-                    var leave_data = response.leave_data;
-                    var table_html_data =
-                        `
-        <div class="card">
-        <div class="card-body">
-            <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%" data-responsive="true">
-                <thead>
-                    <tr>
-                    <th>Sr. N.</th>
-                    <th>Name</th>
-                    <th>Employee Id</th>
-                    <th>Shift hrs</th>
-                    `;
-                    const startDate = new Date(start_d);
-                    const endDate = new Date(end_d);
-                    const dates = [];
-                    var c_data = response.calendar_data;
-                    c_data.forEach(c_data => {
-                        dates.push(new Date(c_data.date));
-                        Working_Day++;
-                    });
-                    dates.forEach(date => {
-                        const formattedDate = date.toLocaleDateString("en-US", {
-                            weekday: "long",
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric"
-                        });
-                        month_and_year_var = date.toLocaleDateString("en-US", {
-                            month: "long",
-                            year: "numeric"
-                        });
-                        table_html_data += `
+    show_animation();
+    $.ajax({
+        url: url_input,
+        type: "GET",
+        dataType: "json",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        success: function(response) {
+            console.log("Response:", response);
+            $("#result").empty();
+            var count_flag = 1;
+            var all_data = response.data;
+            var role_number = $("#role_number").val();
+            var Work, Absent, Over_Time, Over_Time_in_INR, Advance, Deduction, Penalty, Monthly_Salary, Net_Salary;
+            Work = 0;
+            Over_Time = 0;
+            Over_Time_in_INR = 0;
+            Working_Day = 0;
+            var deductions_amount = 0;
+            var month_deductions_amount = 0;
+            var Penalty = 0;
+            var advance = 0;
+            var monthaly_salary = 0;
+            var net_salary = 0;
+            var Day_Total_Amount = 0;
+            var Over_Ttime_Rate = 0;
+            var Swap_Day_array_data = 0;
+            var Public_Holiday_array_data = 0;
+            var Daily_Rate = 0;
+            var Over_Ttime_Rate = 0;
+            var leave_color = "";
+            var Half_Day_Leave = 0;
+            var Payment_Status = "";
+            var Short_Name = "";
+            var OT_Amt = 0;
+            var Daily_Amt = 0;
+            var Total_OT_Amount = 0;
+            var Total_Amount = 0;
+            var Total_all_day_Amount = 0;
+            var Weekly_Off_array_data = 0;
+            var data_count = 1;
+            var top_table_content = 0;
+            var one_user_monthly_in_out = '';
+            var one_user_monthly_total_amount = 0;
+            var month_and_year_var;
+            var month_year;
+            var leave_holiday_weakly_off_count = 0;
+            var all_users_data = response.all_users.data;
+            var all_attandance_data = response.attendance_info_data;
+            var deductions_data = response.deductions_data;
+            var penalty_data = response.penalty_data;
+            var advance_data = response.advance_data;
+            var public_holiday_data = response.holiday_data;
+            var leave_data = response.leave_data;
+            var table_html_data =
+                `
+                <div class="card">
+                <div class="card-body">
+                    <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%" data-responsive="true">
+                        <thead>
+                            <tr>
+                            <th>Sr. N.</th>
+                            <th>Name</th>
+                            <th>Employee Id</th>
+                            <th>Shift hrs</th>
+                            `;
+            const startDate = new Date(start_d);
+            const endDate = new Date(end_d);
+            const dates = [];
+            var c_data = response.calendar_data;
+            c_data.forEach(c_data => {
+                dates.push(new Date(c_data.date));
+                Working_Day++;
+            });
+            dates.forEach(date => {
+                const formattedDate = date.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                });
+                month_and_year_var = date.toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric"
+                });
+                table_html_data += `
                     <th class="date_p" data-toggle="collapse" data-target="#date_${formatDateToYYYYMMDD(date)}" style="cursor:pointer">
                     ${formattedDate}
                 </th>
                     `;
-                    });
-                    table_html_data += `
+            });
+            table_html_data += `
                     <th>Total Day</th>
                     <th>Working Day</th>
                     <th>work (in day)</th>
@@ -762,151 +762,229 @@
                 <tbody>
                     `;
 
-                    all_users_data.forEach(all_users_data => {
-                        table_html_data += `
+            all_users_data.forEach(all_users_data => {
+                table_html_data += `
                     <tr id="users_data_row${all_users_data.Employee_id}" ondblclick="open_arrear_pop_up('${all_users_data.Employee_id}')">
                     <td>${data_count}</td>
                     <td onclick="open_pershon_details('${all_users_data.Employee_id}')">${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
                     <td>${all_users_data.Employee_id}</td>
                     <td>${all_users_data.Shift_hours}</td>
                     `;
-                        var Employee_Daily_Rate = all_users_data.salary / Working_Day;
-                        data_count++;
-                        var pop_up_total_hr = 0;
-                        var pop_up_total_min = 0;
-                        var pop_up_total_ot_hr = 0;
-                        var pop_up_total_ot_min = 0;
-                        var pop_up_total_ot_amount = 0;
-                        var pop_up_total_amount = 0;
-                        dates.forEach(date => {
-                            const formattedDate = date.toLocaleDateString("en-US", {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric"
-                            });
-                            month_year = date.toLocaleDateString("en-US", {
-                                month: "2-digit",
-                                year: "numeric"
-                            });
-                            const filteredData = all_attandance_data.filter(all_att_data =>
-                                all_att_data.Employee_id === all_users_data.Employee_id &&
-                                formatDateToYYYYMMDD(date) === all_att_data.attandence_Date
-                            );
-                            const public_holiday_filyer_data = public_holiday_data.filter(public_holiday_data =>
-                                formatDateToYYYYMMDD(date) === public_holiday_data.holiday_Date
-                            );
-                            const leave_filter_data = leave_data.filter(leave_d =>
-                                leave_d.Employee_id === all_users_data.Employee_id && leave_d.Start_Date <=
-                                formatDateToYYYYMMDD(date) && leave_d.End_Date >= formatDateToYYYYMMDD(date)
-                            );
-                            if (leave_filter_data.length > 0) {
-                                leave_filter_data.forEach(leave_filter_data => {
-                                    leave_color = leave_filter_data.Color;
-                                    Half_Day_Leave = leave_filter_data.Half_Day;
-                                    Payment_Status_Leave = leave_filter_data.Payment_Status;
-                                    Short_Name_Leave = leave_filter_data.Short_Name;
-                                });
-                            }
-                            Payment_Status = "";
-                            OT_Amt = 0;
-                            Daily_Amt = 0;
-                            public_holiday_filyer_data.forEach(pub_ho => {
-                                if (pub_ho.holiday_Date === formatDateToYYYYMMDD(date)) {
-                                    Public_Holiday_array_data = 1;
-                                } else {
-                                    Public_Holiday_array_data = 0;
-                                }
-                            });
-                            filteredData.forEach(element => {
-                                Swap_Day_array_data = element.Swap_Day;
-                                Daily_Rate = element.Daily_Rate;
-                                Over_Ttime_Rate = element.Over_Ttime_Rate;
-                                Weekly_Off_array_data = element.WeeklyOff;
-                            });
-                            console.log(Over_Ttime_Rate);
-                            let cellBackgroundColor = '';
-                            if (Swap_Day_array_data == 1) {
-                                cellBackgroundColor = 'style="background-color:orange"';
-                            } else if (public_holiday_filyer_data.length == 1) {
-                                cellBackgroundColor = 'style="background-color:yellow"';
-                                Daily_Amt = Employee_Daily_Rate;
-                            } else if (Weekly_Off_array_data == 1) {
-                                cellBackgroundColor = 'style="background-color:cyan"';
-                                Daily_Amt = Employee_Daily_Rate;
-                            } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', {
-                                    weekday: 'long'
-                                })) {
-                                cellBackgroundColor = 'style="background-color:cyan"';
-                                Daily_Amt = Employee_Daily_Rate;
-                            } else if (public_holiday_filyer_data.holiday_Date == formatDateToYYYYMMDD(date)) {
-                                cellBackgroundColor = 'style="background-color:yellow"';
-                                Daily_Amt = Employee_Daily_Rate;
-                            } else if (leave_filter_data.length > 0) {
-                                Payment_Status = leave_filter_data[0].Payment_Status;
-                                cellBackgroundColor = 'style="background-color:' + leave_color + '"';
-                                if (Half_Day_Leave == 1) {
-                                    cellBackgroundColor = 'style="background: linear-gradient(to right, ' + leave_color +
-                                        '50%, transparent 50%);"';
-                                    leave_holiday_weakly_off_count += 0.5;
-                                    if (Half_Day_Leave == 1 && Payment_Status == "Paid") {
-                                        Daily_Amt = Employee_Daily_Rate / 2;
-                                    }
-                                } else {
-                                    if (cellBackgroundColor != "") {
-                                        leave_holiday_weakly_off_count++;
-                                        if (Payment_Status == "Paid") {
-                                            Daily_Amt = Employee_Daily_Rate;
-                                        }
-                                    }
-                                }
-                            }
-                            if (filteredData.length === 0) {
-                                table_html_data += `
-                    <td class="in_time_p" ${cellBackgroundColor}></td>
-                    <td class="out_time_p" ${cellBackgroundColor}></td>
-                    <td class="total_hr_p" ${cellBackgroundColor}></td>
-                    <td class="total_min_p" ${cellBackgroundColor}></td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}></td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}></td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>`;
-                            } else {
-                                filteredData.forEach(all_att_data => {
-                                    if (Half_Day_Leave == 1 && all_att_data.Totel_Hours >= all_att_data.Shift_hours / 2) {
-                                        Daily_Amt += all_att_data.Daily_Rate / 2;
-                                    } else if (all_att_data.Totel_Hours >= all_att_data.Shift_hours) {
-                                        Daily_Amt += all_att_data.Daily_Rate;
-                                    } else {
-                                        Daily_Amt += all_att_data.Daily_Rate;
-                                    }
-                                    OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
-                                    Total_OT_Amount = Total_OT_Amount + OT_Amt;
-                                    table_html_data += `
-                    <td class="in_time_p" ${cellBackgroundColor}>${all_att_data.in_time}</td>
-                    <td class="out_time_p" ${cellBackgroundColor}>${all_att_data.out_time}</td>
-                    <td class="total_hr_p" ${cellBackgroundColor}>${all_att_data.Total_Time}</td>
-                    <td class="total_min_p" ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.Overtime}</td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
-                    <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>`;
-                                    pop_up_total_hr += all_att_data.Totel_Hours;
-                                    pop_up_total_min += all_att_data.Total_Minutes;
-                                    pop_up_total_ot_hr += all_att_data.OT_Hr;
-                                    pop_up_total_ot_min += all_att_data.Overtime;
-                                    pop_up_total_ot_amount += OT_Amt;
-                                    Work++;
-                                    Over_Time += all_att_data.Overtime;
-                                });
-                            }
-                            pop_up_total_amount += Daily_Amt;
-                            Total_all_day_Amount += Daily_Amt;
+                var Employee_Daily_Rate = all_users_data.salary / Working_Day;
+                data_count++;
+                var pop_up_total_hr = 0;
+                var pop_up_total_min = 0;
+                var pop_up_total_ot_hr = 0;
+                var pop_up_total_ot_min = 0;
+                var pop_up_total_ot_amount = 0;
+                var pop_up_total_amount = 0;
+                var cumulative_amount = 0;
+
+                // Initialize the one_user_monthly_in_out with table header
+                one_user_monthly_in_out = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="bg-info text-white">
+                            <tr>
+                                <th>DATE</th>
+                                <th>In</th>
+                                <th>Out</th>
+                                <th>Tot. Hrs</th>
+                                <th>Tot. Min</th>
+                                <th>OT Hrs.</th>
+                                <th>OT Min</th>
+                                <th>OT Amt</th>
+                                <th>Daily Amt</th>
+                                <th>Cumulative Amt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="in_out_single_user_tr">`;
+
+                dates.forEach(date => {
+                    const formattedDate = date.toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    });
+                    month_year = date.toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        year: "numeric"
+                    });
+                    const filteredData = all_attandance_data.filter(all_att_data =>
+                        all_att_data.Employee_id === all_users_data.Employee_id &&
+                        formatDateToYYYYMMDD(date) === all_att_data.attandence_Date
+                    );
+                    const public_holiday_filyer_data = public_holiday_data.filter(public_holiday_data =>
+                        formatDateToYYYYMMDD(date) === public_holiday_data.holiday_Date
+                    );
+                    const leave_filter_data = leave_data.filter(leave_d =>
+                        leave_d.Employee_id === all_users_data.Employee_id && leave_d.Start_Date <=
+                        formatDateToYYYYMMDD(date) && leave_d.End_Date >= formatDateToYYYYMMDD(date)
+                    );
+                    if (leave_filter_data.length > 0) {
+                        leave_filter_data.forEach(leave_filter_data => {
+                            leave_color = leave_filter_data.Color;
+                            Half_Day_Leave = leave_filter_data.Half_Day;
+                            Payment_Status_Leave = leave_filter_data.Payment_Status;
+                            Short_Name_Leave = leave_filter_data.Short_Name;
                         });
-                        const absent_data = 0;
-                        var Absent_count = Working_Day - response.holiday_count - Work;
-                        if (Absent_count <= 0) {
-                            Absent_count = 0;
+                    }
+                    Payment_Status = "";
+                    OT_Amt = 0;
+                    Daily_Amt = 0;
+                    public_holiday_filyer_data.forEach(pub_ho => {
+                        if (pub_ho.holiday_Date === formatDateToYYYYMMDD(date)) {
+                            Public_Holiday_array_data = 1;
+                        } else {
+                            Public_Holiday_array_data = 0;
                         }
-                        Total_Amount = Total_all_day_Amount + Total_OT_Amount;
+                    });
+                    filteredData.forEach(element => {
+                        Swap_Day_array_data = element.Swap_Day;
+                        Daily_Rate = element.Daily_Rate;
+                        Over_Ttime_Rate = element.Over_Ttime_Rate;
+                        Weekly_Off_array_data = element.WeeklyOff;
+                    });
+
+                    let cellBackgroundColor = '';
+                    if (Swap_Day_array_data == 1) {
+                        cellBackgroundColor = 'style="background-color:orange"';
+                    } else if (public_holiday_filyer_data.length == 1) {
+                        cellBackgroundColor = 'style="background-color:yellow"';
+                        Daily_Amt = Employee_Daily_Rate;
+                    } else if (Weekly_Off_array_data == 1) {
+                        cellBackgroundColor = 'style="background-color:cyan"';
+                        Daily_Amt = Employee_Daily_Rate;
+                    } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', {
+                            weekday: 'long'
+                        })) {
+                        cellBackgroundColor = 'style="background-color:cyan"';
+                        Daily_Amt = Employee_Daily_Rate;
+                    } else if (public_holiday_filyer_data.holiday_Date == formatDateToYYYYMMDD(date)) {
+                        cellBackgroundColor = 'style="background-color:yellow"';
+                        Daily_Amt = Employee_Daily_Rate;
+                    } else if (leave_filter_data.length > 0) {
+                        Payment_Status = leave_filter_data[0].Payment_Status;
+                        cellBackgroundColor = 'style="background-color:' + leave_color + '"';
+                        if (Half_Day_Leave == 1) {
+                            cellBackgroundColor = 'style="background: linear-gradient(to right, ' + leave_color +
+                                '50%, transparent 50%);"';
+                            leave_holiday_weakly_off_count += 0.5;
+                            if (Half_Day_Leave == 1 && Payment_Status == "Paid") {
+                                Daily_Amt = Employee_Daily_Rate / 2;
+                            }
+                        } else {
+                            if (cellBackgroundColor != "") {
+                                leave_holiday_weakly_off_count++;
+                                if (Payment_Status == "Paid") {
+                                    Daily_Amt = Employee_Daily_Rate;
+                                }
+                            }
+                        }
+                    }
+
+                    cumulative_amount += Daily_Amt;
+
+                    if (filteredData.length === 0) {
+                        // For dates without attendance data
                         table_html_data += `
+                        <td class="in_time_p" ${cellBackgroundColor}></td>
+                        <td class="out_time_p" ${cellBackgroundColor}></td>
+                        <td class="total_hr_p" ${cellBackgroundColor}></td>
+                        <td class="total_min_p" ${cellBackgroundColor}></td>
+                        <td class="total_min_p ot" ${cellBackgroundColor}></td>
+                        <td class="total_min_p ot" ${cellBackgroundColor}></td>
+                        <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>`;
+
+                        // Add to monthly in/out report
+                        one_user_monthly_in_out += `
+                        <tr>
+                            <td class="in_time_p" ${cellBackgroundColor}>${formatDateToYYYYMMDD(date)}</td>
+                            <td class="in_time_p" ${cellBackgroundColor}></td>
+                            <td class="out_time_p" ${cellBackgroundColor}></td>
+                            <td class="total_hr_p" ${cellBackgroundColor}></td>
+                            <td class="total_min_p" ${cellBackgroundColor}></td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}></td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}></td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}></td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}>${cumulative_amount.toFixed(2)}</td>
+                        </tr>`;
+                    } else {
+                        filteredData.forEach(all_att_data => {
+                            if (Half_Day_Leave == 1 && all_att_data.Totel_Hours >= all_att_data.Shift_hours / 2) {
+                                Daily_Amt += all_att_data.Daily_Rate / 2;
+                            } else if (all_att_data.Totel_Hours >= all_att_data.Shift_hours) {
+                                Daily_Amt += all_att_data.Daily_Rate;
+                            } else {
+                                Daily_Amt += all_att_data.Daily_Rate;
+                            }
+                            OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
+                            Total_OT_Amount = Total_OT_Amount + OT_Amt;
+
+                            table_html_data += `
+                            <td class="in_time_p" ${cellBackgroundColor}>${all_att_data.in_time}</td>
+                            <td class="out_time_p" ${cellBackgroundColor}>${all_att_data.out_time}</td>
+                            <td class="total_hr_p" ${cellBackgroundColor}>${all_att_data.Total_Time}</td>
+                            <td class="total_min_p" ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.Overtime}</td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
+                            <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>`;
+
+                            // Add to monthly in/out report
+                            one_user_monthly_in_out += `
+                            <tr>
+                                <td class="in_time_p" ${cellBackgroundColor}>${formatDateToYYYYMMDD(date)}</td>
+                                <td class="in_time_p" ${cellBackgroundColor}>${all_att_data.in_time}</td>
+                                <td class="out_time_p" ${cellBackgroundColor}>${all_att_data.out_time}</td>
+                                <td class="total_hr_p" ${cellBackgroundColor}>${all_att_data.Totel_Hours}</td>
+                                <td class="total_min_p" ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
+                                <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.OT_Hr}</td>
+                                <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.Overtime}</td>
+                                <td class="total_min_p ot" ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
+                                <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>
+                                <td class="total_min_p ot" ${cellBackgroundColor}>${cumulative_amount.toFixed(2)}</td>
+                            </tr>`;
+
+                            pop_up_total_hr += all_att_data.Totel_Hours;
+                            pop_up_total_min += all_att_data.Total_Minutes;
+                            pop_up_total_ot_hr += all_att_data.OT_Hr;
+                            pop_up_total_ot_min += all_att_data.Overtime;
+                            pop_up_total_ot_amount += OT_Amt;
+                            Work++;
+                            Over_Time += all_att_data.Overtime;
+                        });
+                    }
+                    pop_up_total_amount += Daily_Amt;
+                    Total_all_day_Amount += Daily_Amt;
+                });
+
+                // Add totals row before closing the table
+                one_user_monthly_in_out += `
+                <tr class="table-secondary font-weight-bold">
+                    <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
+                    <td><strong>${pop_up_total_hr.toFixed(2)}</strong></td>
+                    <td><strong>${pop_up_total_min}</strong></td>
+                    <td><strong>${pop_up_total_ot_hr.toFixed(2)}</strong></td>
+                    <td><strong>${pop_up_total_ot_min}</strong></td>
+                    <td><strong>${pop_up_total_ot_amount.toFixed(2)}</strong></td>
+                    <td><strong>${pop_up_total_amount.toFixed(2)}</strong></td>
+                    <td><strong>${cumulative_amount.toFixed(2)}</strong></td>
+                </tr>`;
+
+                // Close the one_user_monthly_in_out table
+                one_user_monthly_in_out += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+                const absent_data = 0;
+                var Absent_count = Working_Day - response.holiday_count - Work;
+                if (Absent_count <= 0) {
+                    Absent_count = 0;
+                }
+                Total_Amount = Total_all_day_Amount + Total_OT_Amount;
+                table_html_data += `
                     <td>${Working_Day}</td>
                     <td>${Working_Day - response.holiday_count}</td>
                     <td>${Work}</td>
@@ -915,46 +993,46 @@
                     <td>${Over_Ttime_Rate.toFixed(2)}</td>
                     <td>${Math.round(Total_OT_Amount)}</td>
                     `;
-                        table_html_data += `
+                table_html_data += `
                     <td id="advance${all_users_data.Employee_id}">`;
-                        if (advance_data != "") {
-                            advance_data.forEach(advance_data => {
-                                if (advance_data.Employee_id == all_users_data.Employee_id) {
-                                    advance = parseInt(advance) + parseInt(advance_data.Loan_Amount_in_INR);
-                                }
-                            });
+                if (advance_data != "") {
+                    advance_data.forEach(advance_data => {
+                        if (advance_data.Employee_id == all_users_data.Employee_id) {
+                            advance = parseInt(advance) + parseInt(advance_data.Loan_Amount_in_INR);
                         }
-                        table_html_data += `${advance}
+                    });
+                }
+                table_html_data += `${advance}
                     </td>
                     `;
-                        table_html_data += `
+                table_html_data += `
                     <td id="deductions_amount${all_users_data.Employee_id}">`;
-                        if (deductions_data != null) {
-                            deductions_data.forEach(deductions => {
-                                if (deductions.Employee_id === all_users_data.Employee_id) {
-                                    deductions_amount += parseInt(deductions.deduction_Amount_in_INR);
-                                }
-                            });
+                if (deductions_data != null) {
+                    deductions_data.forEach(deductions => {
+                        if (deductions.Employee_id === all_users_data.Employee_id) {
+                            deductions_amount += parseInt(deductions.deduction_Amount_in_INR);
                         }
-                        table_html_data += `${deductions_amount}
+                    });
+                }
+                table_html_data += `${deductions_amount}
                     </td>
                     `;
-                        table_html_data += `
+                table_html_data += `
                     <td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
                     <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>
                     `;
-                        table_html_data += `
+                table_html_data += `
                     <td>${Daily_Rate.toFixed(2)}</td>
                     <td id="monthly_salary${all_users_data.Employee_id}">`;
-                        monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
-                        table_html_data += `${Math.round(monthaly_salary)}
+                monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
+                table_html_data += `${Math.round(monthaly_salary)}
                     </td>
                     `;
-                        var arrer_amo = all_users_data.Arrear_Amount ?? 0;
-                        table_html_data += `
+                var arrer_amo = all_users_data.Arrear_Amount ?? 0;
+                table_html_data += `
                     <td id="net_salary${all_users_data.Employee_id}">`;
-                        net_salary = monthaly_salary - Penalty - deductions_amount + arrer_amo;
-                        top_table_content = `<tr>
+                net_salary = monthaly_salary - Penalty - deductions_amount + arrer_amo;
+                top_table_content = `<tr>
                             <th colspan='2'>Employee Information</th>
                             <th colspan='2'>Attendance Details</th>
                             <th colspan='2'>Overtime</th>
@@ -982,98 +1060,98 @@
                             <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
                         </tr>`;
 
-                    var paid_amt = 0;
-                    if (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '') {
-                        paid_amt = Math.round(net_salary);
-                    } else {
-                        paid_amt = all_users_data.Paid_Amount;
-                    }
+                var paid_amt = 0;
+                if (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '') {
+                    paid_amt = Math.round(net_salary);
+                } else {
+                    paid_amt = all_users_data.Paid_Amount;
+                }
 
-                    table_html_data += `${Math.round(net_salary)}
+                table_html_data += `${Math.round(net_salary)}
                     <input type="hidden" id="header_cont_${all_users_data.Employee_id}" value="${top_table_content.replace(/"/g, '&quot;')}">
                     <input type="hidden" value='${one_user_monthly_total_amount}' id='one_user_monthly_total_amount${all_users_data.Employee_id}'>
                     <input type="hidden" value='${one_user_monthly_in_out.replace(/"/g, '&quot;')}' id='one_user_monthly_in_out${all_users_data.Employee_id}'>
                     <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>
                     `;
-                        var paid_amt = 0;
-                        if (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '') {
-                            paid_amt = Math.round(net_salary);
-                        } else {
-                            paid_amt = all_users_data.Paid_Amount;
-                        }
-                        table_html_data += `
+                var paid_amt = 0;
+                if (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '') {
+                    paid_amt = Math.round(net_salary);
+                } else {
+                    paid_amt = all_users_data.Paid_Amount;
+                }
+                table_html_data += `
                     <td><input type="text" value="${paid_amt}" style="border:none;width:100%" id="paid_amount_td${all_users_data.Employee_id}"></td>
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Over_Time / 60}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
                     <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">`;
-                        if (all_users_data.Paid_Flag == 1) {
-                            table_html_data += `
+                if (all_users_data.Paid_Flag == 1) {
+                    table_html_data += `
                         <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
                         <i class="fas fa-check-circle"></i> PAID
                         </button>`;
-                        } else {
-                            table_html_data += `
+                } else {
+                    table_html_data += `
                         <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary(${all_users_data.Employee_id})">
                         <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
                         <span class='tooltip'>Pay Salary for Employee Name</span>
                         </button>`;
-                        }
-                        table_html_data += `
+                }
+                table_html_data += `
                     </td>
                     </tr>
                     `;
-                        leave_holiday_weakly_off_count = 0;
-                        one_user_monthly_in_out = '';
-                        top_table_content = '';
-                        one_user_monthly_total_amount = 0;
-                        Work = 0;
-                        paid_amt = 0;
-                        Over_Time = 0;
-                        deductions = 0;
-                        Penalty = 0;
-                        advance = 0;
-                        deductions_amount = 0;
-                        advance = "0";
-                        Over_Ttime_Rate = 0;
-                        Day_Total_Amount = 0;
-                        Daily_Rate = 0;
-                        Over_Ttime_Rate = 0;
-                        otm = 0;
-                        Total_OT_Amount = 0;
-                        Total_Amount = 0;
-                        Total_all_day_Amount = 0;
-                    });
-                    table_html_data += `
+                leave_holiday_weakly_off_count = 0;
+                one_user_monthly_in_out = '';
+                top_table_content = '';
+                one_user_monthly_total_amount = 0;
+                Work = 0;
+                paid_amt = 0;
+                Over_Time = 0;
+                deductions = 0;
+                Penalty = 0;
+                advance = 0;
+                deductions_amount = 0;
+                advance = "0";
+                Over_Ttime_Rate = 0;
+                Day_Total_Amount = 0;
+                Daily_Rate = 0;
+                Over_Ttime_Rate = 0;
+                otm = 0;
+                Total_OT_Amount = 0;
+                Total_Amount = 0;
+                Total_all_day_Amount = 0;
+            });
+            table_html_data += `
                 </tbody>
             </table>
         </div>
         </div>
         `;
-                    $("#result").html(table_html_data);
-                    hide_animation();
-                    // Pagination
-                    var pajination_data = response.all_users.links;
-                    var pagination_html = `
+            $("#result").html(table_html_data);
+            hide_animation();
+            // Pagination
+            var pajination_data = response.all_users.links;
+            var pagination_html = `
         <nav aria-label="Page navigation">
         <ul class="pagination">
             `;
-                    pajination_data.forEach(element => {
-                        if (element.url === null) {
-                            pagination_html += `
+            pajination_data.forEach(element => {
+                if (element.url === null) {
+                    pagination_html += `
             <li class="page-item disabled">
                 <a class="page-link">${element.label}</a>
             </li>
             `;
-                        } else {
-                            pagination_html += `
+                } else {
+                    pagination_html += `
             <li class="page-item ${element.active ? 'active' : ''}">
                 <a class="page-link" href="${element.url}">${element.label}</a>
             </li>
             `;
-                        }
-                    });
-                    pagination_html += `
+                }
+            });
+            pagination_html += `
         </ul>
         </nav>
         <div class="d-flex justify-content-end">
@@ -1081,57 +1159,57 @@
         <p><b>Total Records :</b> ${response.all_users.total}</p>
         </div>
         `;
-                    $("#pagination_div").html(pagination_html);
-                    // Enhanced DataTables initialization with full features
-                    $('#salary_table').DataTable({
-                        "scrollX": true,
-                        "scrollCollapse": true,
-                        "paging": true,
-                        "pageLength": 10,
-                        "lengthMenu": [
-                            [10, 25, 50, 100, -1],
-                            [10, 25, 50, 100, "All"]
-                        ],
-                        "info": true,
-                        "searching": true,
-                        "ordering": true,
-                        "order": [
-                            [0, "asc"]
-                        ],
-                        "autoWidth": false,
-                        "responsive": true,
-                        "dom": 'Bfrtip',
-                        "buttons": [
-                            'copy', 'csv', 'excel', 'pdf', 'print'
-                        ],
-                        "columnDefs": [{
-                                "className": "dt-center",
-                                "targets": "_all"
-                            },
-                            {
-                                "width": "2%",
-                                "targets": "_all"
-                            },
-                            {
-                                "orderable": false,
-                                "targets": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1]
-                            },
-                            {
-                                "searchable": false,
-                                "targets": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1]
-                            }
-                        ],
-                        "language": {
-                            "search": "Search:",
-                            "lengthMenu": "Show _MENU_ entries",
-                            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                            "infoEmpty": "Showing 0 to 0 of 0 entries",
-                            "infoFiltered": "(filtered from _MAX_ total entries)",
-                            "paginate": {
-                                "first": "First",
-                                "last": "Last",
-                                "next": "Next",
-                                "previous": "Previous"
+            $("#pagination_div").html(pagination_html);
+            // Enhanced DataTables initialization with full features
+            $('#salary_table').DataTable({
+                "scrollX": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "pageLength": 10,
+                "lengthMenu": [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "All"]
+                ],
+                "info": true,
+                "searching": true,
+                "ordering": true,
+                "order": [
+                    [0, "asc"]
+                ],
+                "autoWidth": false,
+                "responsive": true,
+                "dom": 'Bfrtip',
+                "buttons": [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                "columnDefs": [{
+                        "className": "dt-center",
+                        "targets": "_all"
+                    },
+                    {
+                        "width": "2%",
+                        "targets": "_all"
+                    },
+                    {
+                        "orderable": false,
+                        "targets": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1]
+                    },
+                    {
+                        "searchable": false,
+                        "targets": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1]
+                    }
+                ],
+                "language": {
+                    "search": "Search:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
                             }
                         },
                         "stateSave": true,
@@ -1170,7 +1248,7 @@
             }
 
             // Open the arrear info form modal or section
-            open_Arrear_Info_form(employee_id);
+            open_Arrear_Info_form();
 
             // Get arrear amount and reason from the table cells
             const arrear_amount_td = $("#arrear_amount_td" + employee_id).text();
@@ -1263,96 +1341,36 @@
         }
 
         function salary_paid_function(employee_id) {
-        // Get header content and other employee details from hidden inputs
-        var headerContent = $("#header_cont_" + employee_id).val();
-        var monthlyInOut = $("#one_user_monthly_in_out" + employee_id).val();
-        var heading = $("#heading" + employee_id).text();
-        var paidAmount = $("#paid_amount_td" + employee_id).val();
-        var netAmount = $("#net_amount_td" + employee_id).val();
-        var OT_amt = $("#OT_amt" + employee_id).val();
-        var OT_hrs = $("#OT_hrs" + employee_id).val();
-        let arrear_month = $('#month-selector').val() || '';
+            // Get header content and other employee details from hidden inputs
+            var headerContent = $("#header_cont_" + employee_id).val();
+            var monthlyInOut = $("#one_user_monthly_in_out" + employee_id).val();
+            var heading = $("#heading" + employee_id).text();
+            var paidAmount = $("#paid_amount_td" + employee_id).val();
+            var netAmount = $("#net_amount_td" + employee_id).val();
+            var OT_amt = $("#OT_amt" + employee_id).val();
+            var OT_hrs = $("#OT_hrs" + employee_id).val();
+            let arrear_month = $('#month-selector').val() || '';
 
-        if (arrear_month === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'No Month Selected',
-                text: 'Please select a month before processing salary.'
-            });
-            return;
+            if (arrear_month === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Month Selected',
+                    text: 'Please select a month before processing salary.'
+                });
+                return;
+            }
+
+            // Log or display data for now — since modal is removed
+            console.log("Salary Payment Summary:");
+            console.log("Employee:", heading);
+            console.log("Paid Amount:", paidAmount);
+            console.log("Net Amount:", netAmount);
+            console.log("OT Amount:", OT_amt);
+            console.log("OT Hours:", OT_hrs);
+            console.log("Arrear Month:", arrear_month);
+
         }
 
-        // Create the modal content
-        var modalContent = `
-        <div class="modal fade" id="salaryModal" tabindex="-1" role="dialog" aria-labelledby="salaryModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="salaryModalLabel">${heading}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Employee Salary Summary</h3>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    ${headerContent}
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h3 class="card-title">Attendance Details</h3>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>In Time</th>
-                                            <th>Out Time</th>
-                                            <th>Total Hours</th>
-                                            <th>Total Minutes</th>
-                                            <th>OT Hours</th>
-                                            <th>OT Minutes</th>
-                                            <th>OT Amount</th>
-                                            <th>Daily Amount</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${monthlyInOut}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="paySalary(${employee_id})">Pay Salary</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        `;
-
-        // Append modal to body and show it
-        $("body").append(modalContent);
-        $("#salaryModal").modal('show');
-
-        // Set the paid amount in the popup
-        $("#paid_amoutn_for_pup_up_span").text(paidAmount);
-
-        // Clean up modal when hidden
-        $("#salaryModal").on('hidden.bs.modal', function () {
-            $(this).remove();
-        });
-    }
 
     // Keep the paySalary function separate
     function paySalary(employee_id) {

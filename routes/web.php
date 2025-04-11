@@ -198,7 +198,7 @@ Route::get('/depaetment-Master-view/{id}',[HR_setting_controller::class,'depaetm
 Route::post('/add-employee-type',[HR_setting_controller::class,'add_employee_type'])->name('add_employee_type');
 Route::post('/add-shift',[shift_masterController::class,'add_shift'])->name('add_shift');
 Route::post('/change-Password',[HR_setting_controller::class,'change_Password'])->name('change_Password');
-Route::get('/change-Password/{Employee_id}',[forgot_password_controller::class,'change_Password_view'])->name('change_Password_view');
+Route::post('/change-Password/{Employee_id}',[forgot_password_controller::class,'change_Password_view'])->name('change_Password_view');
 Route::post('/change-Password-with-link',[forgot_password_controller::class,'change_Password_with_link'])->name('change_Password_with_link');
 
 //update fields

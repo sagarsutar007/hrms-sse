@@ -17,12 +17,14 @@
          </div>
          <div class="btn-group ml-2 mb-2">
             @foreach ($roler_permissions as $rol_permiss)
-                <button class="btn btn-primary"
-                    onclick="window.location.href='{{ url('admin-settings/' . $rol_permiss->role_name) }}'">
-                    <i class="fas fa-cogs"></i> {{ ucfirst($rol_permiss->role_name) }} Settings
-                </button>
+                @if (strtolower($rol_permiss->role_name) != 'super admin')
+                    <button class="btn btn-primary"
+                        onclick="window.location.href='{{ url('admin-settings/' . $rol_permiss->role_name) }}'">
+                        <i class="fas fa-cogs"></i> {{ ucfirst($rol_permiss->role_name) }} Settings
+                    </button>
+                @endif
             @endforeach
-         </div>
+        </div>
          <div class="btn-group ml-2 mb-2">
             <button class="btn btn-secondary" data-toggle="modal" data-target="#addRoleModal">Add Role</button>
             <button class="btn btn-secondary" data-toggle="modal" data-target="#leaveMasterModal">Add Leave Master</button>
