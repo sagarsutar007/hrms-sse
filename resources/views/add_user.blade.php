@@ -17,13 +17,13 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <x-adminlte-input name="f_name" label="First Name*" placeholder="First Name" icon="fas fa-user" />
+                        <x-adminlte-input name="f_name" label="First Name" placeholder="First Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_name" label="Middle Name" placeholder="Middle Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="l_name" label="Last Name*" placeholder="Last Name" icon="fas fa-user" />
+                        <x-adminlte-input name="l_name" label="Last Name" placeholder="Last Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_number" label="Mobile Number" placeholder="Mobile Number" maxlength="10" inputmode="numeric" icon="fas fa-phone" />
@@ -68,20 +68,20 @@
                         <x-adminlte-input name="qualification" label="Highest Qualification" placeholder="Highest Qualification" icon="fas fa-graduation-cap" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Salary" label="Salary*" placeholder="Salary" type="number" icon="fas fa-money-bill" />
+                        <x-adminlte-input name="Salary" label="Salary" placeholder="Salary" type="number" icon="fas fa-money-bill" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="Pan_number" label="Pan Number" placeholder="Pan Number" maxlength="20" icon="fas fa-id-card-alt" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="can_login" label="Login Enabled" id="can_login" onchange="set_required()" icon="fas fa-sign-in-alt">
+                        <x-adminlte-select name="can_login" label="Login Enabled" id="can_login" icon="fas fa-sign-in-alt">
                             <option value="0">Select Status</option>
                             <option value="1" selected>Yes</option>
                             <option value="0">No</option>
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="shift" label="Shift*" icon="fas fa-clock">
+                        <x-adminlte-select name="shift" label="Shift" icon="fas fa-clock">
                             <option value="">Select Shift</option>
                             @foreach ($shift_master as $shift_m)
                                 <option value="{{ $shift_m->id }}">{{ $shift_m->Shift_Name }}</option>
@@ -89,7 +89,7 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="emp_type" label="Employee Type*" icon="fas fa-briefcase">
+                        <x-adminlte-select name="emp_type" label="Employee Type" icon="fas fa-briefcase">
                             <option value="">Select Employee Type</option>
                             @foreach ($employee_type_master as $emp_type)
                                 <option value="{{ $emp_type->id }}">{{ $emp_type->EmpTypeName }}</option>
@@ -97,7 +97,7 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="role" label="Employee Role*" icon="fas fa-user-tag">
+                        <x-adminlte-select name="role" label="Employee Role" icon="fas fa-user-tag">
                             <option value="">Select Employee Role</option>
                             @foreach ($role_masrer as $role_m)
                                 @if ($role_m->id >= session('role_number'))
@@ -107,22 +107,22 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="DOJ" label="Date Of Joining*" type="date" icon="fas fa-calendar-check" />
+                        <x-adminlte-input name="DOJ" label="Date Of Joining" type="date" icon="fas fa-calendar-check" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Account_Number" label="Account Number*" placeholder="Account Number" type="number" icon="fas fa-university" />
+                        <x-adminlte-input name="Account_Number" label="Account Number" placeholder="Account Number" type="number" icon="fas fa-university" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name*" placeholder="Bank Holder Name" icon="fas fa-user-tie" />
+                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name" placeholder="Bank Holder Name" icon="fas fa-user-tie" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="IFSC_Code" label="IFSC Code*" placeholder="IFSC Code" icon="fas fa-barcode" />
+                        <x-adminlte-input name="IFSC_Code" label="IFSC Code" placeholder="IFSC Code" icon="fas fa-barcode" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Name" label="Bank Name*" placeholder="Bank Name" icon="fas fa-landmark" />
+                        <x-adminlte-input name="Bank_Name" label="Bank Name" placeholder="Bank Name" icon="fas fa-landmark" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="department_master" label="Department*" icon="fas fa-building">
+                        <x-adminlte-select name="department_master" label="Department" icon="fas fa-building">
                             <option value="">Select Department</option>
                             @foreach ($department_master as $dpm)
                                 <option value="{{ $dpm->id }}">{{ $dpm->Department_name }}</option>
@@ -180,59 +180,76 @@
     </div>
 
     <script>
-        function set_required(){
-            let can_login_flag = document.getElementById('can_login').value;
-            if(can_login_flag == 1){
-                document.getElementById('email_field').required = true;
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             // Add AJAX handling for the form submission
             $('#employeeForm').on('submit', function(e) {
-                e.preventDefault();
+    e.preventDefault();
 
-                $.ajax({
-                    url: $(this).attr('action'),
-                    method: $(this).attr('method'),
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            // Populate modal with employee details
-                            $('#modal-name').text(response.data.name);
-                            $('#modal-email').text(response.data.email);
-                            $('#modal-mobile').text(response.data.mobile);
-                            $('#modal-employee-id').text(response.data.employee_id);
-                            $('#modal-password').text(response.data.password);
+    // Get the form data
+    let formData = $(this).serialize();
 
-                            // Show the success modal
-                            $('#successModal').modal('show');
+    $.ajax({
+        url: $(this).attr('action'),
+        method: $(this).attr('method'),
+        data: formData,
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                // Build name from first and last name
+                let fullName = [response.F_name, response.L_name].filter(Boolean).join(' ');
 
-                            // Set redirect URL (if available in response)
-                            if (response.redirect_url) {
-                                $('#redirectBtn').on('click', function() {
-                                    window.location.href = response.redirect_url;
-                                });
-                            } else {
-                                $('#redirectBtn').on('click', function() {
-                                    window.location.href = "{{ route('view_employee') }}";
-                                });
-                            }
-                        } else {
-                            alert(response.message || 'An error occurred');
-                        }
-                    },
-                    error: function(xhr) {
-                        alert('An error occurred: ' + xhr.statusText);
-                    }
+                // Populate modal with available data
+                $('#modal-name').text(fullName || 'Not provided');
+                $('#modal-employee-id').text(response.Employee_id || 'Not available');
+                $('#modal-password').text(response.Password || 'Not available');
+
+                // Show success modal
+                $('#successModal').modal('show');
+
+                // Set redirect button action
+                $('#redirectBtn').off('click').on('click', function() {
+                    window.location.href = "{{ route('view_employee') }}";
                 });
-            });
+            } else {
+                // Show detailed error message
+                let errorMessage = response.Message || 'An error occurred';
+                let errorDetails = '';
 
-            // Redirect button in modal
-            $('#redirectBtn').on('click', function() {
-                window.location.href = "{{ route('view_employee') }}";
-            });
+                if (response.error) {
+                    errorDetails += '\n\nError details: ' + response.error;
+                    console.error('Error details:', response.error);
+                }
+
+                if (response.trace) {
+                    console.error('Stack trace:', response.trace);
+                }
+
+                if (response.attempted_data) {
+                    console.error('Attempted data:', response.attempted_data);
+                }
+
+                alert(errorMessage + errorDetails);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', status, error);
+            console.error('Response:', xhr.responseText);
+
+            let errorMessage = 'An error occurred while processing your request.';
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response.message) {
+                    errorMessage += '\n\nServer message: ' + response.message;
+                }
+            } catch (e) {
+                // If parsing fails, include the raw response text
+                errorMessage += '\n\nServer response: ' + xhr.responseText;
+            }
+
+            alert(errorMessage);
+        }
+    });
+});
         });
     </script>
 @endsection
