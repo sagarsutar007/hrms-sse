@@ -269,9 +269,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <a href="#" class="btn btn-warning" id="edit-employee-btn">
-                    <i class="fas fa-pencil-alt"></i> Edit
-                </a>
                 <a href="#" class="btn btn-success" id="download-id-card-btn">
                     <i class="fas fa-download"></i> Download ID Card
                 </a>
@@ -457,7 +454,7 @@
 
             // Set the edit and download buttons
             $('#edit-employee-btn').attr('href', 'user-details/' + employeeId);
-            // $('#download-id-card-btn').attr('href', 'dounloade-user-id-catd/' + employeeId);
+            $('#download-id-card-btn').attr('href', 'dounloade-user-id-catd/' + employeeId);
 
             // Show the modal
             $('#employee-view-modal').modal('show');

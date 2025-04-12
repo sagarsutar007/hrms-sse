@@ -3,52 +3,59 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
-@endsection
+    <h1 class="m-0 text-dark">Dashboard</h1>
+@stop
 
 @section('content')
-
 <div class="row">
     @if ($view_home_page_options == 1)
-        <!-- Employees Card -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-purple">
+            <div class="small-box bg-purple" onclick="location.href='{{url('employees')}}'">
                 <div class="inner">
                     <h3>{{$employee_number}}</h3>
                     <p>Employees</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
                 </div>
                 <a href="{{url('employees')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
-        <!-- Attendance Card -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-orange">
+            <div class="small-box bg-warning" onclick="location.href='{{url('all-attendance')}}'">
                 <div class="inner">
                     <h3>P:{{$Present_number}} A:{{$Absent_number}}</h3>
                     <p>Attendance</p>
                 </div>
-                <a href="{{url('attendance-records')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
+                <div class="icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <a href="{{url('all-attendance')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
-        <!-- Total Leave Card -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-green">
+            <div class="small-box bg-success" onclick="location.href='{{url('total-leave')}}'">
                 <div class="inner">
                     <h3>{{$leave_number}}</h3>
                     <p>Total Leave</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-sign-out-alt"></i>
                 </div>
                 <a href="{{url('total-leave')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
-        <!-- Late Entry Card -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-blue">
+            <div class="small-box bg-primary" onclick="location.href='{{url('all-attendance')}}'">
                 <div class="inner">
                     <h3>{{$LatePunch}}</h3>
                     <p>Late Entry</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-clock"></i>
                 </div>
                 <a href="{{url('all-attendance')}}" class="small-box-footer">View Table <i class="fas fa-arrow-circle-right"></i></a>
             </div>
@@ -56,518 +63,697 @@
     @endif
 </div>
 
-<!-- Tables in col-md-6 -->
 <div class="row">
-    <!-- Shift Wise -->
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Shift Wise</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-user-clock mr-2"></i>Shift Wise Attendance</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Shift Name</th>
-                            <th>Total</th>
-                            <th>Present</th>
-                            <th>On Weekly Off</th>
-                            <th>Late Punch</th>
-                            <th>On Leave</th>
-                        </tr>
-                    </thead>
-                    <tbody id="shift_wise_body">
-                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="result">
+                <!-- Shift wise attendance data will be loaded here -->
             </div>
         </div>
     </div>
 
-
-    <!-- Employee Type Wise -->
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Employee Type Wise</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-user-tag mr-2"></i>Employee Type Wise Attendance</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Total</th>
-                            <th>Present</th>
-                            <th>On Weekly Off</th>
-                            <th>Late Punch</th>
-                            <th>On Leave</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employeeTypeResult">
-                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="result_Get_Employee_Type_Wise_Current_Date_Data">
+                <!-- Employee type wise attendance data will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-hourglass-half mr-2"></i>Late Commers</h3>
+            </div>
+            <div class="card-body table-responsive p-0" id="Late_commer_data_table">
+                <!-- Late commers data will be loaded here -->
             </div>
         </div>
     </div>
 
-
-    <!-- Late Comers -->
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Late Comers</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-business-time mr-2"></i>OT Hours Department Wise</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered" id="Late_commer_data_table">
-                    <thead>
-                        <tr>
-                            <th>Employee ID</th>
-                            <th>Name</th>
-                            <th>In Time</th>
-                            <th>Employee Type</th>
-                            <th>Shift Name</th>
-                            <th>Department</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6" class="text-center">No Data Available</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="OTDataTable">
+                <!-- OT data will be loaded here -->
             </div>
         </div>
     </div>
+</div>
 
-
-    <!-- OT Hrs Department Wise -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">OT Hrs Department Wise</h3>
-            </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Department Name</th>
-                            <th>Overtime Hours</th>
-                            <th>Overtime Minutes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="3" class="text-center">No Data Available</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Absent List -->
+<div class="row">
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Absent List</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-user-times mr-2"></i>Absent List</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered" id="absent_list_table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Employee ID</th>
-                            <th>Shift Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="3" class="text-center">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="result_absent">
+                <!-- Absent list data will be loaded here -->
             </div>
         </div>
     </div>
 
-    <!-- Top 10 Present List -->
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Top 10 Present List</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-user-check mr-2"></i>Top 10 Present List</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Present</th>
-                        </tr>
-                    </thead>
-                    <tbody id="present_list_body">
-                        <tr><td colspan="2" class="text-center">Loading...</td></tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="result_present">
+                <!-- Present list data will be loaded here -->
             </div>
         </div>
     </div>
 
-
-    <!--Default Absent List -->
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Default Absent</h3>
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-user-slash mr-2"></i>Default Absent</h3>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered" id="default_absent_table">
-                    <thead>
-                        <tr>
-                            <th>Employee ID</th>
-                            <th>Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="2" class="text-center">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card-body table-responsive p-0" id="result_defult_absent">
+                <!-- Default absent data will be loaded here -->
             </div>
         </div>
     </div>
 </div>
 
 
-
-
-<!-- Pie Charts for Employee Types -->
 <div class="row">
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Casual (Total Employees: 9)</h3>
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Employee Type Attendance Charts</h3>
             </div>
             <div class="card-body">
-                <canvas id="casualChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Daily Wages (Total Employees: 1)</h3>
-            </div>
-            <div class="card-body">
-                <canvas id="dailyWagesChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Full Time (Total Employees: 7)</h3>
-            </div>
-            <div class="card-body">
-                <canvas id="fullTimeChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h3 class="card-title">Staff (Total Employees: 5)</h3>
-            </div>
-            <div class="card-body">
-                <canvas id="staffChart"></canvas>
+                <div class="row" id="pieChartsContainer">
+                    <!-- Pie charts will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-@endsection
+<!-- ID Card Modal -->
+<div class="modal fade" id="idCardModal" tabindex="-1" role="dialog" aria-labelledby="idCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idCardModalLabel">Employee ID Card</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="id-card-container text-center">
+                    <div class="company-header">
+                        <h2>Shri Sai Electricals</h2>
+                    </div>
+                    <div class="employee-photo">
+                        <img src="{{asset('/storage')}}/{{$login_u_data['photo_name']}}" alt="Employee Photo" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
+                    </div>
+                    <div class="employee-details mt-3">
+                        <h3>{{$login_u_data['Name']}}</h3>
+                        <h5>Branch Manager</h5>
+                    </div>
+                    <div class="mt-3" id="qrcode"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@stop
+
+@section('css')
+    <style>
+        .small-box {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .small-box:hover {
+            transform: translateY(-5px);
+        }
+        #pieChartsContainer .chart-item {
+            margin-bottom: 20px;
+        }
+        .employee-photo img {
+            border: 4px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card {
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 0.75rem 1.25rem;
+        }
+        .card-header h3 {
+            margin-bottom: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            padding: 12px;
+        }
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(0,123,255,0.05);
+        }
+        .table td {
+            padding: 12px;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Status badges */
+        .badge-present {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .badge-absent {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .badge-weekly-off {
+            background-color: #17a2b8;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .badge-late {
+            background-color: #ffc107;
+            color: #212529;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .badge-leave {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Shadow effect */
+        .shadow {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        /* Scrollable tables */
+        .table-responsive {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+    </style>
+@stop
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    function createPieChart(canvasId, present, weeklyOff, onLeave, absent) {
-        new Chart(document.getElementById(canvasId), {
-            type: 'pie',
-            data: {
-                labels: ['Present', 'On Weekly Off', 'On Leave', 'Absent'],
-                datasets: [{
-                    data: [present, weeklyOff, onLeave, absent],
-                    backgroundColor: ['#ff0000', '#00c0ef', '#00a65a', '#9164ff']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
-    // Generate charts with data
-    createPieChart('casualChart', 0, 0, 0, 9);
-    createPieChart('dailyWagesChart', 0, 0, 0, 1);
-    createPieChart('fullTimeChart', 0, 0, 0, 7);
-    createPieChart('staffChart', 0, 0, 0, 5);
+    <script>
+        // QR Code generation
+        function generateQRCode() {
+            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: "{{url('/push-attendance/')}}/{{$login_u_data['Employee_id']}}/6207820301",
+                width: 85,
+                height: 85,
+            });
+        }
 
-    function Late_commer_data_function(apiUrl) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response:", response);
+        // Show ID Card
+        function showIdCard() {
+            $('#idCardModal').modal('show');
+            setTimeout(function() {
+                generateQRCode();
+            }, 500);
+        }
 
-                const $tbody = $("#Late_commer_data_table tbody");
-                $tbody.empty(); // Clear previous data
+        // Shift Wise Attendance
+        function attendanceDataSet(apiUrl) {
+            fetchDataAndRenderTable(apiUrl, "#result");
+        }
 
-                if (response.length === 0) {
-                    $tbody.html('<tr><td colspan="6" class="text-center">No Data Available</td></tr>');
-                    return;
+        function fetchDataAndRenderTable(apiUrl, targetElement) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response:", response);
+                    $(targetElement).empty();
+
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Shift Name</th>
+                                <th>Total</th>
+                                <th>Present</th>
+                                <th>Weekly Off</th>
+                                <th>Late Punch</th>
+                                <th>On Leave</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.forEach(record => {
+                        const { Shift_Name, Present, OnWeeklyOff, LatePunch, OnLeave, TotalEmployees } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="font-weight-bold">${Shift_Name}</span></td>
+                            <td>${TotalEmployees}</td>
+                            <td><span class="badge-present">${Present}</span></td>
+                            <td><span class="badge-weekly-off">${OnWeeklyOff}</span></td>
+                            <td><span class="badge-late">${LatePunch}</span></td>
+                            <td><span class="badge-leave">${OnLeave}</span></td>
+                        </tr>`;
+                    });
+
+                    tableHtml += `</tbody></table>`;
+                    $(targetElement).html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
                 }
+            });
+        }
 
-                response.forEach(record => {
-                    const {
-                        Department,
-                        EmpTypeName,
-                        Shift_Name,
-                        f_name,
-                        m_name,
-                        l_name,
-                        Employee_id,
-                        in_time
-                    } = record;
+        // Employee Type Wise Data
+        function renderEmployeeTypeWiseData(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response:", response);
+                    $("#employeeTypeResult").empty();
 
-                    const row = `
-                        <tr>
-                            <td>${Employee_id}</td>
-                            <td>${f_name || ""} ${m_name || ""} ${l_name || ""}</td>
-                            <td>${in_time}</td>
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Total</th>
+                                <th>Present</th>
+                                <th>Weekly Off</th>
+                                <th>Late Punch</th>
+                                <th>On Leave</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.forEach(record => {
+                        const { EmpTypeName, TotalEmployees, Present, OnWeeklyOff, LatePunch, OnLeave } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="font-weight-bold">${EmpTypeName}</span></td>
+                            <td>${TotalEmployees}</td>
+                            <td><span class="badge-present">${Present}</span></td>
+                            <td><span class="badge-weekly-off">${OnWeeklyOff}</span></td>
+                            <td><span class="badge-late">${LatePunch}</span></td>
+                            <td><span class="badge-leave">${OnLeave}</span></td>
+                        </tr>`;
+                    });
+
+                    tableHtml += `</tbody></table>`;
+                    $("#result_Get_Employee_Type_Wise_Current_Date_Data").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Late Comers
+        function Late_commer_data_function(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response:", response);
+
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>In Time</th>
+                                <th>Employee Type</th>
+                                <th>Shift</th>
+                                <th>Department</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.forEach(record => {
+                        const {
+                            Department,
+                            EmpTypeName,
+                            Shift_Name,
+                            f_name,
+                            m_name,
+                            l_name,
+                            Employee_id,
+                            in_time
+                        } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="text-primary">${Employee_id}</span></td>
+                            <td><span class="font-weight-bold">${f_name || " "} ${m_name || " "} ${l_name || " "}</span></td>
+                            <td><span class="badge-late">${in_time}</span></td>
                             <td>${EmpTypeName}</td>
                             <td>${Shift_Name}</td>
                             <td>${Department}</td>
-                        </tr>
-                    `;
-
-                    $tbody.append(row);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-            }
-        });
-    }
-
-    absent_list('{{url("/absent-employee-list/")}}')
-    function absent_list(apiUrl) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response: absent", response);
-
-                const $tbody = $("#absent_list_table tbody");
-                $tbody.empty(); // Clear existing rows
-
-                if (!response.data || response.data.length === 0) {
-                    $tbody.html('<tr><td colspan="3" class="text-center">No Data Available</td></tr>');
-                    return;
-                }
-
-                response.data.forEach(record => {
-                    const { Shift_name, name, EmployeeID } = record;
-
-                    const row = `
-                        <tr>
-                            <td>${name}</td>
-                            <td>${EmployeeID}</td>
-                            <td>${Shift_name}</td>
-                        </tr>
-                    `;
-                    $tbody.append(row);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $("#absent_list_table tbody").html('<tr><td colspan="3" class="text-center text-danger">Error loading data</td></tr>');
-            }
-        });
-    }
-
-    defult_absent('{{url("/Default-Absentees-By-Month/")}}')
-    function defult_absent(apiUrl) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response: absent", response);
-
-                const $tbody = $("#default_absent_table tbody");
-                $tbody.empty(); // Clear existing data
-
-                if (!response.data || response.data.length === 0) {
-                    $tbody.html('<tr><td colspan="2" class="text-center">No Data Available</td></tr>');
-                    return;
-                }
-
-                response.data.forEach(record => {
-                    const { name, EmployeeID } = record;
-
-                    const row = `
-                        <tr>
-                            <td>${EmployeeID}</td>
-                            <td>${name}</td>
-                        </tr>
-                    `;
-
-                    $tbody.append(row);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $("#default_absent_table tbody").html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
-            }
-        });
-    }
-
-    present_list('{{url("/attandance_100_top_10_list_api/")}}')
-    function present_list(apiUrl) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response: present", response);
-
-                const $tbody = $("#present_list_body");
-                $tbody.empty();
-
-                if (!response.data || response.data.length === 0) {
-                    $tbody.html('<tr><td colspan="2" class="text-center">No Data Available</td></tr>');
-                    return;
-                }
-
-                response.data.forEach(record => {
-                    const { name, Present } = record;
-
-                    const row = `
-                        <tr>
-                            <td>${name}</td>
-                            <td>${Present}</td>
-                        </tr>
-                    `;
-
-                    $tbody.append(row);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $("#present_list_body").html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
-            }
-        });
-    }
-
-    renderEmployeeTypeWiseData("{{url("/Get-Employee-Type-Wise-Current-Date-Data-api/")}}");
-    function renderEmployeeTypeWiseData(apiUrl) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("API URL:", apiUrl);
-                console.log("Response:", response);
-
-                let tableRows = "";
-
-                response.forEach(record => {
-                    const { EmpTypeName, TotalEmployees, Present, OnWeeklyOff, LatePunch, OnLeave } = record;
-
-                    tableRows += `
-                        <tr>
-                            <td>${EmpTypeName}</td>
-                            <td>${TotalEmployees}</td>
-                            <td>${Present}</td>
-                            <td>${OnWeeklyOff}</td>
-                            <td>${LatePunch}</td>
-                            <td>${OnLeave}</td>
                         </tr>`;
-                });
+                    });
 
-                $("#employeeTypeResult").html(tableRows);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-            }
-        });
-    }
-
-    attendanceDataSet('{{url("/all-attandance-detail-with-let-api/")}}');
-    function fetchDataAndRenderTable(apiUrl, targetElement) {
-        $.ajax({
-            url: apiUrl,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response:", response);
-                const $tbody = $(targetElement);
-                $tbody.empty();
-
-                if (!response || response.length === 0) {
-                    $tbody.html('<tr><td colspan="6" class="text-center">No Data Available</td></tr>');
-                    return;
+                    tableHtml += `</tbody></table>`;
+                    $("#Late_commer_data_table").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
                 }
+            });
+        }
 
-                response.forEach(record => {
-                    const { Shift_Name, TotalEmployees, Present, OnWeeklyOff, LatePunch, OnLeave } = record;
+        // Absent List
+        function absent_list(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response: absent", response);
 
-                    const row = `
-                        <tr>
-                            <td>${Shift_Name}</td>
-                            <td>${TotalEmployees}</td>
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Employee ID</th>
+                                <th>Shift Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.data.forEach(record => {
+                        const {
+                            Shift_name,
+                            name,
+                            EmployeeID
+                        } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="font-weight-bold">${name}</span></td>
+                            <td><span class="text-primary">${EmployeeID}</span></td>
+                            <td>${Shift_name}</td>
+                            <td><span class="badge-absent">Absent</span></td>
+                        </tr>`;
+                    });
+
+                    tableHtml += `</tbody></table>`;
+                    $("#result_absent").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Present List
+        function present_list(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response: present", response);
+
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Present Days</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.data.forEach(record => {
+                        const {
+                            Present,
+                            name
+                        } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="font-weight-bold">${name}</span></td>
                             <td>${Present}</td>
-                            <td>${OnWeeklyOff}</td>
-                            <td>${LatePunch}</td>
-                            <td>${OnLeave}</td>
-                        </tr>
-                    `;
+                            <td><span class="badge-present">Regular</span></td>
+                        </tr>`;
+                    });
 
-                    $tbody.append(row);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $(targetElement).html('<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>');
-            }
+                    tableHtml += `</tbody></table>`;
+                    $("#result_present").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Default Absent
+        function defult_absent(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response: default absent", response);
+
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.data.forEach(record => {
+                        const {
+                            name,
+                            EmployeeID
+                        } = record;
+
+                        tableHtml += `<tr>
+                            <td><span class="text-primary">${EmployeeID}</span></td>
+                            <td><span class="font-weight-bold">${name}</span></td>
+                            <td><span class="badge-absent">Default Absent</span></td>
+                        </tr>`;
+                    });
+
+                    tableHtml += `</tbody></table>`;
+                    $("#result_defult_absent").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // OT Data
+        function OTDataFunction(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response: OT", response);
+
+                    let tableHtml = `
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>OT Hours</th>
+                                <th>OT Minutes</th>
+                                <th>Total Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.forEach(record => {
+                        const {
+                            Department_name,
+                            OTHrs,
+                            OTMin
+                        } = record;
+
+                        // Calculate total time in hours and minutes
+                        const totalHours = parseInt(OTHrs);
+                        const totalMinutes = parseInt(OTMin);
+                        const formattedTime = `${totalHours}h ${totalMinutes}m`;
+
+                        tableHtml += `<tr>
+                            <td><span class="font-weight-bold">${Department_name}</span></td>
+                            <td>${totalHours}</td>
+                            <td>${totalMinutes}</td>
+                            <td><span class="badge badge-info">${formattedTime}</span></td>
+                        </tr>`;
+                    });
+
+
+                    tableHtml += `</tbody></table>`;
+                    $("#OTDataTable").html(tableHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Pie Charts
+        function renderEmployeeTypeWisePieCharts(apiUrl) {
+            $.ajax({
+                url: apiUrl,
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                success: function(response) {
+                    console.log("Response:", response);
+
+                    // Clear the container for new charts
+                    $("#pieChartsContainer").empty();
+
+                    // Loop through each employee type data
+                    response.forEach((record, index) => {
+                        const { EmpTypeName, Present, OnWeeklyOff, OnLeave, Absent, TotalEmployees } = record;
+
+                        // Create a container and canvas for each chart
+                        const chartId = `employeeTypePieChart_${index}`;
+                        $("#pieChartsContainer").append(`
+                            <div class="col-md-3 chart-item">
+                                <div class="card shadow">
+                                    <div class="card-header bg-light">
+                                        <h5>${EmpTypeName} (Total: ${TotalEmployees})</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="${chartId}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // Render the pie chart
+                        const ctx = document.getElementById(chartId).getContext("2d");
+                        new Chart(ctx, {
+                            type: "pie",
+                            data: {
+                                labels: ["Present", "On Weekly Off", "On Leave", "Absent"],
+                                datasets: [{
+                                    data: [Present, OnWeeklyOff, OnLeave, Absent],
+                                    backgroundColor: [
+                                        "#28a745", "#17a2b8", "#ffc107", "#dc3545"
+                                    ],
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(tooltipItem) {
+                                                return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Initialize functions on document ready
+        $(document).ready(function() {
+            attendanceDataSet('{{url("/all-attandance-detail-with-let-api/")}}');
+            renderEmployeeTypeWiseData('{{url("/Get-Employee-Type-Wise-Current-Date-Data-api/")}}');
+            Late_commer_data_function('{{url("/Late-Commer-Current-Date-Data-api/")}}');
+            absent_list('{{url("/absent-employee-list/")}}');
+            present_list('{{url("/attandance_100_top_10_list_api/")}}');
+            defult_absent('{{url("/Default-Absentees-By-Month/")}}');
+            OTDataFunction('{{url("/Daily-Ot-Hrs-api/")}}');
+            renderEmployeeTypeWisePieCharts('{{url("/Get-Employee-Type-Wise-Current-Date-Data-api/")}}');
+
+            // Add user icon to navbar for ID card
+            $('.navbar-nav.ml-auto').append('<li class="nav-item"><a class="nav-link" href="#" onclick="showIdCard()"><i class="fas fa-id-card"></i></a></li>');
         });
-    }
-
-
-</script>
-@endsection
+    </script>
+@stop

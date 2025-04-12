@@ -44,9 +44,9 @@
                     <a href="#" class="list-group-item list-group-item-action" id="add-holiday-btn">
                         <i class="fas fa-plus mr-2"></i> Add Holiday
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action">
+                    {{-- <a href="#" class="list-group-item list-group-item-action">
                         <i class="fas fa-upload mr-2"></i> Bulk Upload
-                    </a>
+                    </a> --}}
                 </div>
             </div>
         </div>
@@ -67,16 +67,16 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="Holiday_Name">Holiday Name*</label>
-                        <input type="text" class="form-control" id="Holiday_Name" name="Holiday_Name" placeholder="Enter holiday name" required>
+                        <label for="nmt">Holiday Name*</label>
+                        <input type="text" class="form-control" id="nmt" name="Holiday_Name" placeholder="Enter holiday name" required>
                     </div>
                     <div class="form-group">
                         <label for="Holiday_Date">Holiday Date*</label>
                         <input type="date" class="form-control" id="Holiday_Date" name="Holiday_Date" required>
                     </div>
                     <div class="form-group d-none">
-                        <label for="Swap_with_Date">Swap with Date</label>
-                        <input type="date" class="form-control" id="Swap_with_Date" name="Swap_with_Date">
+                        <label for="Swap_with_Datem">Swap with Date</label>
+                        <input type="date" class="form-control" id="Swap_with_Datem" name="Swap_with_Date">
                     </div>
                     <div class="form-group">
                         <label for="Public_Holiday">Public Holiday*</label>
@@ -269,12 +269,6 @@ $(document).ready(function () {
         $("#addHolidayModal").modal('show');
     });
 
-    // Handle form submission
-    $("#holidayForm").on("submit", function(event) {
-        event.preventDefault();
-        insertHoliday();
-    });
-
     // Calendar initialization
     var calendar = {
         current: new Date(),
@@ -284,6 +278,7 @@ $(document).ready(function () {
 
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    // Function to render the calendar
     function renderCalendar() {
         const month = calendar.current.getMonth();
         const year = calendar.current.getFullYear();
@@ -393,7 +388,7 @@ $(document).ready(function () {
         $("#addHolidayModal").modal('show');
     });
 
-    // Load holiday data
+    // Function to load holidays
     function loadHolidays() {
         $.ajax({
             url: "{{ url('/all-holiday-api') }}/" + 100000000,
@@ -403,13 +398,16 @@ $(document).ready(function () {
                 "Content-Type": "application/json"
             },
             success: function(response) {
+                // Clear existing events
+                calendar.events = {};
+
                 if (response && response.all_users && response.all_users.data) {
                     const eventData = response.all_users.data;
 
                     eventData.forEach(event => {
                         calendar.events[event.holiday_Date] = {
                             name: event.Holiday_name,
-                            isPublic: event.status === "1"
+                            isPublic: event.Public_Holiday === "1"  // Changed from status to Public_Holiday
                         };
                     });
 
@@ -438,115 +436,34 @@ $(document).ready(function () {
         $('#successToast').toast('show');
     }
 
+    // Form submission
+    $("#holidayForm").on("submit", function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: "{{ route('add_holiday_api') }}",
+            method: "POST",
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.status) {
+                    showSuccess(response.message);
+                    $("#addHolidayModal").modal('hide');
+                    $("#holidayForm")[0].reset();
+
+                    // Reload holidays to refresh the calendar
+                    loadHolidays();
+                }
+            },
+            error: function(xhr) {
+                showError("Error saving holiday: " + xhr.responseText);
+                console.log(xhr.responseText);
+            }
+        });
+    });
+
     // Initialize calendar and load holidays
     loadHolidays();
     renderCalendar();
 });
-
-// Event handler for the submit button
-$("#submit_btn").on("click", function(event) {
-    event.preventDefault();
-    insert_holiday();
-});
-
-var calendar = {
-    current: new Date(),
-    activeDate: null,
-    events: {}
-};
-
-const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-// Function to render the calendar
-function renderCalendar() {
-    const month = calendar.current.getMonth();
-    const year = calendar.current.getFullYear();
-    const today = new Date();
-
-    // Update month and year display
-    $('#current-month').text(calendar.current.toLocaleString('default', { month: 'long' }));
-    $('#current-year').text(year);
-
-    // Render days of the week header
-    $('#days-of-week').html(daysOfWeek.map(day => `<div class="day-name">${day}</div>`).join(''));
-
-    // Calculate calendar parameters
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevMonthDays = new Date(year, month, 0).getDate();
-
-    let daysHtml = '';
-
-    // Add previous month's days
-    for (let i = firstDay; i > 0; i--) {
-        daysHtml += `<div class="day prev-month">${prevMonthDays - i + 1}</div>`;
-    }
-
-    // Add current month's days
-    for (let i = 1; i <= daysInMonth; i++) {
-        const date = new Date(year, month, i);
-        const dateKey = `${year}-${month + 1}-${i}`;
-        const isToday = today.toDateString() === date.toDateString() ? 'active' : '';
-        const isSunday = date.getDay() === 0 ? 'sunday' : '';
-        const event = calendar.events[dateKey] || '';
-
-        // Set background color for days with events
-        const eventStyle = event ? 'style="background-color: rgba(252, 120, 174, 0.986);"' : '';
-
-        daysHtml += `
-            <div class="day ${isToday} ${isSunday}" ${eventStyle} data-date="${dateKey}">
-                <div class="day-number">${i}</div>
-                <div class="event-indicator">${event}</div>
-            </div>
-        `;
-    }
-
-    // Update the calendar with generated HTML
-    $('#days').html(daysHtml);
-}
-
-function insert_holiday() {
-    var holiday_date = $('#Holiday_Date').val();
-    var holiday_name = $('#nmt').val();
-    var holiday_swipe_date = $('#Swap_with_Datem').val();
-    var public_holiday = $('#Public_Holiday').val();
-
-    if (holiday_date && holiday_name && public_holiday) {
-        if (typeof calendar !== "undefined") {
-            calendar.events[holiday_date] = holiday_name;
-        }
-
-        renderCalendar();
-        document.getElementById("Payslip_Info_div").style.display = "none";
-
-        // Send the request using jQuery AJAX
-        $.ajax({
-            url: `{{url("/add-holiday-api")}}/${holiday_name}/${holiday_date}/${holiday_swipe_date}/${public_holiday}`,
-            type: 'GET',
-            success: function(response) {
-                console.log('Success:', response);
-            },
-            error: function(xhr, status, error) {
-                console.log('Error:', error);
-                show_error("Error: " + error);
-            }
-        });
-    } else {
-        if (!holiday_date) show_error("Please Enter Holiday Date");
-        if (!holiday_name) show_error("Please Enter Holiday Name");
-        if (!public_holiday) show_error("Please Select Public Holiday");
-    }
-}
-
-function show_error(message) {
-    var errorDiv = document.getElementById("error_sms_div");
-    errorDiv.style.display = "flex";
-    errorDiv.innerHTML = message;
-    setTimeout(() => {
-        errorDiv.style.display = "none";
-        errorDiv.innerHTML = "";
-    }, 3000);
-}
-
 </script>
 @stop

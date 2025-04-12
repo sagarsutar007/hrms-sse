@@ -349,7 +349,7 @@ return [
         'icon' => 'fas fa-chart-bar',
         'submenu' => [
             [
-                'text' => 'Report 1',
+                'text' => 'Collated Report',
                 'icon' => 'fas fa-file-alt',
                 'url' => '/report-1',
             ],

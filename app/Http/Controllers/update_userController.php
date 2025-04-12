@@ -6,74 +6,57 @@ use Illuminate\Http\Request;
 
 class update_userController extends Controller
 {
-    
-    public function  update_basic_info(Request $update_req) {
-        $updated_by = session()->get('EmployeeID');
 
-        // if(isset($update_req->Termination_Date)){
-        //   $Termination_Date = $update_req->Termination_Date;
-        // }else{
-        //   $Termination_Date = NILL;
-        // }
+    public function update_basic_info(Request $update_req)
+{
+    $updated_by = session()->get('EmployeeID');
 
+    $update_data = [
+        'f_name' => $update_req->First_Name ?? '',
+        'l_name' => $update_req->Last_Name ?? '',
+        'email' => $update_req->Email ?? '',
+        'mobile_number' => $update_req->Phone ?? '',
+        'pan_number' => $update_req->PAN_Number ?? '',
+        'dob' => $update_req->DOB ?? null,
+        'current_address' => $update_req->Current_Address ?? '',
+        'permanent_address' => $update_req->Parment_Addtess ?? '',
+        'aadhaar_number' => $update_req->Aadhar_Number ?? '',
+        'voter_id_number' => $update_req->Voter_id_Number ?? '',
+        'gender' => $update_req->Gender ?? '',
+        'ration_card_number' => $update_req->Ration_Card_Number ?? '',
+        'salary' => $update_req->Salary ?? '',
+        'shift_time' => $update_req->Shift_Number ?? '',
+        'employee_type' => $update_req->Employee_Type ?? '',
+        'updated_at' => now(),
+    ];
 
-        // Preprocess $update_req data
-$update_data = [
-  'f_name' => $update_req->First_Name ?? 0,
-  'l_name' => $update_req->Last_Name ?? 0,
-  'email' => $update_req->Email ?? 0,
-  'mobile_number' => $update_req->Phone ?? 0,
-  'pan_number' => $update_req->PAN_Number ?? 0,
-  'dob' => $update_req->DOB ?? 0,
-  'current_address' => $update_req->Current_Address ?? 0,
-  'permanent_address' => $update_req->Parment_Addtess ?? 0,
-  'aadhaar_number' => $update_req->Aadhar_Number ?? 0,
-  'voter_id_number' => $update_req->Voter_id_Number ?? 0,
-  'gender' => $update_req->Gender ?? 0,
-  'ration_card_number' => $update_req->Ration_Card_Number ?? 0,
-  'salary' => $update_req->Salary ?? 0,
-  'shift_time' => $update_req->Shift_Number ?? 0,
-  'employee_type' => $update_req->Employee_Type ?? 0,
-  'updated_at' => now(),
-];
+    $update_basic_info = DB::table('all_users')
+        ->where('Employee_id', $update_req->Employee_Id)
+        ->update($update_data);
 
-// Update query
-$update_basic_info = DB::table('all_users')
-  ->where('Employee_id', $update_req->Employee_Id)
-  ->update($update_data);
-
-        if($update_basic_info){
-            ?>
-<script>
-alert("Data Updated Successfully")
-history.back();
-</script>
-<?php
-                  }else{
-                ?>
-<script>
-alert("faield")
-history.back()
-</script>
-<?php
-        }
+    if ($update_basic_info) {
+        return redirect()->route('view_employee')->with('success', 'Data Updated Successfully');
+    } else {
+        return redirect()->route('view_employee')->with('error', 'Failed to update data');
     }
+}
+
 
 //    edit_emergency_contact
 
     public function  edit_emergency_contact(Request $update_req) {
         $updated_by =  session()->get('EmployeeID') ;
-        $update_basic_info = DB::table('_emergency__contacts') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-         ->update( [ 
-         'Relation' => $update_req->Relation, 
-         'Email' => $update_req->Email, 
-         'Name' => $update_req->Name, 
-         'Address' => $update_req->Address, 
-         'mobile' => $update_req->mobile, 
-         'updated_by' => $updated_by, 
-         'updated_at' => now(), 
-        ]); 
+        $update_basic_info = DB::table('_emergency__contacts')
+        ->where('Employee_id', $update_req->Employee_Id)
+         ->update( [
+         'Relation' => $update_req->Relation,
+         'Email' => $update_req->Email,
+         'Name' => $update_req->Name,
+         'Address' => $update_req->Address,
+         'mobile' => $update_req->mobile,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
         if($update_basic_info){
             ?>
 <script>
@@ -94,18 +77,18 @@ history.back()
     //update_Social_Profile
     public function  update_Social_Profile(Request $update_req) {
         $updated_by = session()->get('EmployeeID');
-        $update_basic_info = DB::table('_social__profile') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-         ->update( [ 
-         'Facebook_Profile' => $update_req->Facebook, 
-         'LinkedIn_Profile' => $update_req->LinkedIn, 
-         'Twitter_Profile' => $update_req->Twitter, 
-         'Whats_App_Profile' => $update_req->WhatsApp, 
-         'updated_by' => $updated_by, 
-         'updated_at' => now(), 
-        ]); 
+        $update_basic_info = DB::table('_social__profile')
+        ->where('Employee_id', $update_req->Employee_Id)
+         ->update( [
+         'Facebook_Profile' => $update_req->Facebook,
+         'LinkedIn_Profile' => $update_req->LinkedIn,
+         'Twitter_Profile' => $update_req->Twitter,
+         'Whats_App_Profile' => $update_req->WhatsApp,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
         if($update_basic_info){
-   
+
             ?>
 <script>
 alert("Data Updated Successfully")
@@ -126,40 +109,40 @@ history.back()
     //update_document
      public function  update_document(Request $update_req) {
         $updated_by = session()->get('EmployeeID');
-       
+
         $file = $update_req->file('Front_path');
         $update_req->validate([
             'Front_path' => 'required|mimes:jpg,png,pdf|max:3072',
         ]);
         $path =  $update_req->file('Front_path')->store('file_fronte', 'public');
-  
+
   if($update_req->file('Back_path')){
     $file = $update_req->file('Back_path');
     $update_req->validate([
         'Back_path' => 'required|mimes:jpg,png,pdf|max:3072',
     ]);
     $path2 =  $update_req->file('Back_path')->store('file_back', 'public');
-  
+
   }else{
     $path2 =  "";
   }
 
 
 
-       $update_basic_info = DB::table('all__document') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-         ->update( [ 
-         'Document_Type' => $update_req->Document_Type, 
-         'Title' => $update_req->Title, 
-         'Expired_Date' => $update_req->Expired_Date, 
-         'Description' => $update_req->Description, 
-         'Document_path' => $path , 
-         'Document_path_back' => $path2 , 
-         'updated_by' => $updated_by,  
-         'updated_at' => now(), 
-        ]); 
+       $update_basic_info = DB::table('all__document')
+        ->where('Employee_id', $update_req->Employee_Id)
+         ->update( [
+         'Document_Type' => $update_req->Document_Type,
+         'Title' => $update_req->Title,
+         'Expired_Date' => $update_req->Expired_Date,
+         'Description' => $update_req->Description,
+         'Document_path' => $path ,
+         'Document_path_back' => $path2 ,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
         if($update_basic_info){
-          
+
                 ?>
 <script>
 alert("Data Updated Success")
@@ -180,21 +163,21 @@ history.back()
     //edit-qualifications
     public function  update_qualifications(Request $update_req) {
         $updated_by = session()->get('EmployeeID');
-        $update_basic_info = DB::table('_qualifications') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-         ->update( [ 
-         'School_University' => $update_req->School_University, 
-         'Education_Level' => $update_req->Education_Level, 
-         'From' => $update_req->From, 
-         'Description' => $update_req->Description, 
-         'to' => $update_req->to, 
-         'Language' => $update_req->Language, 
-         'Professional_Skills' => $update_req->Professional_Skills, 
-         'updated_by' => $updated_by,  
-         'updated_at' => now(), 
-        ]); 
+        $update_basic_info = DB::table('_qualifications')
+        ->where('Employee_id', $update_req->Employee_Id)
+         ->update( [
+         'School_University' => $update_req->School_University,
+         'Education_Level' => $update_req->Education_Level,
+         'From' => $update_req->From,
+         'Description' => $update_req->Description,
+         'to' => $update_req->to,
+         'Language' => $update_req->Language,
+         'Professional_Skills' => $update_req->Professional_Skills,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
         if($update_basic_info){
-           
+
                 ?>
 <script>
 alert("Data Updated Success")
@@ -214,19 +197,19 @@ history.back()
     //update_Work_Experience
     public function  update_Work_Experience(Request $update_req) {
         $updated_by = session()->get('EmployeeID');
-        $update_basic_info = DB::table('_work__experience') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-         ->update( [ 
-         'Company' => $update_req->Company_Name, 
-         'Pos' => $update_req->Post, 
-         'From' => $update_req->From, 
-         'Description' => $update_req->Description, 
-         'to' => $update_req->to, 
-         'updated_by' => $updated_by,  
-         'updated_at' => now(), 
-        ]); 
+        $update_basic_info = DB::table('_work__experience')
+        ->where('Employee_id', $update_req->Employee_Id)
+         ->update( [
+         'Company' => $update_req->Company_Name,
+         'Pos' => $update_req->Post,
+         'From' => $update_req->From,
+         'Description' => $update_req->Description,
+         'to' => $update_req->to,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
         if($update_basic_info){
-            
+
             ?>
 <script>
 alert("Data uploaded successfully!")
@@ -254,7 +237,7 @@ history.back()
                 'IFSC_Code' => $update_req->IFSC_Code,
                 'updated_at' => now(),
             ]);
-    
+
         // Return JSON response
         if ($update_basic_info) {
             return response()->json([
@@ -268,18 +251,18 @@ history.back()
             ], 500); // HTTP 500 Internal Server Error
         }
     }
-    
+
 
 
 
 
     public function  uploade_test_image_view() {
-      
+
       $images = Storage::files('public/images'); // Get all images in the directory
       $imageUrls = array_map(fn($path) => storage::url($path), $images);
 
       return view('uploade_test', compact('imageUrls'));
-   
+
 
 
     }
@@ -292,27 +275,27 @@ history.back()
     $imagePath = $request->file('image')->store('images', 'public');
 
     return back()->with('success', 'Image uploaded successfully!')->with('imagePath', $imagePath);
-     
+
     }
     public function update_Profile_image(Request $update_req)
     {
         $updated_by = session()->get('EmployeeID');
-    
+
         $file = $update_req->file('Front_path');
         $file_name = $file->getClientOriginalName();
         $update_req->validate([
             'Front_path' => 'required|mimes:jpg,png|max:3072', // Validate image types
         ]);
-    
+
         // Save the original image
         $originalPath = $update_req->file('Front_path')->move(public_path('/storage/profile_image'), $file_name);
         $full_path = "/storage/profile_image/" . $file_name;
-    
+
         // Generate thumbnail
         $thumbnailName = 'thumbnail_' . $file_name;
         $thumbnailPath = public_path('/storage/profile_image/' . $thumbnailName);
         $this->createThumbnail($originalPath, $thumbnailPath, 200); // Thumbnail with a width of 200px
-    
+
         // Update the database
         $update_basic_info = DB::table('all_users')
             ->where('Employee_id', $update_req->Employee_Id)
@@ -320,14 +303,14 @@ history.back()
                 'photo_name' => '/profile_image/' . $thumbnailName, // Save thumbnail path
                 'updated_at' => now(),
             ]);
-    
+
         if ($update_basic_info) {
             return back()->with('success', 'File uploaded and thumbnail created successfully!');
         } else {
             return back()->with('error', 'Failed to upload the file!');
         }
     }
-    
+
     /**
      * Create a simple thumbnail without any external library.
      *
@@ -339,7 +322,7 @@ history.back()
     {
         // Get original image dimensions and type
         list($originalWidth, $originalHeight, $imageType) = getimagesize($sourcePath);
-    
+
         // Load the image based on its type
         switch ($imageType) {
             case IMAGETYPE_JPEG:
@@ -351,14 +334,14 @@ history.back()
             default:
                 throw new Exception("Unsupported image type.");
         }
-    
+
         // Calculate the new height maintaining the aspect ratio
         $aspectRatio = $originalHeight / $originalWidth;
         $thumbHeight = $thumbWidth * $aspectRatio;
-    
+
         // Create a blank canvas for the thumbnail
         $thumbnail = imagecreatetruecolor($thumbWidth, $thumbHeight);
-    
+
         // Resize the original image into the thumbnail
         imagecopyresampled(
             $thumbnail,
@@ -372,7 +355,7 @@ history.back()
             $originalWidth,
             $originalHeight
         );
-    
+
         // Save the thumbnail
         switch ($imageType) {
             case IMAGETYPE_JPEG:
@@ -382,29 +365,29 @@ history.back()
                 imagepng($thumbnail, $destinationPath);
                 break;
         }
-    
+
         // Free up memory
         imagedestroy($sourceImage);
         imagedestroy($thumbnail);
     }
-    
-  
+
+
  //alloweance_update
  public function  alloweance_update(Request $update_req) {
   $updated_by = session()->get('EmployeeID');
 
 if(isset($updated_by)){
-  $update_basic_salary = DB::table('alloweance') 
-  ->where('Employee_id', $update_req->Employee_Id) 
-  ->where('id', $update_req->Id) 
-   ->update( [ 
-   'month' =>$update_req->Month, 
-   'year' =>$update_req->Year, 
-   'Alloweance_Titel' =>$update_req->Alloweance_Titel, 
-   'Allowance_Ammount_in_INR' =>$update_req->Allowance_Ammount_in_INR, 
-   'updated_by' => $updated_by, 
-   'updated_at' => now(), 
-  ]); 
+  $update_basic_salary = DB::table('alloweance')
+  ->where('Employee_id', $update_req->Employee_Id)
+  ->where('id', $update_req->Id)
+   ->update( [
+   'month' =>$update_req->Month,
+   'year' =>$update_req->Year,
+   'Alloweance_Titel' =>$update_req->Alloweance_Titel,
+   'Allowance_Ammount_in_INR' =>$update_req->Allowance_Ammount_in_INR,
+   'updated_by' => $updated_by,
+   'updated_at' => now(),
+  ]);
 }else{
   ?>
 <script>
@@ -414,7 +397,7 @@ history.back()
 <?php
 }
 
-  
+
   if($update_basic_salary){
       ?>
 <script>
@@ -437,10 +420,10 @@ public function  update_loan(Request $update_req) {
   $updated_by = session()->get('EmployeeID');
 
 if(isset($updated_by)){
-  $update_basic_salary = DB::table('loan') 
-  ->where('Employee_id', $update_req->Employee_Id) 
-  ->where('id', $update_req->Id) 
-   ->update( [ 
+  $update_basic_salary = DB::table('loan')
+  ->where('Employee_id', $update_req->Employee_Id)
+  ->where('id', $update_req->Id)
+   ->update( [
             "Month" => $update_req->Month,
                 "year" => $update_req->Year,
                 "Title" => $update_req->Title,
@@ -450,10 +433,10 @@ if(isset($updated_by)){
                 "Loan_duration" => $update_req->Loan_duration,
                 "Reason" => $update_req->Reason,
                 "Loan_Remaining" => $update_req->Loan_Remaining,
-             
-             "updated_by" => $updated_by, 
-             "updated_at" => now(), 
-  ]); 
+
+             "updated_by" => $updated_by,
+             "updated_at" => now(),
+  ]);
 }else{
   ?>
 <script>
@@ -463,7 +446,7 @@ history.back()
 <?php
 }
 
-  
+
   if($update_basic_salary){
       ?>
 <script>
@@ -487,17 +470,17 @@ history.back()
 public function update_deductions(Request $update_req) {
   $updated_by = session()->get('EmployeeID');
 if(isset($updated_by)){
-  $update_basic_salary = DB::table('deductions') 
-  ->where('Employee_id', $update_req->Employee_Id) 
-  ->where('id', $update_req->Id) 
-   ->update( [ 
+  $update_basic_salary = DB::table('deductions')
+  ->where('Employee_id', $update_req->Employee_Id)
+  ->where('id', $update_req->Id)
+   ->update( [
                 "Month" => $update_req->Month,
                 "Year" => $update_req->Year,
                 "deduction_Titel" => $update_req->Title,
                 "deduction_Amount_in_INR" => $update_req->deduction_Amount_in_INR,
-                "updated_by" => $updated_by, 
-                "updated_at" => now(), 
-  ]); 
+                "updated_by" => $updated_by,
+                "updated_at" => now(),
+  ]);
 }else{
   ?>
 <script>
@@ -507,7 +490,7 @@ history.back()
 <?php
 }
 
-  
+
   if($update_basic_salary){
       ?>
 <script>
@@ -530,17 +513,17 @@ history.back()
 public function update_other_payments(Request $update_req) {
   $updated_by = session()->get('EmployeeID');
 if(isset($updated_by)){
-  $update_basic_salary = DB::table('other_payments') 
-  ->where('Employee_id', $update_req->Employee_Id) 
-  ->where('id', $update_req->Id) 
-   ->update( [ 
+  $update_basic_salary = DB::table('other_payments')
+  ->where('Employee_id', $update_req->Employee_Id)
+  ->where('id', $update_req->Id)
+   ->update( [
                 "Month" => $update_req->Month,
                 "Year" => $update_req->Year,
                 "Titel" => $update_req->Title,
                 "Amount_in_INR" => $update_req->Amount_in_INR,
-                "updated_by" => $updated_by, 
-                "updated_at" => now(), 
-  ]); 
+                "updated_by" => $updated_by,
+                "updated_at" => now(),
+  ]);
 }else{
   ?>
 <script>
@@ -550,7 +533,7 @@ history.back()
 <?php
 }
 
-  
+
   if($update_basic_salary){
       ?>
 <script>
@@ -571,17 +554,17 @@ history.back()
 //basic_salary_update
 public function  basic_salary_update(Request $update_req) {
   $updated_by =session()->get('EmployeeID');
-  $update_basic_salary = DB::table('basic_salary') 
-        ->where('Employee_id', $update_req->Employee_Id) 
-        ->where('id', $update_req->Id) 
-         ->update( [ 
-         'month' =>$update_req->Month, 
-         'year' =>$update_req->Year, 
-         'Payslip_Type' =>$update_req->Payslip_Type, 
-         'Basic_Salary' =>$update_req->Basic_Salary, 
-         'updated_by' => $updated_by, 
-         'updated_at' => now(), 
-        ]); 
+  $update_basic_salary = DB::table('basic_salary')
+        ->where('Employee_id', $update_req->Employee_Id)
+        ->where('id', $update_req->Id)
+         ->update( [
+         'month' =>$update_req->Month,
+         'year' =>$update_req->Year,
+         'Payslip_Type' =>$update_req->Payslip_Type,
+         'Basic_Salary' =>$update_req->Basic_Salary,
+         'updated_by' => $updated_by,
+         'updated_at' => now(),
+        ]);
   if($update_basic_salary){
       ?>
 <script>

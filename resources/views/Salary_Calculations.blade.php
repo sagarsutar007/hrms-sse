@@ -66,45 +66,7 @@
     </div>
 </div>
 
-<!-- Arrear Form -->
-<form  id="Arrear_Form">
-    @csrf
-    <div class="full_width_div" id="Arrear_Info_div" style="display: none;">
-       <div class=" form_inner_div">
-          <div class="form_header_div">
-             <h3> Add Arrear</h3>
-             <p class="cancle_p" onclick="close_Arrear_Info_form()"><i class="fa-regular fa-circle-xmark"></i>
-             </p>
-          </div>
-          <input type="text" name="Employee_Id" id="Employee_Id_inpur_arrear_form" style="padding: 5px 10px ; width:100%;"  hidden>
-          <div class="display_flex_center">
-             <div>
-                <p class="input_lable_p">Arrear Amount*</p>
-                <div class="input">
-                   <input type="text" placeholder="Arrear Amount " style="border:none" name="Arrear_Amount"  id="Arrear_Amount_input" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                </div>
-             </div>
-             <div style="margin-left:10px ">
-                <p class="input_lable_p">Arrear Reason* </p>
-                <div class="input">
-                   <input type="text" id="Arrear_Reason" placeholder="Arrear Reason" name="Arrear_Reason" style="border: none" required>
-                </div>
-             </div>
-          </div>
-          <div class="display_flex_center">
-             <div>
-                <p class="input_lable_p">Arrear Month*</p>
-                <div class="input">
-                   <input type="month" id="Arrear_month_year" name="Arrear_month_year" style="border: none" required>
-                </div>
-             </div>
-          </div>
-          <div class="display_flex_center_2 " style="margin: 40px;">
-             <input type="submit" value="submit" class="input margin_5_20 submit_btn" id="arrear_form_submit_btn" onclick="save_arrear()">
-          </div>
-       </div>
-    </div>
- </form>
+
 
 
 <!-- Employee Details Modal -->
@@ -187,30 +149,56 @@
     </div>
 </div>
 
-
-
-
-<!-- Arrear Modal -->
+<!-- Arrear Form -->
 <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <form id="Arrear_Form">@csrf
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="arrearModalLabel">Add Arrear</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="close_Arrear_Info_form()">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <!-- Your form fields here -->
+          <form id="Arrear_Form">
+            @csrf
+            <input type="text" name="Employee_Id" id="Employee_Id_inpur_arrear_form" style="padding: 5px 10px; width:100%;" hidden>
+
+            <div class="form-group row">
+              <div class="col-md-6">
+                <p class="input_lable_p">Arrear Amount*</p>
+                <div class="input">
+                  <input type="text" class="form-control" placeholder="Arrear Amount" name="Arrear_Amount" id="Arrear_Amount_input" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <p class="input_lable_p">Arrear Reason*</p>
+                <div class="input">
+                  <input type="text" class="form-control" id="Arrear_Reason" placeholder="Arrear Reason" name="Arrear_Reason" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <p class="input_lable_p">Arrear Month*</p>
+              <div class="input">
+                <input type="month" class="form-control" id="Arrear_month_year" name="Arrear_month_year" required>
+              </div>
+            </div>
+          </form>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="arrear_form_submit_btn" onclick="save_arrear()">Submit</button>
         </div>
       </div>
-      </form>
     </div>
   </div>
+
+  <!-- Button to trigger the modal (you can place this wherever needed) -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#arrearModal">
+    Add Arrear
+  </button>
 @stop
 
 @section('css')

@@ -422,7 +422,10 @@ Route::get('/all-holiday-api/{limit}',[leaveController::class,'all_holiday_api']
 Route::get('/all-holiday-short-api/{limit}/{short_by}/{method}',[leaveController::class,'all_holiday_short_api'])->name('all_holiday_short_api');
 Route::get('/all-holiday-search-api/{limit}/{search_inp}',[leaveController::class,'all_holiday_search_api'])->name('all_holiday_search_api');
 
-Route::get('/add-holiday-api/{holiday_name}/{holiday_date}/{swipe_date}/{public_holiday}',[holiday_master_controller::class,'add_holiday_api'])->name('add_holiday_api');
+Route::post('/add-holiday-api', [App\Http\Controllers\holiday_master_controller::class, 'add_holiday_api'])->name('add_holiday_api');
+Route::get('/all-holiday-api/{limit}', [App\Http\Controllers\holiday_master_controller::class, 'all_holiday_api'])->name('all_holiday_api');
+// Route::post('/add-holiday-api', [holiday_master_controller::class, 'add_holiday_api'])->name('add_holiday_api');
+// Route::get('/add-holiday-api/{holiday_name}/{holiday_date}/{swipe_date}/{public_holiday}', [holiday_master_controller::class, 'add_holiday_api_get'])->name('add_holiday_api_get');
 Route::get('/for-me',[roughtController::class,'for_me'])->name('for_me');
 // Route::post('/genrate-attandance',[allAttendenceController::class,'insertAttendanceForAll'])->name('insertAttendanceForAll');
 Route::get('/genrate-attandance/{start_date}/{end_date}/{employeeID}',[allAttendenceController::class,'insertAttendanceForAll'])->name('insertAttendanceForAll');

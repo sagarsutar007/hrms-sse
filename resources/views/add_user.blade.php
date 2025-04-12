@@ -12,18 +12,18 @@
             <h3 class="card-title">Employee Details</h3>
         </div>
         <div class="card-body">
-            <form action="{{ route('add_user') }}" method="post">
+            <form action="{{ route('add_user') }}" method="post" id="employeeForm">
                 @csrf
 
                 <div class="row">
                     <div class="col-md-6">
-                        <x-adminlte-input name="f_name" label="First Name*" placeholder="First Name" required icon="fas fa-user" />
+                        <x-adminlte-input name="f_name" label="First Name*" placeholder="First Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_name" label="Middle Name" placeholder="Middle Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="l_name" label="Last Name*" placeholder="Last Name" required icon="fas fa-user" />
+                        <x-adminlte-input name="l_name" label="Last Name*" placeholder="Last Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_number" label="Mobile Number" placeholder="Mobile Number" maxlength="10" inputmode="numeric" icon="fas fa-phone" />
@@ -68,7 +68,7 @@
                         <x-adminlte-input name="qualification" label="Highest Qualification" placeholder="Highest Qualification" icon="fas fa-graduation-cap" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Salary" label="Salary*" placeholder="Salary" type="number" required icon="fas fa-money-bill" />
+                        <x-adminlte-input name="Salary" label="Salary*" placeholder="Salary" type="number" icon="fas fa-money-bill" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="Pan_number" label="Pan Number" placeholder="Pan Number" maxlength="20" icon="fas fa-id-card-alt" />
@@ -81,7 +81,7 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="shift" label="Shift*" required icon="fas fa-clock">
+                        <x-adminlte-select name="shift" label="Shift*" icon="fas fa-clock">
                             <option value="">Select Shift</option>
                             @foreach ($shift_master as $shift_m)
                                 <option value="{{ $shift_m->id }}">{{ $shift_m->Shift_Name }}</option>
@@ -89,7 +89,7 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="emp_type" label="Employee Type*" required icon="fas fa-briefcase">
+                        <x-adminlte-select name="emp_type" label="Employee Type*" icon="fas fa-briefcase">
                             <option value="">Select Employee Type</option>
                             @foreach ($employee_type_master as $emp_type)
                                 <option value="{{ $emp_type->id }}">{{ $emp_type->EmpTypeName }}</option>
@@ -97,7 +97,7 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="role" label="Employee Role*" required icon="fas fa-user-tag">
+                        <x-adminlte-select name="role" label="Employee Role*" icon="fas fa-user-tag">
                             <option value="">Select Employee Role</option>
                             @foreach ($role_masrer as $role_m)
                                 @if ($role_m->id >= session('role_number'))
@@ -107,22 +107,22 @@
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="DOJ" label="Date Of Joining*" type="date" required icon="fas fa-calendar-check" />
+                        <x-adminlte-input name="DOJ" label="Date Of Joining*" type="date" icon="fas fa-calendar-check" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Account_Number" label="Account Number*" placeholder="Account Number" type="number" required icon="fas fa-university" />
+                        <x-adminlte-input name="Account_Number" label="Account Number*" placeholder="Account Number" type="number" icon="fas fa-university" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name*" placeholder="Bank Holder Name" required icon="fas fa-user-tie" />
+                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name*" placeholder="Bank Holder Name" icon="fas fa-user-tie" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="IFSC_Code" label="IFSC Code*" placeholder="IFSC Code" required icon="fas fa-barcode" />
+                        <x-adminlte-input name="IFSC_Code" label="IFSC Code*" placeholder="IFSC Code" icon="fas fa-barcode" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Name" label="Bank Name*" placeholder="Bank Name" required icon="fas fa-landmark" />
+                        <x-adminlte-input name="Bank_Name" label="Bank Name*" placeholder="Bank Name" icon="fas fa-landmark" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-select name="department_master" label="Department*" required icon="fas fa-building">
+                        <x-adminlte-select name="department_master" label="Department*" icon="fas fa-building">
                             <option value="">Select Department</option>
                             @foreach ($department_master as $dpm)
                                 <option value="{{ $dpm->id }}">{{ $dpm->Department_name }}</option>
@@ -138,6 +138,47 @@
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title" id="successModalLabel">Employee Added Successfully</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 48px;"></i>
+                    </div>
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Employee Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> <span id="modal-name"></span></p>
+                                    <p><strong>Email:</strong> <span id="modal-email"></span></p>
+                                    <p><strong>Mobile:</strong> <span id="modal-mobile"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Employee ID:</strong> <span id="modal-employee-id"></span></p>
+                                    <p><strong>Password:</strong> <span id="modal-password"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="redirectBtn">Go to Employees</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function set_required(){
             let can_login_flag = document.getElementById('can_login').value;
@@ -145,5 +186,53 @@
                 document.getElementById('email_field').required = true;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add AJAX handling for the form submission
+            $('#employeeForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: $(this).attr('method'),
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Populate modal with employee details
+                            $('#modal-name').text(response.data.name);
+                            $('#modal-email').text(response.data.email);
+                            $('#modal-mobile').text(response.data.mobile);
+                            $('#modal-employee-id').text(response.data.employee_id);
+                            $('#modal-password').text(response.data.password);
+
+                            // Show the success modal
+                            $('#successModal').modal('show');
+
+                            // Set redirect URL (if available in response)
+                            if (response.redirect_url) {
+                                $('#redirectBtn').on('click', function() {
+                                    window.location.href = response.redirect_url;
+                                });
+                            } else {
+                                $('#redirectBtn').on('click', function() {
+                                    window.location.href = "{{ route('view_employee') }}";
+                                });
+                            }
+                        } else {
+                            alert(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred: ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Redirect button in modal
+            $('#redirectBtn').on('click', function() {
+                window.location.href = "{{ route('view_employee') }}";
+            });
+        });
     </script>
 @endsection
