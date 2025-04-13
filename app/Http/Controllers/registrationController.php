@@ -178,65 +178,6 @@ $role_masrer = DB::table('role_masrer')
 
 
 
-public function Add_Users(Request $add){
-
-    if($add->Password == $add->Conform_Password){
-        if ($add->User_role == "") {
-            return response()->json(['success' => true, 'message' => 'Please Select User Role']);
-        }else{
-
-            if($add->Add_Users_input_id =="" || $add->Add_Users_input_id ==null){
-                $users = DB::table('users')
-                ->insertOrIgnore([
-                    'name' => $add->User_name,
-                    'f_name' => $add->User_name,
-                    'm_name' => "",
-                    'l_name' => "",
-                    'email' => $add->Email_Id,
-                    'mobile_number' => $add->Mobile_Number,
-                    'password'=> $add->Password,
-                     'role' =>$add->User_role,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-
-                ]);
-
-                if($users){
-                    return response()->json(['success' => true, 'message' => 'User added successfully.']);
-                    }else{
-                        return response()->json(['success' => true, 'message' => 'User Not added.']);
-                    }
-            }else{
-                $users = DB::table('users')
-                ->where('Employee_id', $add->Add_Users_input_id)
-                ->update( [
-                   'name' => $add->User_name,
-                    'f_name' => $add->User_name,
-                    'm_name' => "",
-                    'l_name' => "",
-                    'email' => $add->Email_Id,
-                    'mobile_number' => $add->Mobile_Number,
-                    'password'=> $add->Password,
-                     'role' =>$add->User_role,
-                    'updated_at' => now(),
-                ]);
-
-                if($users){
-                    return response()->json(['success' => true, 'message' => 'User details Updated successfully.']);
-                    }else{
-                        return response()->json(['success' => true, 'message' => 'User details Not Updated .']);
-                    }
-            }
-
-
-
-
-    }
-}else{
-    return response()->json(['success' => true, 'message' => 'Password And Conform Password Are Not Same']);
-}
-}
-
 public function add_user(Request $request)
 {
     try {
@@ -259,6 +200,9 @@ public function add_user(Request $request)
         // Generate a random password
         $Password = rand(100000, 999999);
 
+        // Generate a random mobile number if not provided
+        $mobile_number = $request->m_number ?: $this->generateRandomMobileNumber();
+
         // Get the current user's ID
         $created_by = session()->get('EmployeeID') ?? 1;
 
@@ -268,7 +212,7 @@ public function add_user(Request $request)
             'l_name' => $L_name,
             'm_name' => $request->m_name ?? "",
             'email' => $request->email ?? "",
-            'mobile_number' => $request->m_number ?? "",
+            'mobile_number' => $mobile_number,
             'dob' => $request->dob ?? null,
             'password' => $Password,
             'Employee_id' => $Employee_id,
@@ -276,7 +220,7 @@ public function add_user(Request $request)
             'permanent_address' => $request->p_address ?? "",
             'gender' => $request->gender ?? "",
             'marital_status' => $request->marital_status ?? "",
-            'aadhaar_number' => $request->aadhaar_number ?? "",
+            'aadhaar_number' => $request->aadhaar_number ?: null,
             'voter_id_number' => $request->voter_ID ?? "",
             'pan_number' => $request->Pan_number ?? "",
             'photo_name' => "",
@@ -293,7 +237,8 @@ public function add_user(Request $request)
             'highest_qualification' => $request->qualification ?? "",
             'QR_Code' => "",
             'reason_of_termination' => "",
-            'mobile_number' => $request->m_number !== '' ? $request->m_number : null,
+            'gender' => in_array($request->gender, ['Male', 'Female', 'Other']) ? $request->gender : 'Other',
+            'marital_status' => in_array($request->marital_status, ['Single', 'Married', 'Divorced', 'Widowed']) ? $request->marital_status : null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -301,9 +246,7 @@ public function add_user(Request $request)
         // Log the data we're trying to insert
         \Log::info('Attempting to insert user with data:', $userData);
 
-        // Rest of your code remains the same...
-
-        // Insert information into the all_users table
+        // Insert the user data into the all_users table
         try {
             $users = DB::table('all_users')->insert($userData);
             if (!$users) {
@@ -319,7 +262,7 @@ public function add_user(Request $request)
             ]);
         }
 
-        // Create a account record with form data
+        // Create an account record with form data (optional)
         try {
             $accountData = [
                 'Employee_id' => $Employee_id,
@@ -337,7 +280,7 @@ public function add_user(Request $request)
             \Log::error('Error inserting account data: ' . $e->getMessage());
         }
 
-        // Keep your original permissions code
+        // Insert permissions (optional)
         try {
             $permissionsData = [
                 'Employee_id' => $Employee_id,
@@ -389,5 +332,15 @@ public function add_user(Request $request)
         ]);
     }
 }
+
+// Helper function to generate random mobile number
+private function generateRandomMobileNumber()
+{
+    // Generate a random mobile number starting with a typical country code (e.g., India: +91)
+    $country_code = "+91";
+    $mobile_number = $country_code . rand(1000000000, 9999999999);
+    return $mobile_number;
+}
+
 
 }

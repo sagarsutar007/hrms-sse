@@ -152,49 +152,77 @@
             </form>
         </div>
     </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title" id="successModalLabel">Employee Added Successfully</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 48px;"></i>
+                    </div>
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Employee Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p><strong>Name:</strong> <span id="modal-name"></span></p>
+                                    <p><strong>Employee ID:</strong> <span id="modal-employee-id"></span></p>
+                                    <p><strong>Password:</strong> <span id="modal-password"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="redirectBtn">Go to Employees</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')
 <script>
-    // Add this JavaScript to your page
-$(document).ready(function() {
     $('#employeeForm').on('submit', function(e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    // Show success message
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Employee added successfully. ID: ' + response.Employee_id + ', Password: ' + response.Password,
-                        icon: 'success'
-                    });
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: $(this).serialize(),
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                // Populate modal with employee details - fix field names to match response
+                $('#modal-name').text(response.F_name + ' ' + response.L_name);
+                $('#modal-employee-id').text(response.Employee_id);
+                $('#modal-password').text(response.Password);
 
-                    // Optional: reset form
-                    $('#employeeForm')[0].reset();
-                } else {
-                    // Show error message
-                    Swal.fire({
-                        title: 'Error!',
-                        text: response.Message,
-                        icon: 'error'
-                    });
-                }
-            },
-            error: function(xhr) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'An error occurred while processing your request.',
-                    icon: 'error'
+                // Show the success modal
+                $('#successModal').modal('show');
+
+                // Set redirect URL
+                $('#redirectBtn').on('click', function() {
+                    window.location.href = "{{ route('view_employee') }}";
                 });
-                console.log(xhr.responseText);
+            } else {
+                alert(response.Message || 'An error occurred');
             }
-        });
+        },
+        error: function(xhr) {
+            console.error('AJAX Error:', xhr);
+            alert('An error occurred: ' + xhr.statusText);
+        }
     });
 });
 </script>

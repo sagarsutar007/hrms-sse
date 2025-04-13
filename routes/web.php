@@ -76,6 +76,7 @@ Route::post('/Add-Users',[registrationController::class,'Add_Users'])->name('Add
 Route::get('/Forgot-Password',[forgot_password_controller::class,'forgot_password_view'])->name('forgot_password_view');
 Route::post('/Forgot-Password',[forgot_password_controller::class,'forgot_password'])->name('forgot_password');
 
+Route::post('/final-settlement', [EmployeeController::class, 'finalSettlement'])->name('final.settlement');
 
 Route::get('/employees',[EmployeeController::class,'view_employee'])->name('view_employee');
 Route::get('/swipe-list',[EmployeeController::class,'view_swipe_users'])->name('view_swipe_users');
@@ -300,6 +301,10 @@ Route::get('/total-salary',[leaveController::class,'total_salary'])->name('total
 Route::get('/Absent-List',[leaveController::class,'Absent_List'])->name('Absent_List');
 Route::get('/Defult-Absent-List',[leaveController::class,'Defult_Absent_List'])->name('Defult_Absent_List');
 Route::get('/Present-List',[leaveController::class,'Present_List'])->name('Present_List');
+// API routes for fetching present employees data
+Route::get('/present-employee-list/{date?}', [LeaveController::class, 'getPresentEmployees']);
+Route::get('/present-employee-list-range/{fromDate}/{toDate}', [LeaveController::class, 'getPresentEmployeesRange']);
+
 Route::get('/Let-Commers-List',[leaveController::class,'Let_Commers_List'])->name('Let_Commers_List');
 Route::get('/attandance-100%-list',[leaveController::class,'attandance_100_list'])->name('attandance_100_list');
 Route::get('/attandance-100%-top-10-list',[leaveController::class,'attandance_100_top_10_list'])->name('attandance_100_top_10_list');

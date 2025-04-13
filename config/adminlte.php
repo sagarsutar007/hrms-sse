@@ -340,6 +340,11 @@ return [
         'url' => '/all-attendance',
     ],
     [
+        'text' => 'Leave',
+        'icon' => 'fas fa-user-times',
+        'url' => '/total-leave',
+    ],
+    [
         'text' => 'Salary Calculations',
         'icon' => 'fas fa-calculator',
         'url' => '/salary-calculations',
@@ -352,11 +357,6 @@ return [
                 'text' => 'Collated Report',
                 'icon' => 'fas fa-file-alt',
                 'url' => '/report-1',
-            ],
-            [
-                'text' => 'Leave',
-                'icon' => 'fas fa-user-times',
-                'url' => '/total-leave',
             ],
             [
                 'text' => 'Absent List',

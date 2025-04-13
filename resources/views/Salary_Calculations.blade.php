@@ -1212,6 +1212,9 @@ setInterval(() => {
 }, 1000);
 
 
+
+
+
         function validateNumber(cell, Employee_id) {
         const value = cell.innerText;
         if (!/^[\d+-]*$/.test(value)) { // Allow digits, +, and -
@@ -1559,7 +1562,111 @@ setInterval(() => {
             });
         });
 
+        function open_pershon_details(emp_id) {
+            // Call salary paid check first
+            salary_paid_function(emp_id);
 
+            var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
+            var hed_tr_data = $("#header_cont_" + emp_id).val();
+            var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
+            var table_heading = $("#heading" + emp_id).html();
 
+            $("#heade_table_tr_data").html(hed_tr_data);
+            $("#in_out_single_user_tr").html(one_user_monthly_in_out_data_var);
+            $("#table_heading_h2").html(table_heading);
+            $("#paid_amoutn_for_pup_up_span").text(paid_amoutn_for_pup_up);
+
+            // Store employee ID in a hidden field for PDF generation
+            if ($('#modal_employee_id').length === 0) {
+                $('body').append(`<input type="hidden" id="modal_employee_id" value="${emp_id}">`);
+            } else {
+                $('#modal_employee_id').val(emp_id);
+            }
+
+            // ✅ Show the modal
+            $('#salaryModal').modal('show');
+
+            // Add Print and PDF buttons to modal footer
+            if ($('#printButton').length === 0 && $('#pdfDownloadButton').length === 0) {
+                $('.modal-footer').append(`
+                    <button id="printButton" class="btn btn-primary me-2" onclick="printSalaryDetails('${emp_id}')">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                `);
+            } else {
+                // Update existing buttons with new employee ID
+                $('#printButton').attr('onclick', `printSalaryDetails('${emp_id}')`);
+                $('#pdfDownloadButton').attr('onclick', `downloadPDF('${emp_id}')`);
+            }
+        }
+
+        function printSalaryDetails(emp_id) {
+            // Get modal content
+            var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
+            var hed_tr_data = $("#header_cont_" + emp_id).val();
+            var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
+            var table_heading = $("#heading" + emp_id).html();
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+
+            // Add necessary CSS for printing
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${table_heading}</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+                    <style>
+                        body { padding: 20px; font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        table, th, td { border: 1px solid #ddd; }
+                        th, td { padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .header-info { margin-bottom: 20px; }
+                        @media print {
+                            .no-print { display: none; }
+                            button { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="row header-info">
+                            <div class="col-12">
+                                <h3>${table_heading}</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="table table-bordered">
+                                    ${hed_tr_data}
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>Attendance Details</h4>
+                                ${one_user_monthly_in_out_data_var}
+                            </div>
+                        </div>
+                        <div class="row no-print">
+                            <div class="col-12 text-center mt-3">
+                                <button class="btn btn-primary" onclick="window.print()">Print</button>
+                                <button class="btn btn-secondary" onclick="window.close()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        setTimeout(function() {
+                            window.print();
+                        }, 1000);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+
+        }
     </script>
 @stop
