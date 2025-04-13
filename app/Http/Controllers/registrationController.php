@@ -237,12 +237,12 @@ public function Add_Users(Request $add){
 }
 }
 
-public function add_user(Request $add)
+public function add_user(Request $request)
 {
     try {
         // Get only the first and last name
-        $F_name = $add->f_name;
-        $L_name = $add->l_name;
+        $F_name = $request->f_name;
+        $L_name = $request->l_name;
 
         // Get the next Employee_id
         try {
@@ -252,8 +252,7 @@ public function add_user(Request $add)
             return response()->json([
                 'success' => false,
                 'Message' => 'Error getting last employee ID',
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
         }
 
@@ -263,33 +262,38 @@ public function add_user(Request $add)
         // Get the current user's ID
         $created_by = session()->get('EmployeeID') ?? 1;
 
-        // Prepare data for insertion with all required fields
+        // Prepare data for insertion with correct field mappings
         $userData = [
             'f_name' => $F_name,
             'l_name' => $L_name,
-            'm_name' => "",
-            'email' => "",
-            'mobile_number' => "",
-            'dob' => null,
+            'm_name' => $request->m_name ?? "",
+            'email' => $request->email ?? "",
+            'mobile_number' => $request->m_number ?? "",
+            'dob' => $request->dob ?? null,
             'password' => $Password,
             'Employee_id' => $Employee_id,
-            'current_address' => "",
-            'permanent_address' => "",
-            'gender' => "",
-            'marital_status' => "",
-            'aadhaar_number' => "",
-            'voter_id_number' => "",
-            'pan_number' => "", // Add this field as it's required
-            'photo_name' => "", // Add the missing photo_name field with an empty default
-            'ration_card_number'=> "",
-            'salary' => 0,      // Add default salary
-            'role' => 1,        // Default role
-            'employee_type' => 1, // Default employee type
-            'Department' => 1,  // Default department
-            'shift_time' => 1,  // Default shift
+            'current_address' => $request->c_address ?? "",
+            'permanent_address' => $request->p_address ?? "",
+            'gender' => $request->gender ?? "",
+            'marital_status' => $request->marital_status ?? "",
+            'aadhaar_number' => $request->aadhaar_number ?? "",
+            'voter_id_number' => $request->voter_ID ?? "",
+            'pan_number' => $request->Pan_number ?? "",
+            'photo_name' => "",
+            'ration_card_number'=> $request->rasancard_number ?? "",
+            'salary' => $request->Salary ?? 0,
+            'role' => $request->role ?? 3,
+            'employee_type' => $request->emp_type ?? 1,
+            'Department' => $request->department_master ?? 1,
+            'shift_time' => $request->shift ?? 1,
             'created_by' => $created_by,
             'updated_by' => $created_by,
-            'can_login' => 1,   // Allow login by default
+            'can_login' => $request->can_login ?? 0,
+            'DOJ' => $request->DOJ ?? now()->toDateString(),
+            'highest_qualification' => $request->qualification ?? "",
+            'QR_Code' => "",
+            'reason_of_termination' => "",
+            'mobile_number' => $request->m_number !== '' ? $request->m_number : null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -297,54 +301,43 @@ public function add_user(Request $add)
         // Log the data we're trying to insert
         \Log::info('Attempting to insert user with data:', $userData);
 
+        // Rest of your code remains the same...
+
         // Insert information into the all_users table
         try {
             $users = DB::table('all_users')->insert($userData);
             if (!$users) {
                 return response()->json([
                     'success' => false,
-                    'Message' => 'Failed to insert user data',
-                    'attempted_data' => $userData
+                    'Message' => 'Failed to insert user data'
                 ]);
             }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'Message' => 'Error inserting user data',
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'attempted_data' => $userData
+                'Message' => 'Error inserting user data: ' . $e->getMessage()
             ]);
         }
 
-        // Create a minimal account record
+        // Create a account record with form data
         try {
             $accountData = [
                 'Employee_id' => $Employee_id,
-                'Account_Holder_Name' => $F_name . ' ' . $L_name,
-                'Bank_Name' => "",
-                'Account_Number' => "",
-                'IFSC_Code' => "",
+                'Account_Holder_Name' => $request->Bank_Hoalder_Name ?? ($F_name . ' ' . $L_name),
+                'Bank_Name' => $request->Bank_Name ?? "",
+                'Account_Number' => $request->Account_Number ?? "",
+                'IFSC_Code' => $request->IFSC_Code ?? "",
                 'created_by' => $created_by,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
 
-            \Log::info('Attempting to insert account with data:', $accountData);
-
-            $Bank_AccountQR = DB::table('accounts')->insert($accountData);
-
-            if (!$Bank_AccountQR) {
-                // If account insert fails, log it but continue
-                \Log::warning('Failed to insert account data:', $accountData);
-            }
+            DB::table('accounts')->insert($accountData);
         } catch (\Exception $e) {
-            // If account insert throws an exception, log it but continue
             \Log::error('Error inserting account data: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
         }
 
-        // Insert default permissions
+        // Keep your original permissions code
         try {
             $permissionsData = [
                 'Employee_id' => $Employee_id,
@@ -376,18 +369,9 @@ public function add_user(Request $add)
                 'Delete_Attendance' => 1
             ];
 
-            \Log::info('Attempting to insert permissions with data:', ['Employee_id' => $Employee_id]);
-
-            $permissions = DB::table('user_permissions')->insert($permissionsData);
-
-            if (!$permissions) {
-                // If permissions insert fails, log it but continue
-                \Log::warning('Failed to insert permissions data');
-            }
+            DB::table('user_permissions')->insert($permissionsData);
         } catch (\Exception $e) {
-            // If permissions insert throws an exception, log it but continue
             \Log::error('Error inserting permissions data: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
         }
 
         return response()->json([
@@ -399,12 +383,9 @@ public function add_user(Request $add)
             'Password' => $Password,
         ]);
     } catch (\Exception $e) {
-        // Catch any other exceptions
         return response()->json([
             'success' => false,
-            'Message' => 'Unexpected error during registration',
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'Message' => 'Unexpected error during registration: ' . $e->getMessage()
         ]);
     }
 }
