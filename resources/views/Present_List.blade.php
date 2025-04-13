@@ -169,7 +169,7 @@
 
                     table.row.add([
                         count_flag,
-                        all_users.name,            // Full name now returned from backend
+                        all_users.name,
                         all_users.EmployeeID,
                         all_users.Shift_name,
                         attendanceDate,
