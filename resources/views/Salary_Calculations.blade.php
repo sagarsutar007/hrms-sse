@@ -1,4 +1,3 @@
-<!-- resources/views/salary/index.blade.php -->
 @extends('adminlte::page')
 
 @section('title', 'Salary Sheet')
@@ -46,13 +45,26 @@
         </div>
     </div>
 
+
     <div class="card-body" style="max-height: 1000px; overflow-y: auto; overflow-x: auto;">
-        <div class="mb-2">
-            <span style="display:inline-block; width:15px; height:15px; background-color:#00FFFF; margin-right:5px;"></span> Weekly Off
-            <span style="display:inline-block; width:15px; height:15px; background-color:#FFFF00; margin-right:5px;"></span> Holiday
-            <span style="display:inline-block; width:15px; height:15px; background-color:#FFA500; margin-right:5px;"></span> Swap Day
-            <span style="display:inline-block; width:15px; height:15px; background-color:#FF0000; margin-right:5px;"></span> Sick Leave
-            <span style="display:inline-block; width:15px; height:15px; background-color:#FF00FF; margin-right:5px;"></span> Casual Leave
+        <!-- Flex row with space between -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <!-- Color Legends -->
+            <div class="mb-2">
+                <span style="display:inline-block; width:15px; height:15px; background-color:#00FFFF; margin-right:5px;"></span> Weekly Off
+                <span style="display:inline-block; width:15px; height:15px; background-color:#FFFF00; margin-right:5px;"></span> Holiday
+                <span style="display:inline-block; width:15px; height:15px; background-color:#FFA500; margin-right:5px;"></span> Swap Day
+                <span style="display:inline-block; width:15px; height:15px; background-color:#FF0000; margin-right:5px;"></span> Sick Leave
+                <span style="display:inline-block; width:15px; height:15px; background-color:#FF00FF; margin-right:5px;"></span> Casual Leave
+            </div>
+
+            <!-- Search Bar -->
+            <form action="{{ route('search_employee') }}" method="post" class="d-flex" style="gap: 5px;">
+                @csrf
+                <input type="search" name="search_val" id="search_input" class="form-control"
+                    placeholder="Search Employee by Name Number etc" required onkeyup="serch_on_key_presh()">
+                <button type="submit" id="search_btn" class="btn btn-outline-secondary">Search</button>
+            </form>
         </div>
 
         <div class="table-responsive" id="result">
@@ -61,11 +73,12 @@
                 <p>Loading data...</p>
             </div>
         </div>
-        <div id="pagination_div" class="mt-3">
-        </div>
-    </div>
-</div>
 
+        <div id="pagination_div" class="mt-3"></div>
+    </div>
+
+
+</div>
 
 
 
@@ -192,11 +205,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Button to trigger the modal (you can place this wherever needed) -->
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#arrearModal">
-    Add Arrear
-  </button>
 @stop
 
 @section('css')
@@ -225,7 +233,9 @@
         overflow-x: auto;
         white-space: nowrap;
         position: relative;
+        max-height: 60vh;       /* Limits the vertical height */
     }
+
 
     /* Custom colors for leave types */
     .bg-weekly-off { background-color: #00FFFF !important; }
@@ -634,8 +644,7 @@
         }
 
 
-        // First, let's modify how the table columns are created
-function attendance_data_set(url_input) {
+        function attendance_data_set(url_input) {
     show_animation();
     $.ajax({
         url: url_input,
@@ -692,11 +701,12 @@ function attendance_data_set(url_input) {
             var table_html_data = `
                 <div class="card">
                 <div class="card-body">
-                    <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%" data-responsive="true">
-                        <thead>
-                            <tr>
-                            <th colspan="4"></th>
-                            `;
+                    <div class="table-responsive">
+                        <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                <th colspan="4" class="sticky-col"></th>
+                                `;
 
             // Get date range
             const startDate = new Date(start_d);
@@ -727,10 +737,10 @@ function attendance_data_set(url_input) {
             table_html_data += `
                 </tr>
                 <tr>
-                    <th>Sr. N.</th>
-                    <th>Name</th>
-                    <th>Employee Id</th>
-                    <th>Shift hrs</th>
+                    <th class="sticky-col first-col">Sr. N.</th>
+                    <th class="sticky-col second-col">Name</th>
+                    <th class="sticky-col third-col">Employee Id</th>
+                    <th class="sticky-col fourth-col">Shift hrs</th>
             `;
 
             // Create sub-headers for each date
@@ -771,12 +781,34 @@ function attendance_data_set(url_input) {
 
             // Process each user's data
             all_users_data.forEach(all_users_data => {
+                // Reset variables for each user
+                Work = 0;
+                Over_Time = 0;
+                deductions_amount = 0;
+                advance = 0;
+                Total_OT_Amount = 0;
+                Total_all_day_Amount = 0;
+                leave_holiday_weakly_off_count = 0;
+
+                // Check if employee has a termination date
+                const hasTerminationDate = all_users_data.termination_date && all_users_data.termination_date.trim() !== '';
+                const terminationDate = hasTerminationDate ? new Date(all_users_data.termination_date) : null;
+
+                // Calculate employee's effective working days based on termination date
+                let effectiveWorkingDays = Working_Day;
+                if (hasTerminationDate) {
+                    effectiveWorkingDays = 0;
+                    dates.filter(date => date <= terminationDate).forEach(() => {
+                        effectiveWorkingDays++;
+                    });
+                }
+
                 table_html_data += `
                     <tr id="users_data_row${all_users_data.Employee_id}" ondblclick="open_arrear_pop_up('${all_users_data.Employee_id}')">
-                    <td>${data_count}</td>
-                    <td onclick="open_pershon_details('${all_users_data.Employee_id}')">${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                    <td>${all_users_data.Employee_id}</td>
-                    <td>${all_users_data.Shift_hours}</td>
+                    <td class="sticky-col first-col">${data_count}</td>
+                    <td class="sticky-col second-col" onclick="open_pershon_details('${all_users_data.Employee_id}')">${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
+                    <td class="sticky-col third-col">${all_users_data.Employee_id}</td>
+                    <td class="sticky-col fourth-col">${all_users_data.Shift_hours}</td>
                 `;
 
                 var Employee_Daily_Rate = all_users_data.salary / Working_Day;
@@ -796,8 +828,18 @@ function attendance_data_set(url_input) {
                         <tbody id="in_out_single_user_tr">
                 `;
 
-                // Process each date for this user - MODIFIED SECTION
+                // Process each date for this user
+                let activeDatesProcessed = 0; // Count active dates processed
+
                 dates.forEach(date => {
+                    // Skip completely if after termination date
+                    if (hasTerminationDate && date > terminationDate) {
+                        // Don't add any cells for dates after termination
+                        return;
+                    }
+
+                    activeDatesProcessed++;
+
                     const formattedDate = date.toLocaleDateString("en-US", {
                         day: "2-digit",
                         month: "long",
@@ -893,7 +935,7 @@ function attendance_data_set(url_input) {
 
                     cumulative_amount += Daily_Amt;
 
-                    // NEW APPROACH: Add individual cells for each data point
+                    // Add individual cells for each data point
                     if (filteredData.length === 0) {
                         // No attendance data for this date
                         table_html_data += `
@@ -992,19 +1034,33 @@ function attendance_data_set(url_input) {
                     </table>
                 </div>`;
 
+                // Use effective working days for calculations if employee is terminated
+                const calculationWorkingDays = hasTerminationDate ? effectiveWorkingDays : Working_Day;
+
                 // Calculate absence data
                 const absent_data = 0;
-                var Absent_count = Working_Day - response.holiday_count - Work;
+                let holidayCount = 0;
+
+                // Count holidays before termination date
+                if (hasTerminationDate) {
+                    holidayCount = public_holiday_data.filter(holiday =>
+                        new Date(holiday.holiday_Date) <= terminationDate
+                    ).length;
+                } else {
+                    holidayCount = response.holiday_count;
+                }
+
+                var Absent_count = calculationWorkingDays - holidayCount - Work;
                 if (Absent_count <= 0) {
                     Absent_count = 0;
                 }
 
                 Total_Amount = Total_all_day_Amount + Total_OT_Amount;
 
-                // Add summary columns
+                // Add summary columns with termination date consideration
                 table_html_data += `
-                    <td>${Working_Day}</td>
-                    <td>${Working_Day - response.holiday_count}</td>
+                    <td>${calculationWorkingDays}</td>
+                    <td>${calculationWorkingDays - holidayCount}</td>
                     <td>${Work}</td>
                     <td>${Absent_count}</td>
                     <td>${Over_Time}</td>
@@ -1040,7 +1096,7 @@ function attendance_data_set(url_input) {
                     <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>
                 `;
 
-                // Add daily rate and monthly salary
+                // Add daily rate and monthly salary (prorated if terminated)
                 table_html_data += `<td>${Daily_Rate.toFixed(2)}</td>
                     <td id="monthly_salary${all_users_data.Employee_id}">`;
                 monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
@@ -1051,6 +1107,12 @@ function attendance_data_set(url_input) {
                 table_html_data += `<td id="net_salary${all_users_data.Employee_id}">`;
                 net_salary = monthaly_salary - Penalty - deductions_amount + arrer_amo;
 
+                // Add termination date info to top table content for popup
+                let terminationInfo = '';
+                if (hasTerminationDate) {
+                    terminationInfo = `<tr><td colspan="2" style="color:red">Terminated on: ${all_users_data.termination_date}</td><td colspan="8"></td></tr>`;
+                }
+
                 // Prepare top table content for popup
                 top_table_content = `<tr>
                     <th colspan='2'>Employee Information</th>
@@ -1059,11 +1121,11 @@ function attendance_data_set(url_input) {
                     <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
                     <th colspan='2'>Salary Details</th></tr>
                     <tr><td>Name</td><td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                    <td>Total Days</td><td>${Working_Day}</td><td>Overtime (Hours)</td><td>${Over_Time}</td><td>Loan/Advance (INR)</td><td>${deductions_amount}</td>
+                    <td>Total Days</td><td>${calculationWorkingDays}</td><td>Overtime (Hours)</td><td>${Over_Time}</td><td>Loan/Advance (INR)</td><td>${deductions_amount}</td>
                     <td>Daily Rate (INR)</td><td>${Daily_Rate.toFixed(2)}</td></tr>
 
                     <tr><td>Employee ID</td><td>${all_users_data.Employee_id}</td>
-                    <td>Working Days</td><td>${Working_Day - response.holiday_count}</td><td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
+                    <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td><td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
                     <td>Deductions</td><td>${advance}</td>
                     <td>Gross Salary (INR)</td><td>${monthaly_salary.toFixed(2)}</td></tr>
 
@@ -1078,7 +1140,8 @@ function attendance_data_set(url_input) {
                     <td colspan='2'></td>
                     <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
                     <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
-                </tr>`;
+                </tr>
+                ${terminationInfo}`;
 
                 // Determine paid amount
                 var paid_amt = 0;
@@ -1106,20 +1169,25 @@ function attendance_data_set(url_input) {
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Over_Time / 60}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
-                    <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">
                 `;
 
-                // Add pay button
+                // Add pay button with special handling for terminated employees
+                table_html_data += `<td id="${all_users_data.Employee_id}">`;
+
                 if (all_users_data.Paid_Flag == 1) {
                     table_html_data += `
                         <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
                         <i class="fas fa-check-circle"></i> PAID
                         </button>`;
+                } else if (hasTerminationDate) {
+                    table_html_data += `
+                        <button class="btn btn-warning btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}')">
+                        <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
+                        </button>`;
                 } else {
                     table_html_data += `
-                        <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary(${all_users_data.Employee_id})">
+                        <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}')">
                         <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
-                        <span class='tooltip'>Pay Salary for Employee Name</span>
                         </button>`;
                 }
 
@@ -1151,9 +1219,9 @@ function attendance_data_set(url_input) {
             table_html_data += `
                 </tbody>
             </table>
+            </div>
         </div>
-        </div>
-            `;
+        `;
 
             // Display the table
             $("#result").html(table_html_data);
@@ -1210,10 +1278,6 @@ function attendance_data_set(url_input) {
 setInterval(() => {
     hide_animation();
 }, 1000);
-
-
-
-
 
         function validateNumber(cell, Employee_id) {
         const value = cell.innerText;

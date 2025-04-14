@@ -103,6 +103,8 @@ $ids = $delete_req->ids;
 }
 return response()->json(['success'=>'Data Deleted']);
     }
+
+
     public function add_holiday(Request $delete_req){
         $ids = $delete_req->ids;
         $created_by = session()->get('EmployeeID');
@@ -120,20 +122,23 @@ return response()->json(['success'=>'Data Deleted']);
             $message_inpu = $delete_req->message_inpu;
         }
          foreach ($ids as $id) {
-            $get_holiday = DB::table('All_Holiday')
+            // Fix: Changed table name from 'All_Holiday' to 'all_holiday' to match the database
+            $get_holiday = DB::table('all_holiday')
             ->where('Employee_id',  $id )
             ->where('Holiday_Date',  $delete_req->holiday_date )
             ->get()
             ->toArray();
             $permCounr = count($get_holiday);
             if($permCounr == 1){
-                $update_emp_tyoe = DB::table('All_Holiday')
+                // Fix: Changed table name from 'All_Holiday' to 'all_holiday'
+                $update_emp_tyoe = DB::table('all_holiday')
                 ->where('Employee_id', $id)
                  ->update( [
                     'Swap_Date' =>  $swap_date,
                 ]);
             }else{
-                $users = DB::table('All_Holiday')
+                // Fix: Changed table name from 'All_Holiday' to 'all_holiday'
+                $users = DB::table('all_holiday')
                 ->insertOrIgnore([
                     'Employee_id' => $id,
                     'Holiday_Date' => $delete_req->holiday_date,
@@ -143,11 +148,10 @@ return response()->json(['success'=>'Data Deleted']);
                     'created_by' => $created_by ,
                     'updated_by' => $created_by ,
                 ]);
-
             }
         }
         return response()->json(['success'=>'Holiday Added']);
-            }
+}
     public function set_limit(Request $limit_req){
               if(isset($limit_req->limit_num))  {
                 $role = session()->get('role');
