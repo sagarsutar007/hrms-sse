@@ -56,6 +56,7 @@
                 <span style="display:inline-block; width:15px; height:15px; background-color:#FFA500; margin-right:5px;"></span> Swap Day
                 <span style="display:inline-block; width:15px; height:15px; background-color:#FF0000; margin-right:5px;"></span> Sick Leave
                 <span style="display:inline-block; width:15px; height:15px; background-color:#FF00FF; margin-right:5px;"></span> Casual Leave
+                <span style="display:inline-block; width:15px; height:15px; background-color:#ff8a8a ; margin-right:5px;"></span> Terminated
             </div>
 
             <!-- Search Bar -->
@@ -233,9 +234,8 @@
         overflow-x: auto;
         white-space: nowrap;
         position: relative;
-        max-height: 60vh;       /* Limits the vertical height */
+        max-height: 60vh
     }
-
 
     /* Custom colors for leave types */
     .bg-weekly-off { background-color: #00FFFF !important; }
@@ -243,6 +243,7 @@
     .bg-swap-day { background-color: #FFA500 !important; }
     .bg-sick-leave { background-color: #FF0000 !important; }
     .bg-casual-leave { background-color: #FF00FF !important; }
+    .bg-termination { background-color: #ff8a8a !important; }
 
     /* Fix table header alignment */
     #salary-table-daily th {
@@ -283,6 +284,30 @@
 @stop
 
 @section('js')
+    <!-- jQuery (Required for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+    <!-- Bootstrap 4 JS (Optional but recommended for styling consistency) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables core -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+
+    <!-- JSZip and pdfmake (required for Excel/PDF export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+
+    <!-- Buttons for Excel, PDF, and Print -->
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
+
     <script>
 
         let arrear_month = 0;
@@ -644,6 +669,7 @@
         }
 
 
+        // First, let's modify how the table columns are created
         function attendance_data_set(url_input) {
     show_animation();
     $.ajax({
@@ -701,12 +727,11 @@
             var table_html_data = `
                 <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%">
-                            <thead>
-                                <tr>
-                                <th colspan="4" class="sticky-col"></th>
-                                `;
+                    <table id="salary_table" class="table table-bordered table-hover display nowrap" style="width:100%" data-responsive="true">
+                        <thead>
+                            <tr>
+                            <th colspan="4"></th>
+                            `;
 
             // Get date range
             const startDate = new Date(start_d);
@@ -737,10 +762,10 @@
             table_html_data += `
                 </tr>
                 <tr>
-                    <th class="sticky-col first-col">Sr. N.</th>
-                    <th class="sticky-col second-col">Name</th>
-                    <th class="sticky-col third-col">Employee Id</th>
-                    <th class="sticky-col fourth-col">Shift hrs</th>
+                    <th>Sr. N.</th>
+                    <th>Name</th>
+                    <th>Employee Id</th>
+                    <th>Shift hrs</th>
             `;
 
             // Create sub-headers for each date
@@ -805,10 +830,10 @@
 
                 table_html_data += `
                     <tr id="users_data_row${all_users_data.Employee_id}" ondblclick="open_arrear_pop_up('${all_users_data.Employee_id}')">
-                    <td class="sticky-col first-col">${data_count}</td>
-                    <td class="sticky-col second-col" onclick="open_pershon_details('${all_users_data.Employee_id}')">${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                    <td class="sticky-col third-col">${all_users_data.Employee_id}</td>
-                    <td class="sticky-col fourth-col">${all_users_data.Shift_hours}</td>
+                    <td>${data_count}</td>
+                    <td onclick="open_pershon_details('${all_users_data.Employee_id}')">${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
+                    <td>${all_users_data.Employee_id}</td>
+                    <td>${all_users_data.Shift_hours}</td>
                 `;
 
                 var Employee_Daily_Rate = all_users_data.salary / Working_Day;
@@ -829,16 +854,22 @@
                 `;
 
                 // Process each date for this user
-                let activeDatesProcessed = 0; // Count active dates processed
-
                 dates.forEach(date => {
-                    // Skip completely if after termination date
                     if (hasTerminationDate && date > terminationDate) {
-                        // Don't add any cells for dates after termination
+                        // Skip processing for dates after termination
+                        table_html_data += `
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                            <td class="bg-termination"></td>
+                        `;
+
                         return;
                     }
 
-                    activeDatesProcessed++;
 
                     const formattedDate = date.toLocaleDateString("en-US", {
                         day: "2-digit",
@@ -1169,27 +1200,26 @@
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Over_Time / 60}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
+                    <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">
                 `;
 
                 // Add pay button with special handling for terminated employees
-                table_html_data += `<td id="${all_users_data.Employee_id}">`;
-
                 if (all_users_data.Paid_Flag == 1) {
-                    table_html_data += `
-                        <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
-                        <i class="fas fa-check-circle"></i> PAID
-                        </button>`;
-                } else if (hasTerminationDate) {
-                    table_html_data += `
-                        <button class="btn btn-warning btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}')">
-                        <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
-                        </button>`;
-                } else {
-                    table_html_data += `
-                        <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}')">
-                        <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
-                        </button>`;
-                }
+                        table_html_data += `
+                            <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
+                            <i class="fas fa-check-circle"></i> PAID
+                            </button>`;
+                    } else if (hasTerminationDate) {
+                        table_html_data += `
+                            <button class="btn btn-warning btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
+                            <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
+                            </button>`;
+                    } else {
+                        table_html_data += `
+                            <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
+                            <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
+                            </button>`;
+                    }
 
                 table_html_data += `</td></tr>`;
 
@@ -1219,9 +1249,9 @@
             table_html_data += `
                 </tbody>
             </table>
-            </div>
         </div>
-        `;
+        </div>
+            `;
 
             // Display the table
             $("#result").html(table_html_data);
@@ -1279,6 +1309,10 @@ setInterval(() => {
     hide_animation();
 }, 1000);
 
+
+
+
+
         function validateNumber(cell, Employee_id) {
         const value = cell.innerText;
         if (!/^[\d+-]*$/.test(value)) { // Allow digits, +, and -
@@ -1297,7 +1331,7 @@ setInterval(() => {
             }
 
             // Open the arrear info form modal or section
-            open_Arrear_Info_form();
+            open_Arrear_Info_form(employee_id);
 
             // Get arrear amount and reason from the table cells
             const arrear_amount_td = $("#arrear_amount_td" + employee_id).text();
@@ -1325,61 +1359,26 @@ setInterval(() => {
 
 
         $(document).on('click', '#saveTableData', function () {
-            let arrear_month = $('#month-selector').val(); // Format: YYYY-MM
 
-            if (!arrear_month) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Month',
-                    text: 'Please select a month before processing salary.'
-                });
-                return;
-            }
+        var input_month = $('#month_selector').val();
+        if (input_month !="") {
+            arrear_month = input_month;
+        }
 
-            Swal.fire({
-                title: `Process salary for ${arrear_month}?`,
-                text: "This will apply salary data for the selected month.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Process',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#dc3545'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/luck-one-clic-arrear-data/' + arrear_month,
-                        type: 'GET',
-                        beforeSend: function () {
-                            Swal.fire({
-                                title: 'Processing...',
-                                text: 'Please wait while salary is being calculated.',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-                        },
-                        success: function (response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message
-                            });
-                            set_month_for_data(); // Refresh table or UI
-                        },
-                        error: function (xhr, status, error) {
-                            const errMsg = xhr.responseJSON?.error || error || 'Something went wrong.';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: errMsg
-                            });
-                        }
-                    });
+
+        $.ajax({
+                url: '{{url("/luck-one-clic-arrear-data")}}/' + arrear_month, // Laravel URL helper
+                type: 'GET', // or 'POST' if required
+                success: function(response) {
+                    alert(response.message);
+                    set_month_for_data();
+                },
+                error: function(xhr, status, error) {
+
+                    alert(error);
                 }
             });
-        });
+    });
 
 
 
@@ -1389,166 +1388,50 @@ setInterval(() => {
         function hide_animation() {
         }
 
-        function salary_paid_function(employee_id) {
-            // Get header content and other employee details from hidden inputs
-            var headerContent = $("#header_cont_" + employee_id).val();
-            var monthlyInOut = $("#one_user_monthly_in_out" + employee_id).val();
-            var heading = $("#heading" + employee_id).text();
-            var paidAmount = $("#paid_amount_td" + employee_id).val();
-            var netAmount = $("#net_amount_td" + employee_id).val();
-            var OT_amt = $("#OT_amt" + employee_id).val();
-            var OT_hrs = $("#OT_hrs" + employee_id).val();
-            let arrear_month = $('#month-selector').val() || '';
+        function salary_paid_function(employee_id){
 
-            if (arrear_month === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No Month Selected',
-                    text: 'Please select a month before processing salary.'
-                });
-                return;
+            show_animation();
+            var input_month = $('#month-selector').val();
+            if (input_month !="") {
+                arrear_month = input_month;
             }
+            var paid_amount = $('#paid_amount_td' + employee_id).val();
+            var net_amount = $('#net_amount_td' + employee_id).val();
+            var OT_amt = $('#OT_amt' + employee_id).val();
+            var OT_hrs = $('#OT_hrs' + employee_id).val();
 
-            // Log or display data for now — since modal is removed
-            console.log("Salary Payment Summary:");
-            console.log("Employee:", heading);
-            console.log("Paid Amount:", paidAmount);
-            console.log("Net Amount:", netAmount);
-            console.log("OT Amount:", OT_amt);
-            console.log("OT Hours:", OT_hrs);
-            console.log("Arrear Month:", arrear_month);
-
-        }
-
-
-    // Keep the paySalary function separate
-    function paySalary(employee_id) {
-        let arrear_month = $('#month-selector').val() || '';
-        const paid_amount = $('#paid_amount_td' + employee_id).val();
-        const net_amount = $('#net_amount_td' + employee_id).val();
-        const OT_amt = $('#OT_amt' + employee_id).val();
-        const OT_hrs = $('#OT_hrs' + employee_id).val();
-
-        Swal.fire({
-            title: 'Confirm Salary Payment',
-            html: `
-                <strong>Employee ID:</strong> ${employee_id}<br>
-                <strong>Month:</strong> ${arrear_month}<br>
-                <strong>Net Amount:</strong> ₹${net_amount}<br>
-                <strong>Paid Amount:</strong> ₹${paid_amount}<br>
-                <strong>OT:</strong> ₹${OT_amt} (${OT_hrs} hrs)
-            `,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Pay Salary',
-            cancelButtonText: 'Cancel',
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#dc3545'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Close the detail modal if it's open
-                $("#salaryModal").modal('hide');
-
-                $.ajax({
-                    url: `/luck-arrear-data/${employee_id}/${arrear_month}/${paid_amount}/${net_amount}/${OT_amt}/${OT_hrs}`,
-                    type: 'GET',
-                    beforeSend: function () {
-                        Swal.fire({
-                            title: 'Processing...',
-                            text: 'Please wait while the salary is being paid.',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
+            $.ajax({
+                    url: '{{url("/luck-arrear-data")}}/' + employee_id + "/" + arrear_month + "/" + paid_amount + "/" + net_amount+ "/" + OT_amt + "/" + OT_hrs, // Laravel URL helper
+                    type: 'GET', // or 'POST' if required
+                    success: function(response) {
+                        alert(response.message);
+                        hide_animation()
                     },
-                    success: function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        const errMsg = xhr.responseJSON?.error || error || 'Something went wrong.';
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: errMsg
-                        });
+                    error: function(xhr, status, error) {
+
+                        alert(error);
+                        hide_animation()
                     }
                 });
+
             }
-        });
-    }
 
+    // Fixed paySalary function with proper event handling
+    function paySalary(Employee_id) {
+    if (confirm("Are you sure you want to pay the salary?")) {
+        // Change the button text to "PAID"
+        const button = document.getElementById("payButton" + Employee_id);
+        if (button) {
+            button.innerHTML = '<i class="fas fa-check-circle"></i> PAID'; // Add a check icon and change text
+            button.disabled = true;
 
-
-    function toggleMonths() {
-    var table = document.getElementById("salary_table");
-
-    // Skip if table doesn't exist
-    if (!table) return;
-
-    // First, determine how many date columns we have
-    var headerRow = table.rows[0];
-    var subHeaderRow = table.rows[1];
-
-    // Toggle the empty space above the first four columns
-    if (headerRow.cells[0].colSpan === 4) {
-        headerRow.cells[0].style.display =
-            (headerRow.cells[0].style.display === "none" ? "" : "none");
-    }
-
-    // Get number of date columns from the header row
-    var dateColumns = 0;
-    var firstDateColIndex = 4; // After Sr No, Name, Employee Id, Shift hrs
-
-    for (var i = 1; i < headerRow.cells.length; i++) { // Start from 1 to skip the empty space
-        if (headerRow.cells[i].colSpan === 7) {
-            dateColumns++;
-        }
-    }
-
-    // Now toggle each date's columns
-    for (var rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
-        var row = table.rows[rowIndex];
-
-        if (rowIndex <= 1) {
-            // For header rows, toggle the date header cells
-            if (rowIndex === 0) {
-                // For the main header row, toggle the date headers
-                for (var i = 1; i < headerRow.cells.length; i++) {
-                    if (headerRow.cells[i].colSpan === 7) {
-                        headerRow.cells[i].style.display =
-                            (headerRow.cells[i].style.display === "none" ? "" : "none");
-                    }
-                }
-            } else {
-                // For the subheader row, toggle all date-related column headers
-                for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
-                    var startColIndex = firstDateColIndex + (dateIndex * 7);
-                    for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
-                        var colIndex = startColIndex + subColIndex;
-                        if (colIndex < subHeaderRow.cells.length) {
-                            subHeaderRow.cells[colIndex].style.display =
-                                (subHeaderRow.cells[colIndex].style.display === "none" ? "" : "none");
-                        }
-                    }
-                }
+            // Optionally, you can also change the tooltip or hide it
+            const tooltip = button.querySelector('.tooltip');
+            if (tooltip) {
+                tooltip.style.visibility = 'hidden';
             }
         } else {
-            // For data rows, toggle each date's cells
-            for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
-                var startColIndex = firstDateColIndex + (dateIndex * 7);
-                for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
-                    var colIndex = startColIndex + subColIndex;
-                    if (colIndex < row.cells.length) {
-                        row.cells[colIndex].style.display =
-                            (row.cells[colIndex].style.display === "none" ? "" : "none");
-                    }
-                }
-            }
+            console.error("Button not found for Employee ID:", Employee_id);
         }
     }
 }
@@ -1627,8 +1510,6 @@ setInterval(() => {
         });
 
         function open_pershon_details(emp_id) {
-            // Call salary paid check first
-            salary_paid_function(emp_id);
 
             var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
             var hed_tr_data = $("#header_cont_" + emp_id).val();
@@ -1647,7 +1528,6 @@ setInterval(() => {
                 $('#modal_employee_id').val(emp_id);
             }
 
-            // ✅ Show the modal
             $('#salaryModal').modal('show');
 
             // Add Print and PDF buttons to modal footer
@@ -1732,5 +1612,74 @@ setInterval(() => {
             printWindow.document.close();
 
         }
+
+        function toggleMonths() {
+        var table = document.getElementById("salary_table");
+
+        // Skip if table doesn't exist
+        if (!table) return;
+
+        // First, determine how many date columns we have
+        var headerRow = table.rows[0];
+        var subHeaderRow = table.rows[1];
+
+        // Toggle the empty space above the first four columns
+        if (headerRow.cells[0].colSpan === 4) {
+            headerRow.cells[0].style.display =
+                (headerRow.cells[0].style.display === "none" ? "" : "none");
+        }
+
+        // Get number of date columns from the header row
+        var dateColumns = 0;
+        var firstDateColIndex = 4; // After Sr No, Name, Employee Id, Shift hrs
+
+        for (var i = 1; i < headerRow.cells.length; i++) { // Start from 1 to skip the empty space
+            if (headerRow.cells[i].colSpan === 7) {
+                dateColumns++;
+            }
+        }
+
+        // Now toggle each date's columns
+        for (var rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
+            var row = table.rows[rowIndex];
+
+            if (rowIndex <= 1) {
+                // For header rows, toggle the date header cells
+                if (rowIndex === 0) {
+                    // For the main header row, toggle the date headers
+                    for (var i = 1; i < headerRow.cells.length; i++) {
+                        if (headerRow.cells[i].colSpan === 7) {
+                            headerRow.cells[i].style.display =
+                                (headerRow.cells[i].style.display === "none" ? "" : "none");
+                        }
+                    }
+                } else {
+                    // For the subheader row, toggle all date-related column headers
+                    for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
+                        var startColIndex = firstDateColIndex + (dateIndex * 7);
+                        for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
+                            var colIndex = startColIndex + subColIndex;
+                            if (colIndex < subHeaderRow.cells.length) {
+                                subHeaderRow.cells[colIndex].style.display =
+                                    (subHeaderRow.cells[colIndex].style.display === "none" ? "" : "none");
+                            }
+                        }
+                    }
+                }
+            } else {
+                // For data rows, toggle each date's cells
+                for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
+                    var startColIndex = firstDateColIndex + (dateIndex * 7);
+                    for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
+                        var colIndex = startColIndex + subColIndex;
+                        if (colIndex < row.cells.length) {
+                            row.cells[colIndex].style.display =
+                                (row.cells[colIndex].style.display === "none" ? "" : "none");
+                        }
+                    }
+                }
+            }
+        }
+    }
     </script>
 @stop
