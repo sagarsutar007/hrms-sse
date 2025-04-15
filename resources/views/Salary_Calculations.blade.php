@@ -66,9 +66,6 @@
     </div>
 </div>
 
-
-
-
 <!-- Employee Details Modal -->
 <div class="modal fade" id="employeeDetailsModal" tabindex="-1" role="dialog" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
