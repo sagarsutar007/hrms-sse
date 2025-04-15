@@ -1418,23 +1418,23 @@ setInterval(() => {
 
     // Fixed paySalary function with proper event handling
     function paySalary(Employee_id) {
-    if (confirm("Are you sure you want to pay the salary?")) {
-        // Change the button text to "PAID"
-        const button = document.getElementById("payButton" + Employee_id);
-        if (button) {
-            button.innerHTML = '<i class="fas fa-check-circle"></i> PAID'; // Add a check icon and change text
-            button.disabled = true;
+        if (confirm("Are you sure you want to pay the salary?")) {
+            // Change the button text to "PAID"
+            const button = document.getElementById("payButton" + Employee_id);
+            if (button) {
+                button.innerHTML = '<i class="fas fa-check-circle"></i> PAID'; // Add a check icon and change text
+                button.disabled = true;
 
-            // Optionally, you can also change the tooltip or hide it
-            const tooltip = button.querySelector('.tooltip');
-            if (tooltip) {
-                tooltip.style.visibility = 'hidden';
+                // Optionally, you can also change the tooltip or hide it
+                const tooltip = button.querySelector('.tooltip');
+                if (tooltip) {
+                    tooltip.style.visibility = 'hidden';
+                }
+            } else {
+                console.error("Button not found for Employee ID:", Employee_id);
             }
-        } else {
-            console.error("Button not found for Employee ID:", Employee_id);
         }
     }
-}
 
         const currentDate = new Date();
         let c_year = currentDate.getFullYear();
