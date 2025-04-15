@@ -108,6 +108,7 @@ Route::post('/user-details',[user_details_Controller::class,'form_request'])->na
 Route::post('/employees',[EmployeeController::class,'search_employee'])->name('search_employee');
 Route::post('/delete-employee',[EmployeeController::class,'delete_employee'])->name('delete_employee');
 Route::post('/add-holiday',[EmployeeController::class,'add_holiday'])->name('add_holiday');
+Route::get('/swap-holiday', [EmployeeController::class, 'swap_holiday'])->name('swap_holiday');
 Route::get('/emergency-contact/{id}',[formsController::class,'Emergency_Contact'])->name('Emergency_Contact');
 Route::get('/edit-emergency-contact/{id}',[formsController::class,'edit_Emergency_Contact'])->name('edit_Emergency_Contact');
 Route::get('/delete-emergency-contact/{id}',[formsController::class,'delete_Emergency_Contact'])->name('delete_Emergency_Contact');
@@ -316,6 +317,7 @@ route::get('/all-attendance', [roughtController::class,'all_attendance'])->name(
 Route::get('/attendance/fetch', [roughtController::class, 'fetchAttendance'])->name('attendance.fetch');
 Route::post('/attendance/filter', [roughtController::class, 'filterAttendance'])->name('attendance.filter');
 route::get('/attendance-records', [roughtController::class,'attendanceRecords'])->name('attendance-records');
+
 route::get('/all-holidays', [roughtController::class,'all_holidays'])->name('all_holidays');
 route::get('/all-leave', [roughtController::class,'all_leave'])->name('all_leave');
 route::get('/all-travel', [roughtController::class,'all_travel'])->name('all_travel');

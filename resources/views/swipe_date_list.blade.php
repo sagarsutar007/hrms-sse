@@ -17,9 +17,14 @@
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Swap Holiday Management</h3>
-                <button type="button" class="btn btn-primary delet_add_records">
-                    <i class="fas fa-save"></i> Save Swap Holiday
-                </button>
+                <div>
+                    <a href="{{ route('swap_holiday') }}" class="btn btn-outline-dark mr-2">
+                        <i class="fas fa-arrow-circle-left"></i> Go to Swap List
+                    </a>
+                    <button type="button" class="btn btn-primary delet_add_records">
+                        <i class="fas fa-save"></i> Save Swap Holiday
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -268,10 +273,12 @@ $(function(e){
                     _token: '{{csrf_token()}}'
                 },
                 success: function(response){
-                    show_sucess(response.success);
-                    setTimeout(() => {
-                        location.reload();
-                    }, 3000);
+                    if(response.success) {
+                        show_sucess(response.success);
+                        setTimeout(() => {
+                            window.location.href = "{{route('swap_holiday')}}";
+                        }, 3000);
+                    }
                 },
                 error: function(xhr, status, error) {
                     show_error("Error: " + error);

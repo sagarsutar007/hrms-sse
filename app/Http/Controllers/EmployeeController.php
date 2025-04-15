@@ -105,53 +105,66 @@ return response()->json(['success'=>'Data Deleted']);
     }
 
 
-    public function add_holiday(Request $delete_req){
+    public function add_holiday(Request $delete_req)
+    {
         $ids = $delete_req->ids;
         $created_by = session()->get('EmployeeID');
-        $swap_date =  $delete_req->swap_date;
-        if($swap_date == ''){
-            $swap_date = '0000-00-00';
-        }else{
-            $swap_date = $delete_req->swap_date;
-        }
-        $Public_Holiday =  $delete_req->Public_Holiday;
-        $message_inpu =  $delete_req->message_inpu;
-        if($message_inpu == ''){
-            $message_inpu = ' ';
-        }else{
-            $message_inpu = $delete_req->message_inpu;
-        }
-         foreach ($ids as $id) {
-            // Fix: Changed table name from 'All_Holiday' to 'all_holiday' to match the database
+        $swap_date = $delete_req->swap_date ?: '0000-00-00';
+        $Public_Holiday = $delete_req->Public_Holiday;
+        $message_inpu = $delete_req->message_inpu ?: ' ';
+
+        foreach ($ids as $id) {
             $get_holiday = DB::table('all_holiday')
-            ->where('Employee_id',  $id )
-            ->where('Holiday_Date',  $delete_req->holiday_date )
-            ->get()
-            ->toArray();
-            $permCounr = count($get_holiday);
-            if($permCounr == 1){
-                // Fix: Changed table name from 'All_Holiday' to 'all_holiday'
-                $update_emp_tyoe = DB::table('all_holiday')
                 ->where('Employee_id', $id)
-                 ->update( [
-                    'Swap_Date' =>  $swap_date,
-                ]);
-            }else{
-                // Fix: Changed table name from 'All_Holiday' to 'all_holiday'
-                $users = DB::table('all_holiday')
-                ->insertOrIgnore([
+                ->where('Holiday_Date', $delete_req->holiday_date)
+                ->get()
+                ->toArray();
+
+            if (count($get_holiday) == 1) {
+                DB::table('all_holiday')
+                    ->where('Employee_id', $id)
+                    ->where('Holiday_Date', $delete_req->holiday_date)
+                    ->update([
+                        'Swap_Date' => $swap_date,
+                        'updated_by' => $created_by
+                    ]);
+            } else {
+                DB::table('all_holiday')->insertOrIgnore([
                     'Employee_id' => $id,
                     'Holiday_Date' => $delete_req->holiday_date,
-                    'Swap_Date' =>  $swap_date,
-                    'Public_Holiday' => $Public_Holiday ,
-                    'Message' => $message_inpu ,
-                    'created_by' => $created_by ,
-                    'updated_by' => $created_by ,
+                    'Swap_Date' => $swap_date,
+                    'Public_Holiday' => $Public_Holiday,
+                    'Message' => $message_inpu,
+                    'created_by' => $created_by,
+                    'updated_by' => $created_by,
                 ]);
             }
         }
-        return response()->json(['success'=>'Holiday Added']);
-}
+
+        // Return JSON response instead of redirect
+        return response()->json(['success' => 'Swap Day Added Successfully']);
+    }
+
+
+    public function swap_holiday()
+    {
+        $holidays = DB::table('all_holiday as h')
+        ->join('all_users as u', 'h.Employee_id', '=', 'u.Employee_id')
+        ->select(
+            'h.id',
+            'h.Employee_id',
+            DB::raw("CONCAT(u.f_name, ' ', u.m_name, ' ', u.l_name) as Employee_Name"),
+            'h.Holiday_Date',
+            'h.Swap_Date',
+            'h.Public_Holiday',
+            'h.Message'
+        )
+        ->get();
+
+        return view('swap_holiday', compact('holidays'));
+    }
+
+
     public function set_limit(Request $limit_req){
               if(isset($limit_req->limit_num))  {
                 $role = session()->get('role');

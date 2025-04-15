@@ -26,12 +26,12 @@
                     </button>
                 </div>
             </div>
-            <div class="col-2"></div>
-            <div class="col-md-2">
+            <div class="col-4"></div>
+            {{-- <div class="col-md-2">
                 <button type="button" class="btn btn-success btn-block pay-salary-btn" id="saveTableData">
                     <i class="fas fa-money-bill-wave"></i> Pay All Employee Salary
                 </button>
-            </div>
+            </div> --}}
             <div class="col-md-2">
                 <div class="input-group">
                     <input type="month" class="form-control" id="month-selector" value="{{ date('Y-m') }}">
@@ -815,9 +815,32 @@
                 Total_all_day_Amount = 0;
                 leave_holiday_weakly_off_count = 0;
 
-                // Check if employee has a termination date
                 const hasTerminationDate = all_users_data.termination_date && all_users_data.termination_date.trim() !== '';
                 const terminationDate = hasTerminationDate ? new Date(all_users_data.termination_date) : null;
+
+                let dateInput = document.getElementById("month-selector").value;
+                let selectedDate = new Date(dateInput);
+
+                // Extract month and year for clean comparison
+                const selectedMonth = selectedDate.getMonth();
+                const selectedYear = selectedDate.getFullYear();
+
+                let showEmployee = true;
+
+                if (hasTerminationDate) {
+                    const terminationMonth = terminationDate.getMonth();
+                    const terminationYear = terminationDate.getFullYear();
+
+                    // Skip employee if selected date is after termination month
+                    if (
+                        selectedYear > terminationYear ||
+                        (selectedYear === terminationYear && selectedMonth > terminationMonth)
+                    ) {
+                        showEmployee = false;
+                    }
+
+                    if (!showEmployee) return; // Employee already terminated, skip row
+                }
 
                 // Calculate employee's effective working days based on termination date
                 let effectiveWorkingDays = Working_Day;
@@ -921,48 +944,60 @@
 
                     filteredData.forEach(element => {
                         Swap_Day_array_data = element.Swap_Day;
+                        Swap_Day_Type = element.Swap_Day_Type; // Make sure this value is coming from your query
                         Daily_Rate = element.Daily_Rate;
                         Over_Ttime_Rate = element.Over_Ttime_Rate;
                         Weekly_Off_array_data = element.WeeklyOff;
+                        Holiday_Date = element.Holiday_Date;
+                        Swap_Date = element.Swap_Date;
                     });
 
-                    // Determine cell background color based on status
-                    let cellBackgroundColor = '';
+                    let cellBackgroundColor = ''; // Default is no background color
+
                     if (Swap_Day_array_data == 1) {
-                        cellBackgroundColor = 'style="background-color:orange"';
+                        cellBackgroundColor = 'style="background-color:orange"'; // Swap date
+
                     } else if (public_holiday_filyer_data.length == 1) {
-                        cellBackgroundColor = 'style="background-color:yellow"';
+                        cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday
                         Daily_Amt = Employee_Daily_Rate;
+
                     } else if (Weekly_Off_array_data == 1) {
-                        cellBackgroundColor = 'style="background-color:cyan"';
+                        cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off
                         Daily_Amt = Employee_Daily_Rate;
-                    } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', {
-                            weekday: 'long'
-                        })) {
-                        cellBackgroundColor = 'style="background-color:cyan"';
+
+                    } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
+                        cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off date
                         Daily_Amt = Employee_Daily_Rate;
+
                     } else if (public_holiday_filyer_data.holiday_Date == formatDateToYYYYMMDD(date)) {
-                        cellBackgroundColor = 'style="background-color:yellow"';
+                        cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday by date
                         Daily_Amt = Employee_Daily_Rate;
-                    } else if (leave_filter_data.length > 0) {
-                        Payment_Status = leave_filter_data[0].Payment_Status;
-                        cellBackgroundColor = 'style="background-color:' + leave_color + '"';
+
+                    } else if (leave_filter_data != '') {
+                        Payment_Status = leave_filter_data.Payment_Status;
+                        cellBackgroundColor = 'style="background-color:' + leave_color + '"'; // Leave
+
                         if (Half_Day_Leave == 1) {
-                            cellBackgroundColor = 'style="background: linear-gradient(to right, ' + leave_color +
-                                '50%, transparent 50%);"';
+                            cellBackgroundColor = 'style="background: linear-gradient(to right, ' + leave_color + ' 50%, transparent 50%)"';
                             leave_holiday_weakly_off_count += 0.5;
-                            if (Half_Day_Leave == 1 && Payment_Status == "Paid") {
+
+                            if (Payment_Status == "Paid") {
                                 Daily_Amt = Employee_Daily_Rate / 2;
                             }
+
                         } else {
                             if (cellBackgroundColor != "") {
                                 leave_holiday_weakly_off_count++;
+
                                 if (Payment_Status == "Paid") {
                                     Daily_Amt = Employee_Daily_Rate;
                                 }
                             }
                         }
                     }
+
+
+
 
                     cumulative_amount += Daily_Amt;
 
@@ -1203,23 +1238,30 @@
                     <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">
                 `;
 
-                // Add pay button with special handling for terminated employees
+                // Add pay/final settlement buttons
                 if (all_users_data.Paid_Flag == 1) {
-                        table_html_data += `
-                            <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
+                    // Already paid
+                    table_html_data += `
+                        <button class="btn btn-success btn-sm" disabled id="payButton${all_users_data.Employee_id}">
                             <i class="fas fa-check-circle"></i> PAID
-                            </button>`;
-                    } else if (hasTerminationDate) {
-                        table_html_data += `
-                            <button class="btn btn-warning btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
+                        </button>`;
+                } else if (
+                    hasTerminationDate &&
+                    terminationDate.getMonth() === selectedMonth &&
+                    terminationDate.getFullYear() === selectedYear
+                ) {
+                    // Terminated in selected month → Show Final Settlement
+                    table_html_data += `
+                        <button class="btn btn-warning btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
                             <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
-                            </button>`;
-                    } else {
-                        table_html_data += `
-                            <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
+                        </button>`;
+                } else {
+                    // Still working → Show Pay Salary
+                    table_html_data += `
+                        <button class="btn btn-primary btn-sm" id="payButton${all_users_data.Employee_id}" onclick="paySalary('${all_users_data.Employee_id}', event)">
                             <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
-                            </button>`;
-                    }
+                        </button>`;
+                }
 
                 table_html_data += `</td></tr>`;
 
@@ -1323,7 +1365,6 @@ setInterval(() => {
 
         function open_arrear_pop_up(employee_id) {
             // First call the salary paid logic
-            salary_paid_function(employee_id);
 
             const paid_button_text = $("#payButton" + employee_id).text().trim();
             if (paid_button_text === "PAID") {
