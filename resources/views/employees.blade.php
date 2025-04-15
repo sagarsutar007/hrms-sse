@@ -294,6 +294,31 @@
         </div>
     </div>
 </div>
+
+<!-- Final Settlement Modal -->
+<div class="modal fade" id="finalSettlementModal" tabindex="-1" aria-labelledby="finalSettlementLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="finalSettlementForm" method="POST" action="{{ route('final.settlement') }}">
+        @csrf
+        <input type="hidden" name="user_id" id="finalUserId">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="finalSettlementLabel">Final Settlement</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to proceed with final settlement for this employee?</p>
+            <!-- Optional: Add final amount, remarks, etc. -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Proceed</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
 @stop
 
 @section('js')
@@ -325,14 +350,23 @@
                                 var nameCell = user.f_name + ' ' + (user.m_name || '') + ' ' + (user.l_name || '');
 
                                 // Create the actions cell with view opening modal
-                                var actionsCell = '<div class="action-btns">' +
-                                    '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
-                                    '<i class="fas fa-eye"></i></a> ' +
-                                    '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
-                                    '<i class="fas fa-pencil-alt"></i></a> ' +
-                                    '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
-                                    '<i class="fas fa-download"></i></a>' +
-                                    '</div>';
+                                var actionsCell = '';
+
+                                if (!user.termination_date) {
+                                    actionsCell = '<div class="action-btns">' +
+                                        '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
+                                        '<i class="fas fa-eye"></i></a> ' +
+                                        '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
+                                        '<i class="fas fa-pencil-alt"></i></a> ' +
+                                        '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
+                                        '<i class="fas fa-download"></i></a>' +
+                                        '</div>';
+                                } else {
+                                    actionsCell = '<div class="action-btns">' +
+                                        '<a href="javascript:void(0);" class="final-settlement" data-id="' + user.id + '" title="Final Settlement">' +
+                                        '<i class="fas fa-file-invoice-dollar text-danger"></i></a>' +
+                                        '</div>';
+                                }
 
                                 // Push the formatted row data
                                 data.push({
@@ -711,6 +745,11 @@
             }
         });
 
+        $('.custom-file-input').on('change', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName);
+        });
+
         // Show filename in custom file input
         $(document).on('change', '.custom-file-input', function() {
             let fileName = $(this).val().split('\\').pop();
@@ -809,5 +848,12 @@
                 'openPunchCardModal("' + punchCardDiv.id + '")');
         });
     });
+
+    $(document).on('click', '.final-settlement', function () {
+        var userId = $(this).data('id');
+        $('#finalUserId').val(userId);
+        $('#finalSettlementModal').modal('show');
+    });
+
 </script>
 @stop

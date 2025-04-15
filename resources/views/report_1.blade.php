@@ -1,10 +1,10 @@
 <!-- resources/views/salary/index.blade.php -->
 @extends('adminlte::page')
 
-@section('title', 'Report 1')
+@section('title', 'Collated Report')
 
 @section('content_header')
-    <h1>Report 1</h1>
+    <h1>Collated Report</h1>
 @stop
 
 @section('content')
@@ -68,7 +68,7 @@
                     <nav aria-label="Page navigation">
                         <ul class="pagination pagination-sm justify-content-center" id="pagination_div">
                             <!-- Pagination will be dynamically inserted here -->
-                        </ul>
+                        </ul>`
                     </nav>
                 </div>
 
@@ -601,32 +601,48 @@ $(document).ready(function() {
         $("#result").html(tableHtml);
     }
 
-    // Render pagination
     function renderPagination(links, perPage, total) {
-        let paginationHtml = '<div class="pagination">';
+        let paginationHtml = '';
+
+        paginationHtml += `<ul class="pagination pagination-sm justify-content-center">`;
 
         links.forEach(link => {
             let activeClass = link.active ? 'active' : '';
+            let disabledClass = link.url === null ? 'disabled' : '';
             let label = link.label;
 
             // Replace "Next &raquo;" and "&laquo; Previous" with icons
-            if (label === 'Next &raquo;') {
+            if (label.includes('Next')) {
                 label = '<i class="fas fa-chevron-right"></i>';
-            } else if (label === '&laquo; Previous') {
+            } else if (label.includes('Previous')) {
                 label = '<i class="fas fa-chevron-left"></i>';
             }
 
-            paginationHtml += `<p data-page='${link.url}' class="${activeClass} page-btn">${label}</p>`;
+            paginationHtml += `
+                <li class="page-item ${activeClass} ${disabledClass}">
+                    <a href="#" class="page-link" data-page="${link.url}" tabindex="-1">${label}</a>
+                </li>`;
         });
 
-        paginationHtml += `</div>
-        <div class="ml-2">
-            <span class="badge badge-info">Page Size: ${perPage}</span>
-            <span class="badge badge-secondary">Total Records: ${total}</span>
-        </div>`;
+        paginationHtml += `</ul>
+            <div class="ml-2">
+                <span class="badge badge-info">Page Size: ${perPage}</span>
+                <span class="badge badge-secondary">Total Records: ${total}</span>
+            </div>`;
 
         $("#pagination_div").html(paginationHtml);
+
+        // Optional: Add event listener for page change
+        $('.page-link').on('click', function (e) {
+            e.preventDefault();
+            const pageUrl = $(this).data('page');
+            if (pageUrl) {
+                // Handle your page change here
+                fetchTableData(pageUrl);
+            }
+        });
     }
+
 
     // Validate number inputs
     function validateNumber(cell) {

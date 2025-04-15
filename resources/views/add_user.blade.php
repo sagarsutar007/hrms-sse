@@ -3,7 +3,7 @@
 @section('title', 'Add Employee')
 
 @section('content_header')
-    <h1> Add Employee</h1>
+    <h1>Add Employee</h1>
 @endsection
 
 @section('content')
@@ -14,16 +14,35 @@
         <div class="card-body">
             <form action="{{ route('add_user') }}" method="post" id="employeeForm">
                 @csrf
-
                 <div class="row">
                     <div class="col-md-6">
-                        <x-adminlte-input name="f_name" label="First Name" placeholder="First Name" icon="fas fa-user" />
+                        <div class="form-group">
+                            <label for="f_name">First Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </div>
+                                <input type="text" name="f_name" id="f_name" class="form-control" placeholder="First Name" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_name" label="Middle Name" placeholder="Middle Name" icon="fas fa-user" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="l_name" label="Last Name" placeholder="Last Name" icon="fas fa-user" />
+                        <div class="form-group">
+                            <label for="l_name">Last Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </div>
+                                <input type="text" name="l_name" id="l_name" class="form-control" placeholder="Last Name" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="m_number" label="Mobile Number" placeholder="Mobile Number" maxlength="10" inputmode="numeric" icon="fas fa-phone" />
@@ -32,7 +51,7 @@
                         <x-adminlte-input name="email" label="Email" placeholder="Email Address" type="email" id="email_field" icon="fas fa-envelope" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="dob" label="Date Of Birth" placeholder="Date Of Birth" type="date" icon="fas fa-calendar-alt" />
+                        <x-adminlte-input name="dob" label="Date Of Birth" type="date" icon="fas fa-calendar-alt" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="c_address" label="Current Address" placeholder="Current Address" icon="fas fa-map-marker-alt" />
@@ -73,11 +92,11 @@
                     <div class="col-md-6">
                         <x-adminlte-input name="Pan_number" label="Pan Number" placeholder="Pan Number" maxlength="20" icon="fas fa-id-card-alt" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="display: none;">
                         <x-adminlte-select name="can_login" label="Login Enabled" id="can_login" icon="fas fa-sign-in-alt">
-                            <option value="0">Select Status</option>
-                            <option value="1" selected>Yes</option>
-                            <option value="0">No</option>
+                            <option value="">Select Status</option>
+                            <option value="1">Yes</option>
+                            <option value="0" selected>No</option>
                         </x-adminlte-select>
                     </div>
                     <div class="col-md-6">
@@ -96,30 +115,26 @@
                             @endforeach
                         </x-adminlte-select>
                     </div>
-                    <div class="col-md-6">
-                        <x-adminlte-select name="role" label="Employee Role" icon="fas fa-user-tag">
-                            <option value="">Select Employee Role</option>
-                            @foreach ($role_masrer as $role_m)
-                                @if ($role_m->id >= session('role_number'))
-                                    <option value="{{ $role_m->id }}">{{ $role_m->roles }}</option>
-                                @endif
-                            @endforeach
+                    <div class="col-md-6" style="display: none;">
+                        <x-adminlte-select name="role" label="Employee Role" icon="fas fa-user-tag" disabled>
+                            <option value="3" selected>Employee</option>
                         </x-adminlte-select>
+                        <input type="hidden" name="role" value="3">
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="DOJ" label="Date Of Joining" type="date" icon="fas fa-calendar-check" />
+                        <x-adminlte-input name="DOJ" label="Date Of Joining" type="date" value="{{ \Carbon\Carbon::now()->toDateString() }}" icon="fas fa-calendar-check" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Account_Number" label="Account Number" placeholder="Account Number" type="number" icon="fas fa-university" />
+                        <x-adminlte-input name="Account_Number" label="Account Number" type="number" icon="fas fa-university" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name" placeholder="Bank Holder Name" icon="fas fa-user-tie" />
+                        <x-adminlte-input name="Bank_Hoalder_Name" label="Bank Holder Name" icon="fas fa-user-tie" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="IFSC_Code" label="IFSC Code" placeholder="IFSC Code" icon="fas fa-barcode" />
+                        <x-adminlte-input name="IFSC_Code" label="IFSC Code" icon="fas fa-barcode" />
                     </div>
                     <div class="col-md-6">
-                        <x-adminlte-input name="Bank_Name" label="Bank Name" placeholder="Bank Name" icon="fas fa-landmark" />
+                        <x-adminlte-input name="Bank_Name" label="Bank Name" icon="fas fa-landmark" />
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-select name="department_master" label="Department" icon="fas fa-building">
@@ -158,12 +173,8 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-12">
                                     <p><strong>Name:</strong> <span id="modal-name"></span></p>
-                                    <p><strong>Email:</strong> <span id="modal-email"></span></p>
-                                    <p><strong>Mobile:</strong> <span id="modal-mobile"></span></p>
-                                </div>
-                                <div class="col-md-6">
                                     <p><strong>Employee ID:</strong> <span id="modal-employee-id"></span></p>
                                     <p><strong>Password:</strong> <span id="modal-password"></span></p>
                                 </div>
@@ -178,78 +189,41 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add AJAX handling for the form submission
-            $('#employeeForm').on('submit', function(e) {
+@section('js')
+<script>
+    $('#employeeForm').on('submit', function(e) {
     e.preventDefault();
-
-    // Get the form data
-    let formData = $(this).serialize();
 
     $.ajax({
         url: $(this).attr('action'),
-        method: $(this).attr('method'),
-        data: formData,
+        type: 'POST',
+        data: $(this).serialize(),
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // Build name from first and last name
-                let fullName = [response.F_name, response.L_name].filter(Boolean).join(' ');
+                // Populate modal with employee details - fix field names to match response
+                $('#modal-name').text(response.F_name + ' ' + response.L_name);
+                $('#modal-employee-id').text(response.Employee_id);
+                $('#modal-password').text(response.Password);
 
-                // Populate modal with available data
-                $('#modal-name').text(fullName || 'Not provided');
-                $('#modal-employee-id').text(response.Employee_id || 'Not available');
-                $('#modal-password').text(response.Password || 'Not available');
-
-                // Show success modal
+                // Show the success modal
                 $('#successModal').modal('show');
 
-                // Set redirect button action
-                $('#redirectBtn').off('click').on('click', function() {
+                // Set redirect URL
+                $('#redirectBtn').on('click', function() {
                     window.location.href = "{{ route('view_employee') }}";
                 });
             } else {
-                // Show detailed error message
-                let errorMessage = response.Message || 'An error occurred';
-                let errorDetails = '';
-
-                if (response.error) {
-                    errorDetails += '\n\nError details: ' + response.error;
-                    console.error('Error details:', response.error);
-                }
-
-                if (response.trace) {
-                    console.error('Stack trace:', response.trace);
-                }
-
-                if (response.attempted_data) {
-                    console.error('Attempted data:', response.attempted_data);
-                }
-
-                alert(errorMessage + errorDetails);
+                alert(response.Message || 'An error occurred');
             }
         },
-        error: function(xhr, status, error) {
-            console.error('AJAX error:', status, error);
-            console.error('Response:', xhr.responseText);
-
-            let errorMessage = 'An error occurred while processing your request.';
-            try {
-                const response = JSON.parse(xhr.responseText);
-                if (response.message) {
-                    errorMessage += '\n\nServer message: ' + response.message;
-                }
-            } catch (e) {
-                // If parsing fails, include the raw response text
-                errorMessage += '\n\nServer response: ' + xhr.responseText;
-            }
-
-            alert(errorMessage);
+        error: function(xhr) {
+            console.error('AJAX Error:', xhr);
+            alert('An error occurred: ' + xhr.statusText);
         }
     });
 });
-        });
-    </script>
+</script>
 @endsection

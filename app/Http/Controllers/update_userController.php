@@ -11,6 +11,10 @@ class update_userController extends Controller
 {
     $updated_by = session()->get('EmployeeID');
 
+    // Validate the gender before saving it
+    $gender = in_array($update_req->Gender, ['Male', 'Female', 'Other']) ? $update_req->Gender : null;
+
+
     $update_data = [
         'f_name' => $update_req->First_Name ?? '',
         'l_name' => $update_req->Last_Name ?? '',
@@ -22,11 +26,13 @@ class update_userController extends Controller
         'permanent_address' => $update_req->Parment_Addtess ?? '',
         'aadhaar_number' => $update_req->Aadhar_Number ?? '',
         'voter_id_number' => $update_req->Voter_id_Number ?? '',
-        'gender' => $update_req->Gender ?? '',
+        'gender' => $gender,
         'ration_card_number' => $update_req->Ration_Card_Number ?? '',
         'salary' => $update_req->Salary ?? '',
         'shift_time' => $update_req->Shift_Number ?? '',
         'employee_type' => $update_req->Employee_Type ?? '',
+        'termination_date' => $update_req->termination_date ?: null,
+        'reason_of_termination' => $update_req->reason_of_termination ?: null,
         'updated_at' => now(),
     ];
 

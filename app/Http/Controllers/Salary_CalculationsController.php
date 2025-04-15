@@ -11,7 +11,7 @@ class Salary_CalculationsController extends Controller
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
 
-        
+
       if(isset( $EmployeesID)){
       $user_data = DB::table('all_users')
       ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
@@ -32,7 +32,7 @@ class Salary_CalculationsController extends Controller
          ->with('attendance_info_data', $attendance_info_data)
          ->with('leave_type_master_data', $leave_type_master_data)
          ->with('role',$role);
-        
+
         }else{
           return redirect()->route('login');
         }
@@ -44,7 +44,7 @@ class Salary_CalculationsController extends Controller
       $EmployeesID = session()->get('EmployeeID');
       $role = session()->get('role');
 
-      
+
     if(isset( $EmployeesID)){
     $user_data = DB::table('all_users')
     ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
@@ -65,13 +65,13 @@ class Salary_CalculationsController extends Controller
        ->with('attendance_info_data', $attendance_info_data)
        ->with('leave_type_master_data', $leave_type_master_data)
        ->with('role',$role);
-      
+
       }else{
         return redirect()->route('login');
       }
   }
 
- 
+
     public function Salary_Calculations_api(Request $req){
       $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
@@ -80,7 +80,7 @@ class Salary_CalculationsController extends Controller
         $cYear =  $currentYear;
         $cMonth =  $currentMonth;
       if(isset( $EmployeesID)){
-        
+
         $user_data = DB::table('all_users')
         ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
         ->leftJoin('arrear_table', function ($join) use ($cYear,$cMonth) { // Pass $cYear into the closure
@@ -100,11 +100,25 @@ class Salary_CalculationsController extends Controller
         )
         ->paginate($req->limit);
 
-      //attendance_info
-      $attendance_info_data = DB::table('all_attandencetable')
-      ->whereMonth('attandence_Date', $req->month)
-      ->whereYear('attandence_Date',  $req->year)
-      ->get();
+        $attendance_info_data = DB::table('all_attandencetable as a')
+        ->leftJoin('all_holiday as h', function($join) {
+            $join->on('a.Employee_id', '=', 'h.Employee_id');
+        })
+        ->whereMonth('a.attandence_Date', $req->month)
+        ->whereYear('a.attandence_Date', $req->year)
+        ->where(function ($query) {
+            $query->whereColumn('a.attandence_Date', 'h.Holiday_Date')
+                ->orWhereColumn('a.attandence_Date', 'h.Swap_Date');
+        })
+        ->select(
+            'a.*',
+            'h.Holiday_Date',
+            'h.Swap_Date'
+        )
+        ->get();
+
+
+
 
 
  //calendar_data
@@ -115,7 +129,7 @@ class Salary_CalculationsController extends Controller
 
       $deductions_data = DB::table('deductions')
       ->where('Month', $req->year . "-" . $req->month )
-      
+
       ->get();
 
       $yearMonth = $req->year . "-" . $req->month . "-01"; // Convert input year and month to a valid date
@@ -143,12 +157,12 @@ class Salary_CalculationsController extends Controller
       $deductions_quri = DB::table('deductions')
       ->whereMonth('deductions_Month', $req->month)
       ->whereYear('deductions_Month',  $req->year)
-      
+
       ->get()
       ->toArray();
-     
+
       $holiday_count = count($holiday_quri);
-      //leave data 
+      //leave data
       $leave_quri = DB::table('_leave')
       ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id')
       ->get()
@@ -159,7 +173,7 @@ class Salary_CalculationsController extends Controller
 
       $arr = array(
         'status'=>'true',
-        'message' => 'data Found',  
+        'message' => 'data Found',
         'all_users'=> $user_data,
         'attendance_info_data'=> $attendance_info_data,
         'deductions'=> $deductions_data,
@@ -172,11 +186,11 @@ class Salary_CalculationsController extends Controller
         'holiday_data'=> $holiday_quri ,
         'deductions_data'=> $deductions_quri ,
         'role'=> $role
-         ); 
+         );
       echo json_encode($arr);
 
-  
-        
+
+
         }else{
           return redirect()->route('login');
         }
@@ -184,12 +198,12 @@ class Salary_CalculationsController extends Controller
 
 
 
-    
+
     public function salary_calculations_short_api(Request $req){
       $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
 
-        
+
       if(isset( $EmployeesID)){
       $user_data = DB::table('all_users')
       ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
@@ -219,7 +233,7 @@ class Salary_CalculationsController extends Controller
       $advance_data = DB::table('loan')
       ->where('Month', $req->year . "-" . $req->month )
       ->get();
-      
+
       $penalty_data = DB::table('penalty_master')
       ->whereMonth('created_at', $req->month)
       ->whereYear('created_at',  $req->year)
@@ -235,9 +249,9 @@ class Salary_CalculationsController extends Controller
       ->whereYear('holiday_Date',  $req->year)
       ->get()
       ->toArray();
-     
+
       $holiday_count = count($holiday_quri);
-      //leave data 
+      //leave data
       $leave_quri = DB::table('_leave')
       ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id')
       ->get()
@@ -248,7 +262,7 @@ class Salary_CalculationsController extends Controller
 
       $arr = array(
         'status'=>'true',
-        'message' => 'data Found',  
+        'message' => 'data Found',
         'all_users'=> $user_data,
         'attendance_info_data'=> $attendance_info_data,
         'deductions'=> $deductions_data,
@@ -260,11 +274,11 @@ class Salary_CalculationsController extends Controller
         'leave_data'=> $leave_quri ,
         'holiday_data'=> $holiday_quri ,
         'role'=> $role
-         ); 
+         );
       echo json_encode($arr);
 
-  
-        
+
+
         }else{
           return redirect()->route('login');
         }
@@ -276,7 +290,7 @@ class Salary_CalculationsController extends Controller
       $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         $search_by_inp = $req->search_inp;
-        
+
       if(isset( $EmployeesID)){
       $user_data = DB::table('all_users')
       ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
@@ -306,7 +320,7 @@ class Salary_CalculationsController extends Controller
 
       $deductions_data = DB::table('deductions')
       ->where('Month', $req->year . "-" . $req->month )
-      
+
       ->get();
 
       $yearMonth = $req->year . "-" . $req->month . "-01"; // Convert input year and month to a valid date
@@ -334,12 +348,12 @@ class Salary_CalculationsController extends Controller
       $deductions_quri = DB::table('deductions')
       ->whereMonth('deductions_Month', $req->month)
       ->whereYear('deductions_Month',  $req->year)
-      
+
       ->get()
       ->toArray();
-     
+
       $holiday_count = count($holiday_quri);
-      //leave data 
+      //leave data
       $leave_quri = DB::table('_leave')
       ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id')
       ->get()
@@ -350,7 +364,7 @@ class Salary_CalculationsController extends Controller
 
       $arr = array(
         'status'=>'true',
-        'message' => 'data Found',  
+        'message' => 'data Found',
         'all_users'=> $user_data,
         'attendance_info_data'=> $attendance_info_data,
         'deductions'=> $deductions_data,
@@ -363,7 +377,7 @@ class Salary_CalculationsController extends Controller
         'holiday_data'=> $holiday_quri,
         'deductions_data'=> $deductions_quri,
         'role'=> $role
-         ); 
+         );
       echo json_encode($arr);
         }else{
           return redirect()->route('login');
@@ -373,20 +387,20 @@ class Salary_CalculationsController extends Controller
 
 
 
-    
+
     public function save_salary_data(Request $req){
 
 
 
 
 
-      
+
       $arr = array(
         'status'=>'true',
-        'message' => 'data Found',  
-        'data' => $req,  
-       
-         ); 
+        'message' => 'data Found',
+        'data' => $req,
+
+         );
       echo json_encode($arr);
     }
 

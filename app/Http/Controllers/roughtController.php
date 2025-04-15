@@ -331,6 +331,8 @@ public function all_attendance(){
         return redirect()->route('login');
         }
     }
+
+
     public function all_leave(){
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');

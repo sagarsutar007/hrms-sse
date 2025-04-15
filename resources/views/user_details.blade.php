@@ -545,36 +545,36 @@
                                           </div>
                                           <!-- Termination Details -->
                                           <h5 class="mt-4 mb-3 border-bottom pb-2">Termination Details (if applicable)</h5>
-                                          <div class="row">
-                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                   <label for="termination_date">Termination Date</label>
-                                                   <div class="input-group">
-                                                      <div class="input-group-prepend">
-                                                         <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
-                                                      </div>
-                                                      <input type="date" class="form-control" id="termination_date" name="Termination_Date" value="{{ $u_data['termination_date'] ?? '' }}">
-                                                   </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="termination_date">Termination Date</label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
+                                                            </div>
+                                                            <input type="date" class="form-control" id="termination_date" name="termination_date" value="{{ $u_data['termination_date'] ?? '' }}">
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                             </div>
-                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                   <label for="termination_reason">Reason for Termination</label>
-                                                   <div class="input-group">
-                                                      <div class="input-group-prepend">
-                                                         <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                                      </div>
-                                                      <input type="text" class="form-control" id="termination_reason" name="Reason_Of_Termination" value="{{ $u_data['reason_of_termination'] ?? '' }}">
-                                                   </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="termination_reason">Reason for Termination</label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="termination_reason" name="reason_of_termination" value="{{ $u_data['reason_of_termination'] ?? '' }}">
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                             </div>
-                                          </div>
-                                          <div class="form-group row mt-4">
-                                             <div class="col-sm-12">
-                                                <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Update Personal Information</button>
-                                             </div>
-                                          </div>
-                                       </form>
+                                            </div>
+                                            <div class="form-group row mt-4">
+                                                <div class="col-sm-12">
+                                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Update Personal Information</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
                                  </div>
 
@@ -1720,8 +1720,8 @@
                             <td>${acc.Account_Number}</td>
                             <td>${acc.Bank_Name}</td>
                             <td>${acc.IFSC_Code}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary"
+                            <td style="text-align: end;">
+                                <button class="btn btn-sm btn-primary mb-2"
                                     onclick="open_Update_bank_form(
                                         \`${acc.id}\`,
                                         \`${acc.Account_Holder_Name}\`,
@@ -1729,12 +1729,12 @@
                                         \`${acc.Account_Number}\`,
                                         \`${acc.IFSC_Code}\`
                                     )">
-                                    <i class="fas fa-pencil-alt"></i> Edit
+                                    <i class="fas fa-pencil-alt"></i>
                                 </button>
 
 
                                 <a href="{{url('/delete')}}/${acc.id}/accounts" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
+                                    <i class="fas fa-trash"></i>
                                 </a>
                             </td>
                         </tr>`;

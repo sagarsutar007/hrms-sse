@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class leaveController extends Controller
@@ -101,6 +102,102 @@ class leaveController extends Controller
         return redirect()->route('login');
       }
     }
+
+    /**
+     * Get present employees for a specific date
+     *
+     * @param string|null $date
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getPresentEmployees($date = null)
+{
+    try {
+        if (!$date) {
+            $date = \Carbon\Carbon::now()->format('Y-m-d');
+        }
+
+        $presentEmployees = DB::table('all_attandencetable')
+            ->join('all_users', 'all_attandencetable.Employee_id', '=', 'all_users.id')
+            ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
+            ->select(
+                DB::raw("CONCAT(COALESCE(all_users.f_name, ''), ' ', COALESCE(all_users.m_name, ''), ' ', COALESCE(all_users.l_name, '')) as name"),
+                'all_users.Employee_id as EmployeeID',
+                'shift_master.Shift_Name as Shift_name',
+                'all_attandencetable.attandence_Date as created_at',
+                'all_attandencetable.in_time',
+                'all_attandencetable.out_time',
+                'all_attandencetable.Totel_Hours'
+            )
+            ->whereDate('all_attandencetable.attandence_Date', $date)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $presentEmployees
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+
+    /**
+     * Get present employees for a date range
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getPresentEmployeesRange($fromDate, $toDate)
+{
+    try {
+        // Parse and normalize the dates
+        $from = \Carbon\Carbon::parse($fromDate)->startOfDay();
+        $to = \Carbon\Carbon::parse($toDate)->endOfDay();
+
+        // Ensure date range is valid
+        if ($from->greaterThan($to)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'From date cannot be after to date'
+            ], 400);
+        }
+
+        // Fetch present employees in the date range
+        $presentEmployees = DB::table('all_attandencetable')
+            ->join('all_users', 'all_attandencetable.Employee_id', '=', 'all_users.id')
+            ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
+            ->select(
+                DB::raw("CONCAT(COALESCE(all_users.f_name, ''), ' ', COALESCE(all_users.m_name, ''), ' ', COALESCE(all_users.l_name, '')) as name"),
+                'all_users.Employee_id as EmployeeID',
+                'shift_master.Shift_Name as Shift_name',
+                'all_attandencetable.attandence_Date as attendance_date',
+                'all_attandencetable.in_time',
+                'all_attandencetable.out_time',
+                'all_attandencetable.Totel_Hours'
+            )
+            ->whereBetween('all_attandencetable.attandence_Date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
+            ->orderBy('all_attandencetable.attandence_Date', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $presentEmployees
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
 
     //Let_Commers_List()
     public function Let_Commers_List(Request $req) {

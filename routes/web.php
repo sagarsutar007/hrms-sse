@@ -76,6 +76,7 @@ Route::post('/Add-Users',[registrationController::class,'Add_Users'])->name('Add
 Route::get('/Forgot-Password',[forgot_password_controller::class,'forgot_password_view'])->name('forgot_password_view');
 Route::post('/Forgot-Password',[forgot_password_controller::class,'forgot_password'])->name('forgot_password');
 
+Route::post('/final-settlement', [EmployeeController::class, 'finalSettlement'])->name('final.settlement');
 
 Route::get('/employees',[EmployeeController::class,'view_employee'])->name('view_employee');
 Route::get('/swipe-list',[EmployeeController::class,'view_swipe_users'])->name('view_swipe_users');
@@ -107,6 +108,7 @@ Route::post('/user-details',[user_details_Controller::class,'form_request'])->na
 Route::post('/employees',[EmployeeController::class,'search_employee'])->name('search_employee');
 Route::post('/delete-employee',[EmployeeController::class,'delete_employee'])->name('delete_employee');
 Route::post('/add-holiday',[EmployeeController::class,'add_holiday'])->name('add_holiday');
+Route::get('/swap-holiday', [EmployeeController::class, 'swap_holiday'])->name('swap_holiday');
 Route::get('/emergency-contact/{id}',[formsController::class,'Emergency_Contact'])->name('Emergency_Contact');
 Route::get('/edit-emergency-contact/{id}',[formsController::class,'edit_Emergency_Contact'])->name('edit_Emergency_Contact');
 Route::get('/delete-emergency-contact/{id}',[formsController::class,'delete_Emergency_Contact'])->name('delete_Emergency_Contact');
@@ -300,6 +302,10 @@ Route::get('/total-salary',[leaveController::class,'total_salary'])->name('total
 Route::get('/Absent-List',[leaveController::class,'Absent_List'])->name('Absent_List');
 Route::get('/Defult-Absent-List',[leaveController::class,'Defult_Absent_List'])->name('Defult_Absent_List');
 Route::get('/Present-List',[leaveController::class,'Present_List'])->name('Present_List');
+// API routes for fetching present employees data
+Route::get('/present-employee-list/{date?}', [LeaveController::class, 'getPresentEmployees']);
+Route::get('/present-employee-list-range/{fromDate}/{toDate}', [LeaveController::class, 'getPresentEmployeesRange']);
+
 Route::get('/Let-Commers-List',[leaveController::class,'Let_Commers_List'])->name('Let_Commers_List');
 Route::get('/attandance-100%-list',[leaveController::class,'attandance_100_list'])->name('attandance_100_list');
 Route::get('/attandance-100%-top-10-list',[leaveController::class,'attandance_100_top_10_list'])->name('attandance_100_top_10_list');
@@ -311,6 +317,7 @@ route::get('/all-attendance', [roughtController::class,'all_attendance'])->name(
 Route::get('/attendance/fetch', [roughtController::class, 'fetchAttendance'])->name('attendance.fetch');
 Route::post('/attendance/filter', [roughtController::class, 'filterAttendance'])->name('attendance.filter');
 route::get('/attendance-records', [roughtController::class,'attendanceRecords'])->name('attendance-records');
+
 route::get('/all-holidays', [roughtController::class,'all_holidays'])->name('all_holidays');
 route::get('/all-leave', [roughtController::class,'all_leave'])->name('all_leave');
 route::get('/all-travel', [roughtController::class,'all_travel'])->name('all_travel');
@@ -425,7 +432,7 @@ Route::get('/all-holiday-search-api/{limit}/{search_inp}',[leaveController::clas
 Route::post('/add-holiday-api', [App\Http\Controllers\holiday_master_controller::class, 'add_holiday_api'])->name('add_holiday_api');
 Route::get('/all-holiday-api/{limit}', [App\Http\Controllers\holiday_master_controller::class, 'all_holiday_api'])->name('all_holiday_api');
 // Route::post('/add-holiday-api', [holiday_master_controller::class, 'add_holiday_api'])->name('add_holiday_api');
-// Route::get('/add-holiday-api/{holiday_name}/{holiday_date}/{swipe_date}/{public_holiday}', [holiday_master_controller::class, 'add_holiday_api_get'])->name('add_holiday_api_get');
+Route::get('/add-holiday-api/{holiday_name}/{holiday_date}/{swipe_date}/{public_holiday}', [holiday_master_controller::class, 'add_holiday_api_get'])->name('add_holiday_api_get');
 Route::get('/for-me',[roughtController::class,'for_me'])->name('for_me');
 // Route::post('/genrate-attandance',[allAttendenceController::class,'insertAttendanceForAll'])->name('insertAttendanceForAll');
 Route::get('/genrate-attandance/{start_date}/{end_date}/{employeeID}',[allAttendenceController::class,'insertAttendanceForAll'])->name('insertAttendanceForAll');
