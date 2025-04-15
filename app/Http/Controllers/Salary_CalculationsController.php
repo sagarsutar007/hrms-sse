@@ -106,17 +106,18 @@ class Salary_CalculationsController extends Controller
         })
         ->whereMonth('a.attandence_Date', $req->month)
         ->whereYear('a.attandence_Date', $req->year)
+        ->where(function ($query) {
+            $query->whereColumn('a.attandence_Date', 'h.Holiday_Date')
+                ->orWhereColumn('a.attandence_Date', 'h.Swap_Date');
+        })
         ->select(
             'a.*',
             'h.Holiday_Date',
-            'h.Swap_Date',
-            DB::raw("CASE
-                WHEN h.Swap_Date IS NOT NULL AND a.attandence_Date = h.Swap_Date THEN 1
-                WHEN h.Holiday_Date IS NOT NULL AND a.attandence_Date = h.Holiday_Date AND h.Swap_Date IS NOT NULL THEN 2
-                ELSE 0
-            END as Swap_Day_Type")
+            'h.Swap_Date'
         )
         ->get();
+
+
 
 
 

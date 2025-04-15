@@ -996,9 +996,6 @@
                         }
                     }
 
-
-
-
                     cumulative_amount += Daily_Amt;
 
                     // Add individual cells for each data point
