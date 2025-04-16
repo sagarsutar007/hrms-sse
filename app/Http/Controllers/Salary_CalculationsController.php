@@ -39,37 +39,40 @@ class Salary_CalculationsController extends Controller
     }
 
 
-
     public function report_1() {
-      $EmployeesID = session()->get('EmployeeID');
-      $role = session()->get('role');
+        $EmployeesID = session()->get('EmployeeID');
+        $role = session()->get('role');
 
+        if(isset($EmployeesID)) {
+            $user_data = DB::table('all_users')
+                ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
+                ->select('all_users.*', 'shift_master.Shift_hours')
+                ->get();
 
-    if(isset( $EmployeesID)){
-    $user_data = DB::table('all_users')
-    ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
-   ->select('all_users.*', 'shift_master.Shift_hours')
-    ->get();
+            // Get regular attendance data
+            $attendance_info_data = DB::table('all_attandencetable')
+                ->orderBy('attandence_Date', 'ASC')
+                ->get();
 
-    //attendance_info
-    $attendance_info_data = DB::table('all_attandencetable')
-    ->orderBy('attandence_Date', 'ASC')
-    ->get();
+            // Get holiday data including swap dates
+            $holiday_data = DB::table('all_holiday')
+                ->select('Employee_id', 'Holiday_Date', 'Swap_Date')
+                ->get();
 
-    //attendance_info
-    $leave_type_master_data = DB::table('leave_type_master')
-    ->get();
+            // Get leave type data for styling
+            $leave_type_master_data = DB::table('leave_type_master')
+                ->get();
 
-       return view("report_1")
-       ->with('user_data',$user_data)
-       ->with('attendance_info_data', $attendance_info_data)
-       ->with('leave_type_master_data', $leave_type_master_data)
-       ->with('role',$role);
-
-      }else{
-        return redirect()->route('login');
-      }
-  }
+            return view("report_1")
+                ->with('user_data', $user_data)
+                ->with('attendance_info_data', $attendance_info_data)
+                ->with('holiday_data', $holiday_data)  // Pass holiday data separately
+                ->with('leave_type_master_data', $leave_type_master_data)
+                ->with('role', $role);
+        } else {
+            return redirect()->route('login');
+        }
+    }
 
 
     public function Salary_Calculations_api(Request $req){
@@ -101,25 +104,30 @@ class Salary_CalculationsController extends Controller
         ->paginate($req->limit);
 
         $attendance_info_data = DB::table('all_attandencetable as a')
-        ->leftJoin('all_holiday as h', function($join) {
-            $join->on('a.Employee_id', '=', 'h.Employee_id');
-        })
-        ->whereMonth('a.attandence_Date', $req->month)
-        ->whereYear('a.attandence_Date', $req->year)
-        ->where(function ($query) {
-            $query->whereColumn('a.attandence_Date', 'h.Holiday_Date')
-                ->orWhereColumn('a.attandence_Date', 'h.Swap_Date');
-        })
-        ->select(
-            'a.*',
-            'h.Holiday_Date',
-            'h.Swap_Date'
-        )
-        ->get();
-
-
-
-
+            ->leftJoin('all_holiday as h', function($join) {
+                $join->on('a.Employee_id', '=', 'h.Employee_id');
+                // No additional conditions in the join itself
+            })
+            ->where(function($query) use ($req) {
+                $query->whereMonth('a.attandence_Date', $req->month)
+                    ->whereYear('a.attandence_Date', $req->year);
+            })
+            ->where(function($query) use ($req) {
+                // Either the attendance date matches the holiday date
+                $query->where(function($q) {
+                    $q->whereRaw('a.attandence_Date = h.Holiday_Date');
+                })
+                // Or the attendance date matches the swap date
+                ->orWhere(function($q) {
+                    $q->whereRaw('a.attandence_Date = h.Swap_Date');
+                });
+            })
+            ->select(
+                'a.*',
+                'h.Holiday_Date',
+                'h.Swap_Date'
+            )
+            ->get();
 
  //calendar_data
  $calendar_data = DB::table('calendar')
@@ -306,10 +314,31 @@ class Salary_CalculationsController extends Controller
      ->paginate($req->limit );
 
       //attendance_info
-      $attendance_info_data = DB::table('all_attandencetable')
-      ->whereMonth('attandence_Date', $req->month)
-      ->whereYear('attandence_Date',  $req->year)
-      ->get();
+      $attendance_info_data = DB::table('all_attandencetable as a')
+            ->leftJoin('all_holiday as h', function($join) {
+                $join->on('a.Employee_id', '=', 'h.Employee_id');
+                // No additional conditions in the join itself
+            })
+            ->where(function($query) use ($req) {
+                $query->whereMonth('a.attandence_Date', $req->month)
+                    ->whereYear('a.attandence_Date', $req->year);
+            })
+            ->where(function($query) use ($req) {
+                // Either the attendance date matches the holiday date
+                $query->where(function($q) {
+                    $q->whereRaw('a.attandence_Date = h.Holiday_Date');
+                })
+                // Or the attendance date matches the swap date
+                ->orWhere(function($q) {
+                    $q->whereRaw('a.attandence_Date = h.Swap_Date');
+                });
+            })
+            ->select(
+                'a.*',
+                'h.Holiday_Date',
+                'h.Swap_Date'
+            )
+            ->get();
 
 
  //calendar_data

@@ -694,6 +694,7 @@
             var Day_Total_Amount = 0;
             var Over_Ttime_Rate = 0;
             var Swap_Day_array_data = 0;
+            var Swap_Date = '';
             var Public_Holiday_array_data = 0;
             var Daily_Rate = 0;
             var leave_color = "";
@@ -878,6 +879,7 @@
 
                 // Process each date for this user
                 dates.forEach(date => {
+
                     if (hasTerminationDate && date > terminationDate) {
                         // Skip processing for dates after termination
                         table_html_data += `
@@ -908,7 +910,8 @@
                     // Filter data for this user and date
                     const filteredData = all_attandance_data.filter(all_att_data =>
                         all_att_data.Employee_id === all_users_data.Employee_id &&
-                        formatDateToYYYYMMDD(date) === all_att_data.attandence_Date
+                        (formatDateToYYYYMMDD(date) === all_att_data.attandence_Date ||
+                        formatDateToYYYYMMDD(date) === all_att_data.Swap_Date)
                     );
 
                     // Check for public holidays, leave data, etc.
@@ -942,38 +945,108 @@
                         }
                     });
 
-                    filteredData.forEach(element => {
-                        Swap_Day_array_data = element.Swap_Day;
-                        Swap_Day_Type = element.Swap_Day_Type; // Make sure this value is coming from your query
-                        Daily_Rate = element.Daily_Rate;
-                        Over_Ttime_Rate = element.Over_Ttime_Rate;
-                        Weekly_Off_array_data = element.WeeklyOff;
-                        Holiday_Date = element.Holiday_Date;
-                        Swap_Date = element.Swap_Date;
-                    });
-
                     let cellBackgroundColor = ''; // Default is no background color
+                    let currentDateFormatted = formatDateToYYYYMMDD(date);
 
-                    if (Swap_Day_array_data == 1) {
+                    // Helper function to normalize date formats for reliable comparison
+                    function normalizeDate(dateValue) {
+                        if (!dateValue) return null;
+
+                        try {
+                            // Handle different date formats
+                            if (typeof dateValue === 'string') {
+                                // If it's already in YYYY-MM-DD format, return it
+                                if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+                                    return dateValue;
+                                }
+                                // Otherwise convert to Date and format
+                                return formatDateToYYYYMMDD(new Date(dateValue));
+                            } else if (dateValue instanceof Date) {
+                                return formatDateToYYYYMMDD(dateValue);
+                            }
+                            return null;
+                        } catch (e) {
+                            console.error(`Date normalization error: ${e.message}`);
+                            return null;
+                        }
+                    }
+
+                    // Process all dates in filteredData
+                    let swapDates = [];
+                    let holidayDates = [];
+                    let weeklyOffs = [];
+                    let swapDays = [];
+                    let Daily_Rate = null;
+                    let Over_Ttime_Rate = null;
+
+                    // Safety check before processing
+                    if (filteredData && Array.isArray(filteredData)) {
+                        filteredData.forEach(element => {
+                            // Process swap dates
+                            if (element.Swap_Date) {
+                                const normalizedDate = normalizeDate(element.Swap_Date);
+                                if (normalizedDate) swapDates.push(normalizedDate);
+                            }
+
+                            // Process holiday dates
+                            if (element.Holiday_Date) {
+                                const normalizedDate = normalizeDate(element.Holiday_Date);
+                                if (normalizedDate) holidayDates.push(normalizedDate);
+                            }
+
+                            // Process other data
+                            if (element.Swap_Day == 1) swapDays.push(element);
+                            if (element.WeeklyOff == 1) weeklyOffs.push(element);
+
+                            // Keep the last values for rates (assuming they're the same for all records)
+                            Daily_Rate = element.Daily_Rate;
+                            Over_Ttime_Rate = element.Over_Ttime_Rate;
+                        });
+                    }
+
+                    // Log data for debugging
+                    console.log(`Employee: ${all_users_data.Employee_id}, Date: ${currentDateFormatted}`);
+                    console.log(`Available swap dates: ${swapDates.join(', ')}`);
+
+                    // Determine the cell background color based on conditions
+                    if (swapDates.includes(currentDateFormatted)) {
                         cellBackgroundColor = 'style="background-color:orange"'; // Swap date
-
-                    } else if (public_holiday_filyer_data.length == 1) {
+                        console.log(`Swap date found: ${currentDateFormatted}`);
+                    }
+                    else if (swapDays.length > 0) {
+                        cellBackgroundColor = 'style="background-color:orange"'; // Swap day
+                        console.log(`Swap day found: ${currentDateFormatted}`);
+                    }
+                    else if (public_holiday_filyer_data && public_holiday_filyer_data.length == 1) {
                         cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday
                         Daily_Amt = Employee_Daily_Rate;
-
-                    } else if (Weekly_Off_array_data == 1) {
+                    }
+                    else if (weeklyOffs.length > 0) {
                         cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off
                         Daily_Amt = Employee_Daily_Rate;
-
-                    } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
-                        cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off date
+                    }
+                    else if (all_users_data && all_users_data.Weekly_Off &&
+                            all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
+                        cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off by day name
                         Daily_Amt = Employee_Daily_Rate;
-
-                    } else if (public_holiday_filyer_data.holiday_Date == formatDateToYYYYMMDD(date)) {
-                        cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday by date
+                    }
+                    else if (holidayDates.includes(currentDateFormatted)) {
+                        cellBackgroundColor = 'style="background-color:yellow"'; // Holiday date
                         Daily_Amt = Employee_Daily_Rate;
+                    }
+                    else if (public_holiday_filyer_data && Array.isArray(public_holiday_filyer_data)) {
+                        // Check if any holiday date matches the current date
+                        const found = public_holiday_filyer_data.some(holiday => {
+                            if (!holiday || !holiday.holiday_Date) return false;
+                            return normalizeDate(holiday.holiday_Date) === currentDateFormatted;
+                        });
 
-                    } else if (leave_filter_data != '') {
+                        if (found) {
+                            cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday
+                            Daily_Amt = Employee_Daily_Rate;
+                        }
+                    }
+                    else if (leave_filter_data != '') {
                         Payment_Status = leave_filter_data.Payment_Status;
                         cellBackgroundColor = 'style="background-color:' + leave_color + '"'; // Leave
 
@@ -984,7 +1057,6 @@
                             if (Payment_Status == "Paid") {
                                 Daily_Amt = Employee_Daily_Rate / 2;
                             }
-
                         } else {
                             if (cellBackgroundColor != "") {
                                 leave_holiday_weakly_off_count++;
@@ -995,7 +1067,6 @@
                             }
                         }
                     }
-
                     cumulative_amount += Daily_Amt;
 
                     // Add individual cells for each data point
@@ -1038,11 +1109,13 @@
                             OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
                             Total_OT_Amount = Total_OT_Amount + OT_Amt;
 
+                            const formattedTotalHours = parseFloat(all_att_data.Totel_Hours).toFixed(2);
+
                             // Add individual cells for each data point
                             table_html_data += `
                                 <td ${cellBackgroundColor}>${all_att_data.in_time}</td>
                                 <td ${cellBackgroundColor}>${all_att_data.out_time}</td>
-                                <td ${cellBackgroundColor}>${all_att_data.Totel_Hours}</td>
+                                <td ${cellBackgroundColor}>${parseFloat(all_att_data.Totel_Hours).toFixed(2)}</td>
                                 <td ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
                                 <td ${cellBackgroundColor}>${all_att_data.Overtime}</td>
                                 <td ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
@@ -1055,7 +1128,7 @@
                                 <td class="in_time_p" ${cellBackgroundColor}>${formatDateToYYYYMMDD(date)}</td>
                                 <td class="in_time_p" ${cellBackgroundColor}>${all_att_data.in_time}</td>
                                 <td class="out_time_p" ${cellBackgroundColor}>${all_att_data.out_time}</td>
-                                <td class="total_hr_p" ${cellBackgroundColor}>${all_att_data.Totel_Hours}</td>
+                                <td class="total_hr_p" ${cellBackgroundColor}>${parseFloat(all_att_data.Totel_Hours).toFixed(2)}</td>
                                 <td class="total_min_p" ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
                                 <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.OT_Hr}</td>
                                 <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.Overtime}</td>
@@ -1064,7 +1137,7 @@
                                 <td class="total_min_p ot" ${cellBackgroundColor}>${cumulative_amount.toFixed(2)}</td>
                             </tr>`;
 
-                            pop_up_total_hr += all_att_data.Totel_Hours;
+                            pop_up_total_hr += parseFloat(all_att_data.Totel_Hours);
                             pop_up_total_min += all_att_data.Total_Minutes;
                             pop_up_total_ot_hr += all_att_data.OT_Hr;
                             pop_up_total_ot_min += all_att_data.Overtime;
