@@ -192,42 +192,45 @@
                             </thead>
                             <tbody>`;
 
-                    all_attendance.forEach(user_data => {
-                        var othrs = user_data.OTHrs;
+                                all_attendance.forEach(user_data => {
+                                    var othrs = user_data.OTHrs;
 
-                        table_html_data += `
-                            <tr>
-                                <td>${user_data.Employee_id}</td>
-                                <td>${user_data.NAME}</td>
-                                <td>${user_data.Department_name}</td>
-                                <td>${user_data.EmpTypeName}</td>
-                                <td>${user_data.Shift_Name}</td>
-                                <td>${user_data.in_time ?? " "}</td>
-                                <td>${user_data.out_time ?? " "}</td>
-                                <td>${user_data.WorkingHours ? parseFloat(user_data.WorkingHours).toFixed(2) : " "}</td>
-                                <td>${user_data.Total_Minutes ?? " "}</td>
-                                <td>${parseFloat(othrs).toFixed(2)}</td>
-                                <td>${user_data.OTMinutes ?? " "}</td>
-                                <td>${user_data.EarlyGoing ?? " "}</td>
-                                <td>${user_data.LateEntry ?? " "}</td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center" style="gap: 10px;">
-                                        <a href="login/${user_data.Employee_id}" class="btn btn-success btn-sm" title="Add Attendance">
-                                            <i class="fas fa-user-check"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-primary btn-sm edit-btn"
-                                            data-employee-id="${user_data.Employee_id}"
-                                            data-in-time-id="${user_data.in_time_id}"
-                                            data-out-time-id="${user_data.out_time_id}"
-                                            title="Edit Attendance">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
+                                    // Check if attendance is punched (both in_time and out_time exist)
+                                    var isAttendancePunched = user_data.in_time && user_data.out_time;
 
-
-                            </tr>`;
-                    });
+                                    table_html_data += `
+                                        <tr>
+                                            <td>${user_data.Employee_id}</td>
+                                            <td>${user_data.NAME}</td>
+                                            <td>${user_data.Department_name}</td>
+                                            <td>${user_data.EmpTypeName}</td>
+                                            <td>${user_data.Shift_Name}</td>
+                                            <td>${user_data.in_time ?? " "}</td>
+                                            <td>${user_data.out_time ?? " "}</td>
+                                            <td>${user_data.WorkingHours ? parseFloat(user_data.WorkingHours).toFixed(2) : " "}</td>
+                                            <td>${user_data.Total_Minutes ?? " "}</td>
+                                            <td>${parseFloat(othrs).toFixed(2)}</td>
+                                            <td>${user_data.OTMinutes ?? " "}</td>
+                                            <td>${user_data.EarlyGoing ?? " "}</td>
+                                            <td>${user_data.LateEntry ?? " "}</td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center" style="gap: 10px;">
+                                                    <a href="login/${user_data.Employee_id}" class="btn btn-success btn-sm" title="Add Attendance">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </a>
+                                                    ${isAttendancePunched ? `
+                                                    <button type="button" class="btn btn-primary btn-sm edit-btn"
+                                                        data-employee-id="${user_data.Employee_id}"
+                                                        data-in-time-id="${user_data.in_time_id}"
+                                                        data-out-time-id="${user_data.out_time_id}"
+                                                        title="Edit Attendance">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    ` : ''}
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                                });
 
                     table_html_data += `</tbody></table>`;
                     $("#result").html(table_html_data);

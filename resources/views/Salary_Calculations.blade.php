@@ -924,6 +924,17 @@
                         formatDateToYYYYMMDD(date) && leave_d.End_Date >= formatDateToYYYYMMDD(date)
                     );
 
+                    // Initialize variables
+                    let leave_color = '';
+                    let Half_Day_Leave = 0;
+                    let Payment_Status_Leave = '';
+                    let Short_Name_Leave = '';
+                    let Payment_Status = "";
+                    let OT_Amt = 0;
+                    let Daily_Amt = 0;
+                    let Public_Holiday_array_data = 0;
+
+                    // Process leave data if available
                     if (leave_filter_data.length > 0) {
                         leave_filter_data.forEach(leave_filter_data => {
                             leave_color = leave_filter_data.Color;
@@ -933,10 +944,7 @@
                         });
                     }
 
-                    Payment_Status = "";
-                    OT_Amt = 0;
-                    Daily_Amt = 0;
-
+                    // Check for public holidays
                     public_holiday_filyer_data.forEach(pub_ho => {
                         if (pub_ho.holiday_Date === formatDateToYYYYMMDD(date)) {
                             Public_Holiday_array_data = 1;
@@ -978,10 +986,16 @@
                     let swapDays = [];
                     let Daily_Rate = null;
                     let Over_Ttime_Rate = null;
+                    let hasActualAttendanceData = false; // Flag to check if we have real attendance data
 
                     // Safety check before processing
                     if (filteredData && Array.isArray(filteredData)) {
                         filteredData.forEach(element => {
+                            // Check if this is actual attendance data or just a swap date reference
+                            if (element.attandence_Date === currentDateFormatted) {
+                                hasActualAttendanceData = true;
+                            }
+
                             // Process swap dates
                             if (element.Swap_Date) {
                                 const normalizedDate = normalizeDate(element.Swap_Date);
@@ -1007,15 +1021,26 @@
                     // Log data for debugging
                     console.log(`Employee: ${all_users_data.Employee_id}, Date: ${currentDateFormatted}`);
                     console.log(`Available swap dates: ${swapDates.join(', ')}`);
+                    console.log(`Has actual attendance data: ${hasActualAttendanceData}`);
 
                     // Determine the cell background color based on conditions
                     if (swapDates.includes(currentDateFormatted)) {
                         cellBackgroundColor = 'style="background-color:orange"'; // Swap date
                         console.log(`Swap date found: ${currentDateFormatted}`);
+
+                        // Only add daily amount for swap dates if there's no actual attendance data
+                        if (!hasActualAttendanceData) {
+                            Daily_Amt = Employee_Daily_Rate;
+                        }
                     }
                     else if (swapDays.length > 0) {
                         cellBackgroundColor = 'style="background-color:orange"'; // Swap day
                         console.log(`Swap day found: ${currentDateFormatted}`);
+
+                        // Only add daily amount for swap days if there's no actual attendance data
+                        if (!hasActualAttendanceData) {
+                            Daily_Amt = Employee_Daily_Rate;
+                        }
                     }
                     else if (public_holiday_filyer_data && public_holiday_filyer_data.length == 1) {
                         cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday
@@ -1046,8 +1071,8 @@
                             Daily_Amt = Employee_Daily_Rate;
                         }
                     }
-                    else if (leave_filter_data != '') {
-                        Payment_Status = leave_filter_data.Payment_Status;
+                    else if (leave_filter_data.length > 0) {
+                        Payment_Status = leave_filter_data[0].Payment_Status;
                         cellBackgroundColor = 'style="background-color:' + leave_color + '"'; // Leave
 
                         if (Half_Day_Leave == 1) {
@@ -1067,11 +1092,13 @@
                             }
                         }
                     }
+
+                    // Only update cumulative amount after determining the Daily_Amt
                     cumulative_amount += Daily_Amt;
 
-                    // Add individual cells for each data point
-                    if (filteredData.length === 0) {
-                        // No attendance data for this date
+                    // Create attendance table cells based on actual data presence
+                    if (!hasActualAttendanceData) {
+                        // No actual attendance data for this date (or only swap reference)
                         table_html_data += `
                             <td ${cellBackgroundColor}></td>
                             <td ${cellBackgroundColor}></td>
@@ -1097,14 +1124,28 @@
                             <td class="total_min_p ot" ${cellBackgroundColor}>${cumulative_amount.toFixed(2)}</td>
                         </tr>`;
                     } else {
-                        filteredData.forEach(all_att_data => {
+                        // Filter for only actual attendance data, not swap references
+                        const actualAttendanceData = filteredData.filter(data => data.attandence_Date === currentDateFormatted);
+
+                        actualAttendanceData.forEach(all_att_data => {
+                            // Reset Daily_Amt for actual attendance calculation since we already set it above
+                            // This prevents double-counting
+                            let attendanceDaily_Amt = 0;
+
                             if (Half_Day_Leave == 1 && all_att_data.Totel_Hours >= all_att_data.Shift_hours / 2) {
-                                Daily_Amt += all_att_data.Daily_Rate / 2;
+                                attendanceDaily_Amt = all_att_data.Daily_Rate / 2;
                             } else if (all_att_data.Totel_Hours >= all_att_data.Shift_hours) {
-                                Daily_Amt += all_att_data.Daily_Rate;
+                                attendanceDaily_Amt = all_att_data.Daily_Rate;
                             } else {
-                                Daily_Amt += all_att_data.Daily_Rate;
+                                attendanceDaily_Amt = all_att_data.Daily_Rate;
                             }
+
+                            // If we have actual attendance, use that Daily_Amt instead of the one calculated earlier
+                            Daily_Amt = attendanceDaily_Amt;
+
+                            // Update cumulative amount with the corrected Daily_Amt
+                            // We need to adjust cumulative_amount since we already added the previous Daily_Amt
+                            cumulative_amount = cumulative_amount - Daily_Amt + attendanceDaily_Amt;
 
                             OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
                             Total_OT_Amount = Total_OT_Amount + OT_Amt;

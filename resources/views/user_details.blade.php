@@ -1988,6 +1988,7 @@
     }
 
     function open_Update_Loan_form(id) {
+        console.log("Opening loan form for ID:", id);
         $("#loanModal").modal("show");
         $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
         $("#loan_Id_input").val(id);
@@ -1996,26 +1997,48 @@
             type: "GET",
             url: "/Loan/" + id,
             dataType: "json",
+            beforeSend: function() {
+                console.log("Sending request to /Loan/" + id);
+            },
             success: function(response) {
+                console.log("Full response:", response);
+
                 if (response.success) {
                     const r_data = response.data;
+                    console.log("Loan data:", r_data);
 
-                    $("#loan_month").val(r_data.Month.slice(0, 7)); // Ensure correct format
-                    $("#loan_reason").val(r_data.Reason);
-                    $("#loan_title").val(r_data.Title);
-                    $("#loan_amount").val(r_data.Loan_Amount_in_INR);
-                    $("#number_of_loan_installment").val(r_data.Number_of_installment);
+                    // Check if each field exists before trying to set it
+                    if (r_data.Month) {
+                        $("#loan_month").val(r_data.Month.slice(0, 7));
+                    } else {
+                        console.warn("Month field missing in response");
+                    }
 
-                    genrate_table();
+                    if (r_data.Reason) $("#loan_reason").val(r_data.Reason);
+                    if (r_data.Title) $("#loan_title").val(r_data.Title);
+                    if (r_data.Loan_Amount_in_INR) $("#loan_amount").val(r_data.Loan_Amount_in_INR);
+                    if (r_data.Number_of_installment) $("#number_of_loan_installment").val(r_data.Number_of_installment);
+
+                    // Verify installments data
+                    if (r_data.installments) {
+                        console.log("Installments data:", r_data.installments);
+                        genrate_table(r_data.installments);
+                    } else {
+                        console.warn("No installments data in response");
+                        // Try to generate a table from the main data
+                        genrate_table();
+                    }
                 } else {
-                    console.warn("No data found for this loan");
+                    console.warn("Error in response:", response.message || "Unknown error");
                 }
             },
-            error: function(xhr) {
-                console.error("Loan fetch error:", xhr.responseText);
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", status, error);
+                console.error("Response text:", xhr.responseText);
             }
         });
     }
+
 
     function loan_view(id) {
         $.ajax({
@@ -2557,36 +2580,60 @@
         });
     }
 
-    function genrate_table() {
-    // Clear the previous results
+    function genrate_table(existingInstallments = null) {
+        console.log("genrate_table called with:", existingInstallments);
+        // Clear the previous results
         $("#monthList").empty();
-        // Get the selected date
-        const selectedDate = $("#loan_month").val();
-        const number_of_loop = $("#number_of_loan_installment").val();
-        const advance_amount = $("#loan_amount").val();
-        if (selectedDate != "" && number_of_loop != "" && advance_amount != "")
-            if (selectedDate) {
+
+        // If we have existing installments, display those
+        if (existingInstallments && existingInstallments.length > 0) {
+            console.log("Displaying existing installments");
+            // Display existing installments
+            for (let i = 0; i < existingInstallments.length; i++) {
+                const installment = existingInstallments[i];
+                $("#monthList").append(`
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${installment.Month || 'Unknown'}</td>
+                        <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
+                    </tr>
+                `);
+            }
+        } else {
+            console.log("Generating new installment table");
+            // Generate new installment breakdown
+            const selectedDate = $("#loan_month").val();
+            const number_of_loop = $("#number_of_loan_installment").val();
+            const advance_amount = $("#loan_amount").val();
+
+            console.log("Form values:", {selectedDate, number_of_loop, advance_amount});
+
+            if (selectedDate && number_of_loop && advance_amount) {
                 const startDate = new Date(selectedDate);
                 const year = startDate.getFullYear();
-                const startMonth = startDate.getMonth() + 1; // Start from the next month
-                // Loop through the desired number of months
+                const startMonth = startDate.getMonth();
+
                 for (let i = 0; i < number_of_loop; i++) {
-                    const monthDate = new Date(year, startMonth + i, 1); // Increment months from startMonth
+                    const monthDate = new Date(year, startMonth + i, 1);
                     const monthName = monthDate.toLocaleString("default", {
                         month: "long"
                     });
-                    const displayYear = monthDate.getFullYear(); // Handle year overflow
-                    // Append the month name and other details to the list
+                    const displayYear = monthDate.getFullYear();
+
                     $("#monthList").append(`
-    <tr>
-    <td>${i + 1}</td>
-    <td>${monthName} ${displayYear}</td>
-    <td>${(advance_amount / number_of_loop).toFixed(2)}</td>
-    </tr>
-    `);
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${monthName} ${displayYear}</td>
+                            <td>${(advance_amount / number_of_loop).toFixed(2)}</td>
+                        </tr>
+                    `);
                 }
+            } else {
+                console.warn("Missing required form values to generate installments");
             }
+        }
     }
+
 
 
 

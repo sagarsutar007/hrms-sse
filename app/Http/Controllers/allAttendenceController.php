@@ -32,11 +32,14 @@ class allAttendenceController extends Controller
             $users = DB::table('attendance_info')
                 ->join('all_users', 'attendance_info.Employee_id', '=', 'all_users.Employee_id')
 
-                ->whereAll([
-                    'attendance_info.id', 'attendance_info.Employee_id', 'attendance_info.attendance_time', 'attendance_info.attendance_Date', 'all_users.f_name',
-                ], 'like', '%' . $inputSValue . '%')
+                ->where(function($query) use ($search_input) {
+                    $query->where('all_users.f_name', 'like', '%' . $search_input . '%')
+                          ->orWhere('all_users.m_name', 'like', '%' . $search_input . '%')
+                          ->orWhere('all_users.l_name', 'like', '%' . $search_input . '%')
+                          ->orWhere('attendance_info.attendance_Date', 'like', '%' . $search_input . '%');
+                })
                 ->select('attendance_info.*', 'all_users.f_name', 'all_users.l_name', 'all_users.m_name')
-                ->orderBy('id', 'DESC')
+                ->orderBy('attendance_info.id', 'DESC')
                 ->paginate(10);
 
             $usersCount = count($users);

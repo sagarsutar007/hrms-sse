@@ -226,11 +226,11 @@
         // Initial page load
         lode_data();
 
-        // Search input keyup
+        // Replace the form submit with AJAX
         $("#search_input").on("keyup", function() {
-            inp = $(this).val();
+            inp = $(this).val().trim(); // Get the current value and trim whitespace
             page = 1; // Reset to first page when searching
-            lode_data();
+            lode_data(); // Load data with every keypress
         });
 
         // Change number of entries

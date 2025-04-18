@@ -428,7 +428,11 @@
                 {data: 'Gate_Off'},
                 {data: 'actions', orderable: false, searchable: false}
             ],
-            dom: 'lBfrtip',
+            dom: "<'row mb-3'" +
+                "<'col-md-6 d-flex align-items-center'<'mr-3'l><'ml-3'B>>" +
+                "<'col-md-6 d-flex justify-content-end'f>" +
+            ">" +
+            "rtip",
             buttons: [
                 'colvis',
             ],
