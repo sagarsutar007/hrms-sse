@@ -939,8 +939,8 @@
 
                                                     <!-- Advances Tab -->
                                                     <div class="tab-pane fade" id="nav-loan" role="tabpanel">
-                                                        <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#loanModal">
-                                                            <i class="fas fa-plus mr-1"></i>Add Advance
+                                                        <button type="button" class="btn btn-sm btn-success mb-3 add-advance-btn">
+                                                            <i class="fas fa-plus mr-1"></i> Add Advance
                                                         </button>
                                                         <div class="table-responsive">
                                                             <table class="table table-bordered table-striped" id="loan_table">
@@ -1042,8 +1042,8 @@
                                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                                                     <i class="fas fa-times mr-1"></i> Cancel
                                                                     </button>
-                                                                    <button type="submit" class="btn btn-primary" id="loan_form_submit_btn">
-                                                                    <i class="fas fa-save mr-1"></i> Submit
+                                                                    <button type="button" class="btn btn-primary" id="loan_form_submit_btn">
+                                                                        <i class="fas fa-save mr-1"></i> Submit
                                                                     </button>
                                                                 </div>
                                                             </form>
@@ -1920,124 +1920,6 @@
         load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
     });
 
-    $(document).ready(function() {
-        load_loan_data("{{url('loan_view_api/')}}/" + {{$u_data['Employee_id']}});
-    });
-
-    function load_loan_data(url_input) {
-
-        $.ajax({
-            url: url_input, // API endpoint URL
-            type: "GET", // HTTP method
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Response:", response); // Log the successful response
-                $("#loan_table tbody").empty();
-
-                // Populate Table Rows
-                var all_data = response.data;
-                all_data.forEach($loan => {
-                    const inputDate = $loan.Month;
-                    const date = new Date(inputDate);
-                    const options = { year: 'numeric', month: 'long' };
-                    const formattedDate = date.toLocaleDateString('en-US', options);
-
-                    var row = `
-                        <tr>
-                            <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$loan.Title}</td>
-                            <td>${formattedDate}</td>
-                            <td>${$loan.Reason}</td>
-                            <td>${$loan.Number_of_installment}</td>
-                            <td>${$loan.Loan_Amount_in_INR}</td>
-                            <td>${$loan.Loan_Remaining}</td>
-                            <td>
-                                <!-- View Advance -->
-                                <button type="button" class="btn btn-sm btn-info" onclick="loan_view('${$loan.Loan_id}')">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-
-                                <!-- Update Advance -->
-                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Loan_form('${$loan.Loan_id}')">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </button>
-
-                                <!-- Delete Advance with confirmation modal -->
-                                <button type="button"
-                                        class="btn btn-sm btn-danger"
-                                        data-toggle="modal"
-                                        data-target="#confirmDeleteModal"
-                                        data-href="/delete/${$loan.Loan_id}/loan">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </td>
-
-                        </tr>`;
-                    $("#loan_table tbody").append(row);
-                });
-
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error); // Log the error
-
-            }
-        });
-    }
-
-    function open_Update_Loan_form(id) {
-        console.log("Opening loan form for ID:", id);
-        $("#loanModal").modal("show");
-        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
-        $("#loan_Id_input").val(id);
-
-        $.ajax({
-            type: "GET",
-            url: "/Loan/" + id,
-            dataType: "json",
-            beforeSend: function() {
-                console.log("Sending request to /Loan/" + id);
-            },
-            success: function(response) {
-                console.log("Full response:", response);
-
-                if (response.success) {
-                    const r_data = response.data;
-                    console.log("Loan data:", r_data);
-
-                    // Check if each field exists before trying to set it
-                    if (r_data.Month) {
-                        $("#loan_month").val(r_data.Month.slice(0, 7));
-                    } else {
-                        console.warn("Month field missing in response");
-                    }
-
-                    if (r_data.Reason) $("#loan_reason").val(r_data.Reason);
-                    if (r_data.Title) $("#loan_title").val(r_data.Title);
-                    if (r_data.Loan_Amount_in_INR) $("#loan_amount").val(r_data.Loan_Amount_in_INR);
-                    if (r_data.Number_of_installment) $("#number_of_loan_installment").val(r_data.Number_of_installment);
-
-                    // Verify installments data
-                    if (r_data.installments) {
-                        console.log("Installments data:", r_data.installments);
-                        genrate_table(r_data.installments);
-                    } else {
-                        console.warn("No installments data in response");
-                        // Try to generate a table from the main data
-                        genrate_table();
-                    }
-                } else {
-                    console.warn("Error in response:", response.message || "Unknown error");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX error:", status, error);
-                console.error("Response text:", xhr.responseText);
-            }
-        });
-    }
 
 
     function loan_view(id) {
@@ -2051,8 +1933,9 @@
                 if (response.success) {
                     var r_data = response.data;
 
+                    // Basic loan information
                     var modalContent = `
-                        <div class="row">
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <h5><strong>Title:</strong> ${r_data.Title}</h5>
                                 <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
@@ -2060,8 +1943,92 @@
                             </div>
                             <div class="col-md-6">
                                 <h5><strong>Month:</strong> ${r_data.Month}</h5>
-                                <h5><strong>Year:</strong> ${r_data.Year}</h5>
+                                <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
                                 <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
+                            </div>
+                        </div>
+                    `;
+
+                    // Installment details
+                    modalContent += `
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Sr. No</th>
+                                                <th>Month - Year</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                    `;
+
+                    // Check if installments exist
+                    if (r_data.installments && r_data.installments.length > 0) {
+                        // Add installment rows
+                        r_data.installments.forEach((installment, index) => {
+                            const status = installment.Status ? installment.Status : 'Pending';
+                            const statusClass = status.toLowerCase() === 'paid' ? 'text-success' : 'text-warning';
+
+                            modalContent += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${installment.Month || 'N/A'}</td>
+                                    <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
+                                    <td class="${statusClass}"><strong>${status}</strong></td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        // Calculate installments if not provided in the response
+                        const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
+                        const numberOfInstallments = parseInt(r_data.Number_of_installment);
+
+                        if (totalAmount && numberOfInstallments) {
+                            const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
+
+                            // Get month and year from the response
+                            let startDate;
+                            if (r_data.Month) {
+                                // Try to parse the month string to create a date object
+                                startDate = new Date(r_data.Month + '-01');
+                            } else {
+                                startDate = new Date(); // Fallback to current date
+                            }
+
+                            for (let i = 0; i < numberOfInstallments; i++) {
+                                const monthDate = new Date(startDate);
+                                monthDate.setMonth(startDate.getMonth() + i);
+                                const monthName = monthDate.toLocaleString("default", { month: "long" });
+                                const year = monthDate.getFullYear();
+
+                                modalContent += `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${monthName} ${year}</td>
+                                        <td>₹ ${installmentAmount}</td>
+                                        <td class="text-warning"><strong>Pending</strong></td>
+                                    </tr>
+                                `;
+                            }
+                        } else {
+                            // No way to calculate installments
+                            modalContent += `
+                                <tr>
+                                    <td colspan="4" class="text-center">No installment data available</td>
+                                </tr>
+                            `;
+                        }
+                    }
+
+                    modalContent += `
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -2084,11 +2051,6 @@
     $('#confirmDeleteModal').on('show.bs.modal', function(e) {
         var href = $(e.relatedTarget).data('href');
         $('#confirmDeleteBtn').attr('href', href);
-    });
-
-
-    $(document).ready(function() {
-        load_other_payments_data("{{url('other_payments_view_api/')}}/" + {{$u_data['Employee_id']}});
     });
 
     function load_other_payments_data(url_input) {
@@ -2349,35 +2311,35 @@
         });
     }
 
-   $(document).ready(function() {
-       // Handle form submission
-       $('#Add_Basic_Salary_form_Btn').on('click', function(event) {
-           event.preventDefault();
-           // Serialize form data
-           var formData = $('#Add_Basic_Salary_form').serialize();
+//    $(document).ready(function() {
+//        // Handle form submission
+//        $('#Add_Basic_Salary_form_Btn').on('click', function(event) {
+//            event.preventDefault();
+//            // Serialize form data
+//            var formData = $('#Add_Basic_Salary_form').serialize();
 
-           // Make AJAX POST request
-           $.ajax({
-               url: "{{ route('form_request') }}", // Laravel route
-               method: "POST",
-               data: formData,
-               headers: {
-                   'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
-               },
-               success: function(response) {
-                   // Handle success response
-                   alert(response.message);
-                   close_Basic_Salary_form() // Hide the form
-                   $('#Add_Basic_Salary_form')[0].reset(); // Reset the form
-                   load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
-               },
-               error: function(xhr, status, error) {
-                   // Handle error response
-                   alert('An error occurred: ' + xhr.responseText);
-               }
-           });
-       });
-   });
+//            // Make AJAX POST request
+//            $.ajax({
+//                url: "{{ route('form_request') }}", // Laravel route
+//                method: "POST",
+//                data: formData,
+//                headers: {
+//                    'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
+//                },
+//                success: function(response) {
+//                    // Handle success response
+//                    alert(response.message);
+//                    close_Basic_Salary_form() // Hide the form
+//                    $('#Add_Basic_Salary_form')[0].reset(); // Reset the form
+//                    load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
+//                },
+//                error: function(xhr, status, error) {
+//                    // Handle error response
+//                    alert('An error occurred: ' + xhr.responseText);
+//                }
+//            });
+//        });
+//    });
 
    load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
 
@@ -2529,9 +2491,11 @@
                             <td>${loan.Number_of_installment}</td>
                             <td>₹ ${loan.Loan_Amount_in_INR}</td>
                             <td>₹ ${loan.Loan_Remaining}</td>
-                            <td>
+                           <td>
                                 <button class="btn btn-sm btn-info" onclick="loan_view('${loan.id}')"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-sm btn-warning" onclick="open_Update_Loan_form('${loan.Loan_id}')"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="btn btn-sm btn-info" onclick="open_loan_modal('${loan.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                                 <a href="{{ url('/delete') }}/${loan.id}/loan" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
                             </td>
                         </tr>`;
@@ -2545,49 +2509,80 @@
         });
     }
 
-    function open_Update_Loan_form(id) {
-        // Open the modal
-        $("#loanModal").modal("show");
-
-        // Change modal title to "Update Advance"
-        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
-
-        // Set hidden input value for form processing
-        $("#loan_Id_input").val(id);
-
-        // Fetch loan data using AJAX
-        $.ajax({
-            type: "GET",
-            url: "/Loan/" + id,
-            dataType: "json",
-            success: function(response) {
-                console.log("Loan Response:", response);
-                var r_data = response.data;
-
-                // Fill the form fields with fetched data
-                $("#loan_month").val(r_data.Month);
-                $("#loan_reason").val(r_data.Reason);
-                $("#loan_title").val(r_data.Title);
-                $("#loan_amount").val(r_data.Loan_Amount_in_INR);
-                $("#number_of_loan_installment").val(r_data.Number_of_installment);
-
-                // Regenerate the installment table
-                genrate_table();
-            },
-            error: function(xhr) {
-                console.log("Error fetching loan:", xhr.responseText);
-            }
-        });
-    }
-
-    function genrate_table(existingInstallments = null) {
-        console.log("genrate_table called with:", existingInstallments);
-        // Clear the previous results
+    // Function to open the loan/advance modal
+    function open_loan_modal(id = null) {
+        // Reset the form first
+        $("#add_loan_form")[0].reset();
+        console.log("Form data:", $(this).serialize());
         $("#monthList").empty();
 
-        // If we have existing installments, display those
+        if (id) {
+            // Update mode
+            $(".modal-title").html('<i class="fas fa-money-check-alt mr-1"></i> Update Advance');
+            $("#loan_Id_input").val(id);
+
+            // Fetch existing loan data
+            $.ajax({
+                type: "GET",
+                url: "/Loan/" + id,
+                dataType: "json",
+                success: function(response) {
+                    console.log("Response:", response);
+
+                    if (response.success) {
+                        const r_data = response.data;
+
+                        // Populate form fields with response data
+                        // For month field (appears to be using a date picker)
+                        if (r_data.Month) {
+                            $("#loan_month").val(r_data.Month.slice(0, 7));
+                        }
+
+                        // For other fields (using the IDs from the screenshot)
+                        $("#loan_reason").val(r_data.Reason || "");
+                        $("#loan_title").val(r_data.Title || "");
+                        $("#loan_amount").val(r_data.Loan_Amount_in_INR || "");
+                        $("#number_of_loan_installment").val(r_data.Number_of_installment || "");
+
+                        // Generate installment table
+                        if (r_data.installments && r_data.installments.length > 0) {
+                            genrate_table(r_data.installments);
+                        } else {
+                            setTimeout(genrate_table, 100); // Small delay to ensure values are set
+                        }
+                    } else {
+                        console.warn("Error in response:", response.message || "Unknown error");
+                        alert("Error loading data. Please try again.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error:", status, error);
+                    alert("Error loading data. Please try again.");
+                }
+            });
+        } else {
+            // Add new mode
+            $(".modal-title").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
+            $("#loan_Id_input").val("");
+        }
+
+        // Open the modal
+        $("#loanModal").modal("show");
+    }
+
+    // Modify your genrate_table function to include hidden inputs
+    function genrate_table(existingInstallments = null) {
+        // Clear previous results
+        $("#monthList").empty();
+
+        // Also clear any previous hidden installment inputs
+        $(".installment-hidden-inputs").remove();
+
+        // Create a container for hidden inputs
+        const hiddenInputsContainer = $("<div class='installment-hidden-inputs'></div>");
+        $("#add_loan_form").append(hiddenInputsContainer);
+
         if (existingInstallments && existingInstallments.length > 0) {
-            console.log("Displaying existing installments");
             // Display existing installments
             for (let i = 0; i < existingInstallments.length; i++) {
                 const installment = existingInstallments[i];
@@ -2598,17 +2593,21 @@
                         <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
                     </tr>
                 `);
+
+                // Add hidden inputs for each installment
+                hiddenInputsContainer.append(`
+                    <input type="hidden" name="installments[${i}][Month]" value="${installment.Month || ''}">
+                    <input type="hidden" name="installments[${i}][Amount]" value="${parseFloat(installment.Amount || 0).toFixed(2)}">
+                    <input type="hidden" name="installments[${i}][Id]" value="${installment.Id || ''}">
+                `);
             }
         } else {
-            console.log("Generating new installment table");
             // Generate new installment breakdown
             const selectedDate = $("#loan_month").val();
-            const number_of_loop = $("#number_of_loan_installment").val();
-            const advance_amount = $("#loan_amount").val();
+            const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
+            const advance_amount = parseFloat($("#loan_amount").val()) || 0;
 
-            console.log("Form values:", {selectedDate, number_of_loop, advance_amount});
-
-            if (selectedDate && number_of_loop && advance_amount) {
+            if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
                 const startDate = new Date(selectedDate);
                 const year = startDate.getFullYear();
                 const startMonth = startDate.getMonth();
@@ -2619,22 +2618,67 @@
                         month: "long"
                     });
                     const displayYear = monthDate.getFullYear();
+                    const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
+                    const monthYearString = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
 
                     $("#monthList").append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${monthName} ${displayYear}</td>
-                            <td>${(advance_amount / number_of_loop).toFixed(2)}</td>
+                            <td>${installmentAmount}</td>
                         </tr>
                     `);
+
+                    // Add hidden inputs for each new installment
+                    hiddenInputsContainer.append(`
+                        <input type="hidden" name="installments[${i}][Month]" value="${monthYearString}">
+                        <input type="hidden" name="installments[${i}][Amount]" value="${installmentAmount}">
+                    `);
                 }
-            } else {
-                console.warn("Missing required form values to generate installments");
             }
         }
     }
 
+    // Make sure your edit buttons use this function
+    $(document).ready(function() {
+        // For your "Add Advance" button
+        $(document).on("click", ".add-advance-btn", function() {
+            open_loan_modal();
+        });
 
+        // For your edit icons in the table
+        $(document).on("click", ".edit-loan-btn", function() {
+            const loanId = $(this).data("id");
+            open_loan_modal(loanId);
+        });
+    });
+
+    $(document).ready(function() {
+        $('#loan_form_submit_btn').on('click', function(event) {
+            event.preventDefault();
+
+            var formData = $('#add_loan_form').serialize();
+
+            $.ajax({
+                url: "{{ route('form_request') }}",
+                method: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                },
+                success: function(response) {
+                    alert(response.message);
+                    close_Loan_form(); // Hide modal (assuming this function exists)
+                    $('#add_loan_form')[0].reset();
+                    $("#add_loan_form_header").text("Add Loan"); // if this exists
+                    load_loan_data("{{url('loan_view_api/')}}/" + {{$u_data['Employee_id']}});
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred: ' + xhr.responseText);
+                }
+            });
+        });
+    });
 
 
     load_leave_data("{{ url('Leave_view_api/' . $u_data['Employee_id']) }}");
