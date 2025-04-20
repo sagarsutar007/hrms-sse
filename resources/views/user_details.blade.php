@@ -659,7 +659,7 @@
                                                         <button class="btn btn-sm btn-success mb-3" onclick="open_Basic_Salary_form()">
                                                             <i class="fas fa-plus mr-1"></i>Add Basic Salary
                                                         </button>
-                                                        <div class="table-responsive">
+                                                        <div class="table-responsive" style="height: 500px; overflow-y: auto;">
                                                             <table class="table table-bordered table-striped" id="basic_salary_table">
                                                                 <!-- The table content will be dynamically populated by the load_basic_salary_data() function -->
                                                                 <thead>
@@ -763,7 +763,7 @@
                                                     <!-- Allowances Tab -->
                                                     <div class="tab-pane fade" id="nav-allowances" role="tabpanel">
                                                         <x-adminlte-button label="Add Allowance" theme="success" icon="fas fa-plus" class="mb-3" data-toggle="modal" data-target="#addAllowanceModal" />
-                                                        <div class="table-responsive">
+                                                        <div class="table-responsive" style="height: 500px; overflow-y: auto;">
                                                             <table class="table table-bordered table-striped" id="allowances_table">
                                                                 <thead>
                                                                     <tr>
@@ -841,7 +841,7 @@
                                                         <button class="btn btn-sm btn-success mb-3" data-toggle="modal" data-target="#deductionModal">
                                                             <i class="fas fa-plus mr-1"></i>Add Deduction
                                                         </button>
-                                                        <div class="table-responsive">
+                                                        <div class="table-responsive" style="height: 500px; overflow-y: auto;">
                                                             <table class="table table-bordered table-striped" id="Deductions_table">
                                                                 <thead>
                                                                     <tr>
@@ -849,6 +849,8 @@
                                                                         <th>Month-Year</th>
                                                                         <th>Deduction Title</th>
                                                                         <th>₹ Amount</th>
+                                                                        <th>Against Advance</th>
+                                                                        <th>Paid Flag</th>
                                                                         <th width="15%">Actions</th>
                                                                     </tr>
                                                                 </thead>
@@ -858,6 +860,7 @@
                                                             </table>
                                                         </div>
                                                     </div>
+
 
                                                     <!-- Deduction Form Modal -->
                                                     <div class="modal fade" id="deductionModal" tabindex="-1" role="dialog" aria-labelledby="deductionModalLabel" aria-hidden="true">
@@ -942,7 +945,7 @@
                                                         <button type="button" class="btn btn-sm btn-success mb-3 add-advance-btn">
                                                             <i class="fas fa-plus mr-1"></i> Add Advance
                                                         </button>
-                                                        <div class="table-responsive">
+                                                        <div class="table-responsive" style="height: 500px; overflow-y: auto;">
                                                             <table class="table table-bordered table-striped" id="loan_table">
                                                                 <thead>
                                                                     <tr>
@@ -2363,6 +2366,8 @@
                             <th>Month-Year</th>
                             <th>Title</th>
                             <th>(₹) Amount</th>
+                            <th>Against Advance</th>
+                            <th>Paid Flag</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -2371,21 +2376,24 @@
                 // Populate Table Rows
                 var all_data = response.data;
                 all_data.forEach($deduction => {
+                    const againstAdvance = ($deduction.Advance_Ids && $deduction.Advance_Ids != 0) ? "Yes" : "No";
+                    const paidFlag = ($deduction.Deduction_Paid_Flag == 1) ? "Yes" : "No";
+
                     table_html_data += `
                         <tr>
                             <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$deduction.Month} </td>
+                            <td>${$deduction.Month}</td>
                             <td>${$deduction.deduction_Titel}</td>
                             <td>${$deduction.deduction_Amount_in_INR}</td>
-                           <td>
+                            <td>${againstAdvance}</td>
+                            <td>${paidFlag}</td>
+                            <td>
                                 <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
-
                                 <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
-
                                 <button type="button"
                                     class="btn btn-sm btn-danger"
                                     data-toggle="modal"
@@ -2394,12 +2402,12 @@
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </td>
-
                         </tr>`;
                 });
 
                 table_html_data += `</tbody>`;
                 $("#Deductions_table").html(table_html_data);
+
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
@@ -2657,24 +2665,63 @@
         $('#loan_form_submit_btn').on('click', function(event) {
             event.preventDefault();
 
-            var formData = $('#add_loan_form').serialize();
+            // Make sure all required fields are filled
+            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_title').val() || !$('#loan_reason').val()) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Format the month input for the backend as "YYYY-MM-DD"
+            var monthInput = $('#loan_month').val(); // Format: "2025-03"
+            var formattedDate = monthInput + "-01"; // Add day to make it "2025-03-01"
+
+            var formData = {
+                form_type: "Loan_form",
+                Employee_Id: $('input[name="Employee_Id"]').val(),
+                Month: formattedDate, // Use "2025-03-01" format
+                Amount: $('#loan_amount').val(),
+                Number_of_installment: $('#number_of_loan_installment').val(),
+                Title: $('#loan_title').val(),
+                Reason: $('#loan_reason').val(),
+                loan_Id_input: $('#loan_Id_input').val() || '',
+                _token: $('input[name="_token"]').val()
+            };
+
+            console.log("Form data being sent:", formData);
 
             $.ajax({
-                url: "{{ route('form_request') }}",
+                url: $('#add_loan_form').attr('action'),
                 method: "POST",
                 data: formData,
                 headers: {
                     'X-CSRF-TOKEN': $('input[name="_token"]').val()
                 },
+                beforeSend: function() {
+                    // Show loading state
+                    $('#loan_form_submit_btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                },
                 success: function(response) {
-                    alert(response.message);
-                    close_Loan_form(); // Hide modal (assuming this function exists)
-                    $('#add_loan_form')[0].reset();
-                    $("#add_loan_form_header").text("Add Loan"); // if this exists
-                    load_loan_data("{{url('loan_view_api/')}}/" + {{$u_data['Employee_id']}});
+                    console.log("Success response:", response);
+                    if(response.success) {
+                        alert(response.message);
+                        $('#loanModal').modal('hide');
+                        $('#add_loan_form')[0].reset();
+                        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
+                        // Check if function exists to avoid undefined errors
+                        if(typeof load_loan_data === 'function') {
+                            load_loan_data("{{url('loan_view_api/')}}/" + $('input[name="Employee_Id"]').val());
+                        }
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
                 },
                 error: function(xhr, status, error) {
-                    alert('An error occurred: ' + xhr.responseText);
+                    console.error('AJAX Error:', xhr.responseText);
+                    alert('An error occurred. Please try again later.');
+                },
+                complete: function() {
+                    // Re-enable button
+                    $('#loan_form_submit_btn').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Submit');
                 }
             });
         });

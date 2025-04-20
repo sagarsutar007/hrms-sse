@@ -398,25 +398,6 @@
                     }
                 });
 
-                function open_pershon_details(emp_id) {
-                    // Call salary paid check first
-                    salary_paid_function(emp_id);
-
-                    var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
-                    var hed_tr_data =  $("#header_cont_" + emp_id).val();
-                    var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
-                    var table_heading =  $("#heading" + emp_id).html();
-
-                    $("#heade_table_tr_data").html(hed_tr_data);
-                    $("#in_out_single_user_tr").html(one_user_monthly_in_out_data_var);
-                    $("#table_heading_h2").html(table_heading);
-                    $("#paid_amoutn_for_pup_up_span").text(paid_amoutn_for_pup_up);
-
-                    // ✅ Show the modal
-                    $('#salaryModal').modal('show');
-                }
-
-
                 // Bind submit via jQuery
                 $(document).on('submit', '#Arrear_Form', save_arrear);
 
@@ -744,11 +725,18 @@
                 Working_Day++;
             });
 
+
+
             // Create column headers for each date
             dates.forEach(date => {
                 const formattedDate = date.toLocaleDateString("en-US", {
                     weekday: "long",
                     day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                });
+
+                    month_and_year_var = date.toLocaleDateString("en-US", {
                     month: "long",
                     year: "numeric"
                 });
@@ -845,12 +833,12 @@
 
                 // Calculate employee's effective working days based on termination date
                 let effectiveWorkingDays = Working_Day;
+
                 if (hasTerminationDate) {
-                    effectiveWorkingDays = 0;
-                    dates.filter(date => date <= terminationDate).forEach(() => {
-                        effectiveWorkingDays++;
-                    });
+                    // Count only working days that are on or before the termination date
+                    effectiveWorkingDays = dates.filter(date => date <= terminationDate).length;
                 }
+
 
                 table_html_data += `
                     <tr id="users_data_row${all_users_data.Employee_id}" ondblclick="open_arrear_pop_up('${all_users_data.Employee_id}')">
@@ -1019,9 +1007,9 @@
                     }
 
                     // Log data for debugging
-                    console.log(`Employee: ${all_users_data.Employee_id}, Date: ${currentDateFormatted}`);
-                    console.log(`Available swap dates: ${swapDates.join(', ')}`);
-                    console.log(`Has actual attendance data: ${hasActualAttendanceData}`);
+                    // console.log(`Employee: ${all_users_data.Employee_id}, Date: ${currentDateFormatted}`);
+                    // console.log(`Available swap dates: ${swapDates.join(', ')}`);
+                    // console.log(`Has actual attendance data: ${hasActualAttendanceData}`);
 
                     // Determine the cell background color based on conditions
                     if (swapDates.includes(currentDateFormatted)) {
@@ -1254,6 +1242,8 @@
                         }
                     });
                 }
+                console.log( "advance amount" + advance)
+
                 table_html_data += `${advance}</td>`;
 
                 // Add deductions column
@@ -1320,13 +1310,8 @@
                 </tr>
                 ${terminationInfo}`;
 
-                // Determine paid amount
-                var paid_amt = 0;
-                if (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '') {
-                    paid_amt = Math.round(net_salary);
-                } else {
-                    paid_amt = all_users_data.Paid_Amount;
-                }
+                // Set paid amount to always match net salary
+                var paid_amt = Math.round(net_salary);
 
                 // Finish the net salary cell with hidden inputs
                 table_html_data += `${Math.round(net_salary)}
@@ -1336,11 +1321,7 @@
                     <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>
                 `;
 
-                // Add paid amount cell
-                paid_amt = (all_users_data.Paid_Amount == null || all_users_data.Paid_Amount == 0 || all_users_data.Paid_Amount == '')
-                    ? Math.round(net_salary)
-                    : all_users_data.Paid_Amount;
-
+                // Add paid amount cell (always equal to net salary)
                 table_html_data += `
                     <td><input type="text" value="${paid_amt}" style="border:none;width:100%" id="paid_amount_td${all_users_data.Employee_id}"></td>
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
@@ -1348,6 +1329,7 @@
                     <td hidden><input type="text" value="${Over_Time / 60}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
                     <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">
                 `;
+
 
                 // Add pay/final settlement buttons
                 if (all_users_data.Paid_Flag == 1) {
@@ -1568,25 +1550,36 @@ setInterval(() => {
 
             }
 
-    // Fixed paySalary function with proper event handling
-    function paySalary(Employee_id) {
-        if (confirm("Are you sure you want to pay the salary?")) {
-            // Change the button text to "PAID"
-            const button = document.getElementById("payButton" + Employee_id);
-            if (button) {
-                button.innerHTML = '<i class="fas fa-check-circle"></i> PAID'; // Add a check icon and change text
-                button.disabled = true;
+            function paySalary(Employee_id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to pay the salary?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Pay Now!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Call the function only after user confirms
+                        salary_paid_function(Employee_id);
 
-                // Optionally, you can also change the tooltip or hide it
-                const tooltip = button.querySelector('.tooltip');
-                if (tooltip) {
-                    tooltip.style.visibility = 'hidden';
-                }
-            } else {
-                console.error("Button not found for Employee ID:", Employee_id);
+                        // Update button text and state
+                        const button = document.getElementById("payButton" + Employee_id);
+                        if (button) {
+                            button.innerHTML = '<i class="fas fa-check-circle"></i> PAID';
+                            button.disabled = true;
+
+                            const tooltip = button.querySelector('.tooltip');
+                            if (tooltip) {
+                                tooltip.style.visibility = 'hidden';
+                            }
+                        }
+                    }
+                });
             }
-        }
-    }
+
 
         const currentDate = new Date();
         let c_year = currentDate.getFullYear();
@@ -1664,6 +1657,9 @@ setInterval(() => {
         function open_pershon_details(emp_id) {
 
             var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
+            console.log($('#paid_amount_td' + emp_id).prop('outerHTML'));
+
+
             var hed_tr_data = $("#header_cont_" + emp_id).val();
             var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
             var table_heading = $("#heading" + emp_id).html();
@@ -1699,6 +1695,7 @@ setInterval(() => {
         function printSalaryDetails(emp_id) {
             // Get modal content
             var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
+
             var hed_tr_data = $("#header_cont_" + emp_id).val();
             var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
             var table_heading = $("#heading" + emp_id).html();

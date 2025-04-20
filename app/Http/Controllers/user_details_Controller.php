@@ -1272,12 +1272,15 @@ return response()->json([
                 $loan_Id_input = $freq->loan_Id_input;
                 $Title = $freq->Title;
 
+
+
                 if (isset($loan_Id_input)) {
                     // Update loan data
                     $update_query = DB::table('loan')
-                        ->where('Loan_id', $loan_Id_input)
+                        ->where('id', $loan_Id_input)
+                        ->orWhere('Loan_id', $loan_Id_input)
                         ->update([
-                            'Month' => $Month,
+                            'Month' => date('Y-m', strtotime($Month)),
                             'Loan_type' => $Loan_Option ?? null,
                             'Loan_Amount_in_INR' => $Amount,
                             'Number_of_installment' => $Number_of_installment,
@@ -1285,6 +1288,7 @@ return response()->json([
                             'Reason' => $Reason,
                             'updated_at' => now(),
                         ]);
+
 
                     if ($update_query) {
                         // Delete existing deductions related to the loan
