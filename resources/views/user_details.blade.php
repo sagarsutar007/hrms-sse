@@ -1930,7 +1930,7 @@
             type: "GET",
             url: "/Loan/" + id,
             dataType: "json",
-            success: function(response) {
+            success: function (response) {
                 console.log("Loan Response:", response);
 
                 if (response.success) {
@@ -1952,7 +1952,7 @@
                         </div>
                     `;
 
-                    // Installment details
+                    // Installment breakdown section
                     modalContent += `
                         <div class="row">
                             <div class="col-12">
@@ -1964,48 +1964,42 @@
                                                 <th>Sr. No</th>
                                                 <th>Month - Year</th>
                                                 <th>Amount</th>
-                                                <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                     `;
 
-                    // Check if installments exist
                     if (r_data.installments && r_data.installments.length > 0) {
-                        // Add installment rows
+                        // Show actual installment records
                         r_data.installments.forEach((installment, index) => {
-                            const status = installment.Status ? installment.Status : 'Pending';
-                            const statusClass = status.toLowerCase() === 'paid' ? 'text-success' : 'text-warning';
-
                             modalContent += `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${installment.Month || 'N/A'}</td>
                                     <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
-                                    <td class="${statusClass}"><strong>${status}</strong></td>
                                 </tr>
                             `;
                         });
                     } else {
-                        // Calculate installments if not provided in the response
+                        // Generate installments if missing
                         const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
                         const numberOfInstallments = parseInt(r_data.Number_of_installment);
 
                         if (totalAmount && numberOfInstallments) {
                             const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
 
-                            // Get month and year from the response
                             let startDate;
                             if (r_data.Month) {
-                                // Try to parse the month string to create a date object
                                 startDate = new Date(r_data.Month + '-01');
                             } else {
-                                startDate = new Date(); // Fallback to current date
+                                startDate = new Date();
                             }
 
+                            const baseYear = startDate.getFullYear();
+                            const baseMonth = startDate.getMonth() + 1; // Start from next month
+
                             for (let i = 0; i < numberOfInstallments; i++) {
-                                const monthDate = new Date(startDate);
-                                monthDate.setMonth(startDate.getMonth() + i);
+                                const monthDate = new Date(baseYear, baseMonth + i, 1);
                                 const monthName = monthDate.toLocaleString("default", { month: "long" });
                                 const year = monthDate.getFullYear();
 
@@ -2014,15 +2008,13 @@
                                         <td>${i + 1}</td>
                                         <td>${monthName} ${year}</td>
                                         <td>₹ ${installmentAmount}</td>
-                                        <td class="text-warning"><strong>Pending</strong></td>
                                     </tr>
                                 `;
                             }
                         } else {
-                            // No way to calculate installments
                             modalContent += `
                                 <tr>
-                                    <td colspan="4" class="text-center">No installment data available</td>
+                                    <td colspan="3" class="text-center">No installment data available</td>
                                 </tr>
                             `;
                         }
@@ -2038,18 +2030,20 @@
 
                     $("#loanViewModalContent").html(modalContent);
                     $("#loanViewModal").modal("show");
+
                 } else {
                     $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
                     $("#loanViewModal").modal("show");
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.log("Error:", xhr.responseText);
                 $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
                 $("#loanViewModal").modal("show");
             }
         });
     }
+
 
     $('#confirmDeleteModal').on('show.bs.modal', function(e) {
         var href = $(e.relatedTarget).data('href');
@@ -2583,15 +2577,14 @@
         // Clear previous results
         $("#monthList").empty();
 
-        // Also clear any previous hidden installment inputs
+        // Remove any existing hidden input container
         $(".installment-hidden-inputs").remove();
 
-        // Create a container for hidden inputs
+        // Create a new container for hidden inputs
         const hiddenInputsContainer = $("<div class='installment-hidden-inputs'></div>");
         $("#add_loan_form").append(hiddenInputsContainer);
 
         if (existingInstallments && existingInstallments.length > 0) {
-            // Display existing installments
             for (let i = 0; i < existingInstallments.length; i++) {
                 const installment = existingInstallments[i];
                 $("#monthList").append(`
@@ -2602,7 +2595,6 @@
                     </tr>
                 `);
 
-                // Add hidden inputs for each installment
                 hiddenInputsContainer.append(`
                     <input type="hidden" name="installments[${i}][Month]" value="${installment.Month || ''}">
                     <input type="hidden" name="installments[${i}][Amount]" value="${parseFloat(installment.Amount || 0).toFixed(2)}">
@@ -2610,7 +2602,6 @@
                 `);
             }
         } else {
-            // Generate new installment breakdown
             const selectedDate = $("#loan_month").val();
             const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
             const advance_amount = parseFloat($("#loan_amount").val()) || 0;
@@ -2618,13 +2609,11 @@
             if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
                 const startDate = new Date(selectedDate);
                 const year = startDate.getFullYear();
-                const startMonth = startDate.getMonth();
+                const startMonth = startDate.getMonth() + 1; // Start from next month
 
                 for (let i = 0; i < number_of_loop; i++) {
                     const monthDate = new Date(year, startMonth + i, 1);
-                    const monthName = monthDate.toLocaleString("default", {
-                        month: "long"
-                    });
+                    const monthName = monthDate.toLocaleString("default", { month: "long" });
                     const displayYear = monthDate.getFullYear();
                     const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
                     const monthYearString = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
@@ -2637,7 +2626,6 @@
                         </tr>
                     `);
 
-                    // Add hidden inputs for each new installment
                     hiddenInputsContainer.append(`
                         <input type="hidden" name="installments[${i}][Month]" value="${monthYearString}">
                         <input type="hidden" name="installments[${i}][Amount]" value="${installmentAmount}">
@@ -2646,6 +2634,7 @@
             }
         }
     }
+
 
     // Make sure your edit buttons use this function
     $(document).ready(function() {
