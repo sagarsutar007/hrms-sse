@@ -1282,31 +1282,28 @@
 
                 // Prepare top table content for popup
                 top_table_content = `<tr>
-                    <th colspan='2'>Employee Information</th>
+                    <th colspan='2' >Employee Information</th>
                     <th colspan='2'>Attendance Details</th>
-                    <th colspan='2'>Overtime</th>
-                    <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
-                    <th colspan='2'>Salary Details</th></tr>
-                    <tr><td>Name</td><td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                    <td>Total Days</td><td>${calculationWorkingDays}</td><td>Overtime (Hours)</td><td>${Over_Time}</td><td>Loan/Advance (INR)</td><td>${deductions_amount}</td>
-                    <td>Daily Rate (INR)</td><td>${Daily_Rate.toFixed(2)}</td></tr>
-
-                    <tr><td>Employee ID</td><td>${all_users_data.Employee_id}</td>
-                    <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td><td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
-                    <td>Deductions</td><td>${advance}</td>
-                    <td>Gross Salary (INR)</td><td>${monthaly_salary.toFixed(2)}</td></tr>
-
-                    <tr><td>Shift Hours</td><td>${all_users_data.Shift_hours}</td>
-                    <td>Days Worked</td><td>${Work}</td>
+                                <th colspan='2'>Overtime</th>
+                                <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
+                                <th colspan='2'>Salary Details</th></tr>
+                <tr><td>Name</td> <td>${all_users_data.f_name }  ${all_users_data.m_name } ${all_users_data.l_name }</td>
+                <td>Total Days</td><td>${Working_Day} </td> <td>Overtime (Hours)</td><td>${Over_Time}</td><td>Loan/Advance (INR)</td><td>${deductions_amount}</td>
+                <td>Daily Rate (INR)</td><td> ${Daily_Rate.toFixed(2)}</td></tr>
+                <tr> <td>Employee ID</td> <td>${all_users_data.Employee_id }</td>
+                <td>Working Days</td><td>${Working_Day - response.holiday_count } </td>   <td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
+                <td>Deductions</td><td>${advance}</td>
+                <td>Gross Salary (INR)</td><td >${monthaly_salary.toFixed(2) }</td> </tr>
+                <tr>   <td>Shift Hours</td>  <td>${all_users_data.Shift_hours }</td>
+                <td>Days Worked</td><td>${Work} </td>
                     <td>Overtime (INR)</td><td>${Total_OT_Amount.toFixed(2)}</td>
-                    <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
-                    <td>Net Salary (INR)</td><td>${Math.round(net_salary)}</td></tr>
-
-                    <tr><td colspan='2'></td>
-                    <td>Days Absent</td><td>${Absent_count}</td>
+                <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
+                <td>Net Salary (INR)</td><td>${Math.round(net_salary)}</td> </tr>
+                <tr>   <td colspan='2'></td>
+                <td>Days Absent</td><td> ${Absent_count}</td>
                     <td colspan='2'></td>
-                    <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
-                    <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
+                <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
+                <td> Paid Amount</td> <td id='paid_amoutn_for_pup_up_span'> </td>
                 </tr>
                 ${terminationInfo}`;
 
