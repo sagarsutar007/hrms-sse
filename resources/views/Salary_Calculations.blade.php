@@ -973,8 +973,8 @@
                     let holidayDates = [];
                     let weeklyOffs = [];
                     let swapDays = [];
-                    let Daily_Rate = null;
-                    let Over_Ttime_Rate = null;
+                    let Daily_Rate = all_users_data.Daily_Rate || 0; // Initialize with employee's default rate
+                    let Over_Ttime_Rate = parseFloat(all_users_data.Over_Ttime_Rate || 0); // Initialize with employee's default OT rate
                     let hasActualAttendanceData = false; // Flag to check if we have real attendance data
 
                     // Safety check before processing
@@ -1002,10 +1002,18 @@
                             if (element.WeeklyOff == 1) weeklyOffs.push(element);
 
                             // Keep the last values for rates (assuming they're the same for all records)
-                            Daily_Rate = element.Daily_Rate;
-                            Over_Ttime_Rate = element.Over_Ttime_Rate;
+                            if (element.Daily_Rate) Daily_Rate = element.Daily_Rate;
+                            // Add these console logs after retrieving Over_Ttime_Rate
+                            console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
+
+                            // In the filteredData loop where Over_Ttime_Rate is potentially updated
+                            if (element.Over_Ttime_Rate) {
+                                Over_Ttime_Rate = parseFloat(element.Over_Ttime_Rate);
+                            }
                         });
                     }
+
+                    console.log(Over_Ttime_Rate);
 
                     // Determine the cell background color based on conditions
                     if (swapDates.includes(currentDateFormatted)) {
@@ -1127,8 +1135,13 @@
                             // Set the daily amount for this record
                             Daily_Amt = attendanceDaily_Amt;
 
+                            // Ensure we have a valid overtime rate
+                            if (all_att_data.Over_Ttime_Rate) {
+                                Over_Ttime_Rate = all_att_data.Over_Ttime_Rate;
+                            }
+
                             // Calculate OT amount
-                            OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
+                            OT_Amt = all_att_data.Overtime * Over_Ttime_Rate;
                             Total_OT_Amount = Total_OT_Amount + OT_Amt;
 
                             const formattedTotalHours = parseFloat(all_att_data.Totel_Hours).toFixed(2);
@@ -1175,173 +1188,173 @@
 
                     pop_up_total_amount += Daily_Amt;
                     Total_all_day_Amount += Daily_Amt;
-                });
-
-                // Add totals row to monthly in/out report
-                one_user_monthly_in_out += `
-                <tr class="table-secondary font-weight-bold">
-                    <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
-                    <td><strong>${pop_up_total_hr.toFixed(2)}</strong></td>
-                    <td><strong>${pop_up_total_min}</strong></td>
-                    <td><strong>${pop_up_total_ot_hr.toFixed(2)}</strong></td>
-                    <td><strong>${pop_up_total_ot_min}</strong></td>
-                    <td><strong>${pop_up_total_ot_amount.toFixed(2)}</strong></td>
-                    <td><strong>${pop_up_total_amount.toFixed(2)}</strong></td>
-                    <td><strong>${cumulative_amount.toFixed(2)}</strong></td>
-                </tr>`;
-
-                // Close the monthly in/out report table
-                one_user_monthly_in_out += `
-                        </tbody>
-                    </table>
-                </div>`;
-
-                // Use effective working days for calculations if employee is terminated
-                const calculationWorkingDays = hasTerminationDate ? effectiveWorkingDays : Working_Day;
-
-                // Calculate absence data
-                let holidayCount = 0;
-
-                // Count holidays before termination date
-                if (hasTerminationDate) {
-                    holidayCount = public_holiday_data.filter(holiday =>
-                        new Date(holiday.holiday_Date) <= terminationDate
-                    ).length;
-                } else {
-                    holidayCount = response.holiday_count;
-                }
-
-                // Calculate absence using the same formula as original, but with adjusted values
-                var Absent_count = calculationWorkingDays - holidayCount - Work;
-                if (Absent_count <= 0) {
-                    Absent_count = 0;
-                }
-
-                // Use same total amount calculation as the original
-                Total_Amount = Total_all_day_Amount + Total_OT_Amount;
-
-                // Add summary columns with termination date consideration but same structure as original
-                table_html_data += `<td>${calculationWorkingDays}</td>
-                                <td>${calculationWorkingDays - holidayCount}</td>
-                                <td>${Work}</td>
-                                <td>${Absent_count}</td>
-                                <td>${Over_Time}</td>
-                                <td>${Over_Ttime_Rate.toFixed(2)}</td>
-                                <td>${Math.round(Total_OT_Amount)}</td>`;
-
-                // Add advance column exactly as in original
-                table_html_data += `<td id="advance${all_users_data.Employee_id}">`;
-                if (advance_data != "") {
-                    advance_data.forEach(advance_data => {
-                        if (advance_data.Employee_id == all_users_data.Employee_id) {
-                            advance = parseInt(advance) + parseInt(advance_data.Loan_Amount_in_INR);
-                        }
                     });
-                }
-                table_html_data += `${advance}</td>`;
 
-                // Add deductions column exactly as in original
-                table_html_data += `<td id="deductions_amount${all_users_data.Employee_id}">`;
-                if (deductions_data != null) {
-                    deductions_data.forEach(deductions => {
-                        if (deductions.Employee_id === all_users_data.Employee_id) {
-                            deductions_amount += parseInt(deductions.deduction_Amount_in_INR);
-                        }
-                    });
-                }
-                table_html_data += `${deductions_amount}</td>`;
+                    // Add totals row to monthly in/out report
+                    one_user_monthly_in_out += `
+                    <tr class="table-secondary font-weight-bold">
+                        <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
+                        <td><strong>${pop_up_total_hr.toFixed(2)}</strong></td>
+                        <td><strong>${pop_up_total_min}</strong></td>
+                        <td><strong>${pop_up_total_ot_hr.toFixed(2)}</strong></td>
+                        <td><strong>${pop_up_total_ot_min}</strong></td>
+                        <td><strong>${pop_up_total_ot_amount.toFixed(2)}</strong></td>
+                        <td><strong>${pop_up_total_amount.toFixed(2)}</strong></td>
+                        <td><strong>${cumulative_amount.toFixed(2)}</strong></td>
+                    </tr>`;
 
-                // Add arrear columns exactly as in original
-                table_html_data += `<td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
-                                <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>`;
+                    // Close the monthly in/out report table
+                    one_user_monthly_in_out += `
+                            </tbody>
+                        </table>
+                    </div>`;
 
-                // Add daily rate and monthly salary exactly as in original
-                table_html_data += `<td>${Daily_Rate.toFixed(2)}</td>
-                                <td id="monthly_salary${all_users_data.Employee_id}">`;
-                // Same monthly salary calculation as original
-                monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
-                table_html_data += `${Math.round(monthaly_salary)}</td>`;
+                    // Use effective working days for calculations if employee is terminated
+                    const calculationWorkingDays = hasTerminationDate ? effectiveWorkingDays : Working_Day;
 
-                // Add net salary cell start
-                var arrer_amo = all_users_data.Arrear_Amount ?? 0;
-                table_html_data += `<td id="net_salary${all_users_data.Employee_id}">`;
+                    // Calculate absence data
+                    let holidayCount = 0;
 
-                // Same net salary calculation as original, with parseInt for safety
-                net_salary = monthaly_salary - Penalty - deductions_amount + parseInt(arrer_amo || 0);
+                    // Count holidays before termination date
+                    if (hasTerminationDate) {
+                        holidayCount = public_holiday_data.filter(holiday =>
+                            new Date(holiday.holiday_Date) <= terminationDate
+                        ).length;
+                    } else {
+                        holidayCount = response.holiday_count;
+                    }
 
-                // Create termination info only if needed (new in second snippet)
-                let terminationInfo = '';
-                if (hasTerminationDate) {
-                    terminationInfo = `<tr><td colspan="2" style="color:red">Terminated on: ${all_users_data.termination_date}</td><td colspan="8"></td></tr>`;
-                }
+                    // Calculate absence using the same formula as original, but with adjusted values
+                    var Absent_count = calculationWorkingDays - holidayCount - Work;
+                    if (Absent_count <= 0) {
+                        Absent_count = 0;
+                    }
 
-                // Calculate overtime hours with 2 decimal places
-                const overtimeHours = (Over_Time / 60).toFixed(2);
+                    // Use same total amount calculation as the original
+                    Total_Amount = Total_all_day_Amount + Total_OT_Amount;
 
-                // Create top table content - matches format of original but with termination info
-                top_table_content = `<tr>
-                    <th colspan='2'>Employee Information</th>
-                    <th colspan='2'>Attendance Details</th>
-                    <th colspan='2'>Overtime</th>
-                    <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
-                    <th colspan='2'>Salary Details</th></tr>
-                <tr><td>Name</td> <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
-                <td>Total Days</td><td>${calculationWorkingDays}</td> <td>Overtime (Hours)</td><td>${overtimeHours}</td><td>Loan/Advance (INR)</td><td>${advance}</td>
-                <td>Daily Rate (INR)</td><td>${Daily_Rate.toFixed(2)}</td></tr>
-                <tr> <td>Employee ID</td> <td>${all_users_data.Employee_id}</td>
-                <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td> <td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
-                <td>Deductions</td><td>${deductions_amount}</td>
-                <td>Gross Salary (INR)</td><td>${monthaly_salary.toFixed(2)}</td></tr>
-                <tr> <td>Shift Hours</td> <td>${all_users_data.Shift_hours}</td>
-                <td>Days Worked</td><td>${Work}</td>
-                <td>Overtime (INR)</td><td>${Total_OT_Amount.toFixed(2)}</td>
-                <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
-                <td>Net Salary (INR)</td><td>${Math.round(net_salary)}</td> </tr>
-                <tr> <td colspan='2'></td>
-                <td>Days Absent</td><td>${Absent_count}</td>
-                <td colspan='2'></td>
-                <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
-                <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
-                </tr>
-                ${terminationInfo}`;
+                    // Add summary columns with termination date consideration but same structure as original
+                    table_html_data += `<td>${calculationWorkingDays}</td>
+                                    <td>${calculationWorkingDays - holidayCount}</td>
+                                    <td>${Work}</td>
+                                    <td>${Absent_count}</td>
+                                    <td>${Over_Time}</td>
+                                    <td>${Over_Ttime_Rate.toFixed(2)}</td>
+                                    <td>${Math.round(Total_OT_Amount)}</td>`;
 
-                // Set paid amount as in original
-                var paid_amt = Math.round(net_salary);
+                    // Add advance column exactly as in original
+                    table_html_data += `<td id="advance${all_users_data.Employee_id}">`;
+                    if (advance_data != "") {
+                        advance_data.forEach(advance_data => {
+                            if (advance_data.Employee_id == all_users_data.Employee_id) {
+                                advance = parseInt(advance) + parseInt(advance_data.Loan_Amount_in_INR);
+                            }
+                        });
+                    }
+                    table_html_data += `${advance}</td>`;
 
-                // Complete the net salary cell with hidden inputs as in original
-                table_html_data += `${Math.round(net_salary)}
-                <input hidden id="header_cont_${all_users_data.Employee_id}" type="text" value="${top_table_content.replace(/"/g, '&quot;')}">
-                <input hidden value='${one_user_monthly_total_amount}' id='one_user_monthly_total_amount${all_users_data.Employee_id}'>
-                <input hidden value='${one_user_monthly_in_out}' id='one_user_monthly_in_out${all_users_data.Employee_id}'>
-                <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>`;
+                    // Add deductions column exactly as in original
+                    table_html_data += `<td id="deductions_amount${all_users_data.Employee_id}">`;
+                    if (deductions_data != null) {
+                        deductions_data.forEach(deductions => {
+                            if (deductions.Employee_id === all_users_data.Employee_id) {
+                                deductions_amount += parseInt(deductions.deduction_Amount_in_INR);
+                            }
+                        });
+                    }
+                    table_html_data += `${deductions_amount}</td>`;
 
-                // Add paid amount cell as in original
-                table_html_data += `<td><input type="text" value="${paid_amt}" style="border:none" id="paid_amount_td${all_users_data.Employee_id}"></td>
-                <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
-                <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
-                <td hidden><input type="text" value="${overtimeHours}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
-                <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">`;
+                    // Add arrear columns exactly as in original
+                    table_html_data += `<td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
+                                    <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>`;
 
-                // Add pay/final settlement buttons with same styling as original
-                if (all_users_data.Paid_Flag == 1) {
-                    table_html_data += `<button class="pay-salary-btn" disabled id='payButton${all_users_data.Employee_id}'>
-                        <i class="fas fa-check-circle"></i> PAID
-                    </button>`;
-                } else if (
-                    hasTerminationDate &&
-                    terminationDate.getMonth() === selectedMonth &&
-                    terminationDate.getFullYear() === selectedYear
-                ) {
-                    table_html_data += `<button class="pay-salary-btn" id='payButton${all_users_data.Employee_id}' onclick='paySalary(${all_users_data.Employee_id})'>
-                        <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
-                    </button>`;
-                } else {
-                    table_html_data += `<button class="pay-salary-btn" id='payButton${all_users_data.Employee_id}' onclick='paySalary(${all_users_data.Employee_id})'>
-                        <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
-                    </button>`;
-                }
+                    // Add daily rate and monthly salary exactly as in original
+                    table_html_data += `<td>${Daily_Rate.toFixed(2)}</td>
+                                    <td id="monthly_salary${all_users_data.Employee_id}">`;
+                    // Same monthly salary calculation as original
+                    monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
+                    table_html_data += `${Math.round(monthaly_salary)}</td>`;
 
-                table_html_data += `</td>`;
+                    // Add net salary cell start
+                    var arrer_amo = all_users_data.Arrear_Amount ?? 0;
+                    table_html_data += `<td id="net_salary${all_users_data.Employee_id}">`;
+
+                    // Same net salary calculation as original, with parseInt for safety
+                    net_salary = monthaly_salary - Penalty - deductions_amount + parseInt(arrer_amo || 0);
+
+                    // Create termination info only if needed (new in second snippet)
+                    let terminationInfo = '';
+                    if (hasTerminationDate) {
+                        terminationInfo = `<tr><td colspan="2" style="color:red">Terminated on: ${all_users_data.termination_date}</td><td colspan="8"></td></tr>`;
+                    }
+
+                    // Calculate overtime hours with 2 decimal places
+                    const overtimeHours = (Over_Time / 60).toFixed(2);
+
+                    // Create top table content - matches format of original but with termination info
+                    top_table_content = `<tr>
+                        <th colspan='2'>Employee Information</th>
+                        <th colspan='2'>Attendance Details</th>
+                        <th colspan='2'>Overtime</th>
+                        <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
+                        <th colspan='2'>Salary Details</th></tr>
+                    <tr><td>Name</td> <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
+                    <td>Total Days</td><td>${calculationWorkingDays}</td> <td>Overtime (Hours)</td><td>${overtimeHours}</td><td>Loan/Advance (INR)</td><td>${advance}</td>
+                    <td>Daily Rate (INR)</td><td>${Daily_Rate.toFixed(2)}</td></tr>
+                    <tr> <td>Employee ID</td> <td>${all_users_data.Employee_id}</td>
+                    <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td> <td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
+                    <td>Deductions</td><td>${deductions_amount}</td>
+                    <td>Gross Salary (INR)</td><td>${monthaly_salary.toFixed(2)}</td></tr>
+                    <tr> <td>Shift Hours</td> <td>${all_users_data.Shift_hours}</td>
+                    <td>Days Worked</td><td>${Work}</td>
+                    <td>Overtime (INR)</td><td>${Total_OT_Amount.toFixed(2)}</td>
+                    <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
+                    <td>Net Salary (INR)</td><td>${Math.round(net_salary)}</td> </tr>
+                    <tr> <td colspan='2'></td>
+                    <td>Days Absent</td><td>${Absent_count}</td>
+                    <td colspan='2'></td>
+                    <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
+                    <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
+                    </tr>
+                    ${terminationInfo}`;
+
+                    // Set paid amount as in original
+                    var paid_amt = Math.round(net_salary);
+
+                    // Complete the net salary cell with hidden inputs as in original
+                    table_html_data += `${Math.round(net_salary)}
+                    <input hidden id="header_cont_${all_users_data.Employee_id}" type="text" value="${top_table_content.replace(/"/g, '&quot;')}">
+                    <input hidden value='${one_user_monthly_total_amount}' id='one_user_monthly_total_amount${all_users_data.Employee_id}'>
+                    <input hidden value='${one_user_monthly_in_out}' id='one_user_monthly_in_out${all_users_data.Employee_id}'>
+                    <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>`;
+
+                    // Add paid amount cell as in original
+                    table_html_data += `<td><input type="text" value="${paid_amt}" style="border:none" id="paid_amount_td${all_users_data.Employee_id}"></td>
+                    <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
+                    <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
+                    <td hidden><input type="text" value="${overtimeHours}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
+                    <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">`;
+
+                    // Add pay/final settlement buttons with same styling as original
+                    if (all_users_data.Paid_Flag == 1) {
+                        table_html_data += `<button class="pay-salary-btn" disabled id='payButton${all_users_data.Employee_id}'>
+                            <i class="fas fa-check-circle"></i> PAID
+                        </button>`;
+                    } else if (
+                        hasTerminationDate &&
+                        terminationDate.getMonth() === selectedMonth &&
+                        terminationDate.getFullYear() === selectedYear
+                    ) {
+                        table_html_data += `<button class="pay-salary-btn" id='payButton${all_users_data.Employee_id}' onclick='paySalary(${all_users_data.Employee_id})'>
+                            <i class="fa-solid fa-indian-rupee-sign"></i> Final Settlement
+                        </button>`;
+                    } else {
+                        table_html_data += `<button class="pay-salary-btn" id='payButton${all_users_data.Employee_id}' onclick='paySalary(${all_users_data.Employee_id})'>
+                            <i class="fa-solid fa-indian-rupee-sign"></i> Pay Salary
+                        </button>`;
+                    }
+
+                    table_html_data += `</td>`;
 
                 // Reset variables for next user
                 leave_holiday_weakly_off_count = 0;
