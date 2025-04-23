@@ -2672,6 +2672,7 @@
                 return;
             }
 
+
             // Format the month input for the backend as "YYYY-MM-DD"
             var monthInput = $('#loan_month').val(); // Format: "2025-03"
             var formattedDate = monthInput + "-01"; // Add day to make it "2025-03-01"
