@@ -80,17 +80,17 @@ $role_masrer = DB::table('role_masrer')
             if(count($dudections_ids) >= 1 ){
                 $a = 1;
 
-foreach ($dudections_ids as $dd_ids) {
-    if(isset($dd_ids->Advance_Ids)){
-        $loanRemaining = DB::table('loan')
-        ->where('Loan_id', $dd_ids->Advance_Ids)
-        ->value('Loan_Remaining');
+            foreach ($dudections_ids as $dd_ids) {
+                if(isset($dd_ids->Advance_Ids)){
+                    $loanRemaining = DB::table('loan')
+                    ->where('Loan_id', $dd_ids->Advance_Ids)
+                    ->value('Loan_Remaining');
 
-        $updated = DB::table('loan')
-      ->where('Loan_id', $dd_ids->Advance_Ids)
-      ->update(['Loan_Remaining' => $loanRemaining - 1000]); // Set to the desired value
-    }
-}
+                    $updated = DB::table('loan')
+                ->where('Loan_id', $dd_ids->Advance_Ids)
+                ->update(['Loan_Remaining' => $loanRemaining - 1000]); // Set to the desired value
+                }
+            }
 
                 $update_deduction =   DB::table('deductions')
                 ->where('Employee_id', $req->emp_id,)

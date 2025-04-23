@@ -90,7 +90,7 @@
                     <i class="fas fa-plus mr-1"></i>Add Bank Account
                     </button>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped" id="account_table">
+                        <table class="table table-bordered table-striped table-hover" id="account_table">
                             <thead>
                             <tr>
                                 <th>Account Holder Name</th>
@@ -594,7 +594,7 @@
                                       <i class="fas fa-plus mr-1"></i>Add Emergency Contact
                                       </button>
                                       <div class="table-responsive">
-                                         <table class="table table-bordered table-striped">
+                                         <table class="table table-bordered table-striped table-hover">
                                             <thead>
                                                <tr>
                                                   <th>Name</th>
@@ -660,23 +660,17 @@
                                                             <i class="fas fa-plus mr-1"></i>Add Basic Salary
                                                         </button>
                                                         <div class="table-responsive" style="height: 500px; overflow-y: auto;">
-                                                            <table class="table table-bordered table-striped" id="basic_salary_table">
-                                                                <!-- The table content will be dynamically populated by the load_basic_salary_data() function -->
+                                                            <table class="table table-bordered table-striped table-hover" id="basic_salary_table">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th><input type="checkbox" name="delet_data" id="select-all-checkbox"></th>
+                                                                        <th><input type="checkbox" id="select_all_checkboxes"></th>
                                                                         <th>Month-Year</th>
                                                                         <th>Payslip Type</th>
-                                                                        <th>₹ Basic Salary</th>
-                                                                        <th width="15%">Actions</th>
+                                                                        <th>Basic Salary (₹)</th>
+                                                                        <th>Actions</th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody>
-                                                                    <!-- Data will be injected here by JavaScript -->
-                                                                    <tr>
-                                                                        <td colspan="5" class="text-center">Loading data...</td>
-                                                                    </tr>
-                                                                </tbody>
+                                                                <tbody></tbody>
                                                             </table>
                                                         </div>
                                                         <div class="mt-2">
@@ -764,19 +758,17 @@
                                                     <div class="tab-pane fade" id="nav-allowances" role="tabpanel">
                                                         <x-adminlte-button label="Add Allowance" theme="success" icon="fas fa-plus" class="mb-3" data-toggle="modal" data-target="#addAllowanceModal" />
                                                         <div class="table-responsive" style="height: 500px; overflow-y: auto;">
-                                                            <table class="table table-bordered table-striped" id="allowances_table">
+                                                            <table class="table table-bordered table-striped table-hover" id="allowances_table">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th><input type="checkbox" name="delet_data" id=""></th>
+                                                                        <th><input type="checkbox" id="select_all_allowances"></th>
                                                                         <th>Month-Year</th>
                                                                         <th>Allowance Title</th>
                                                                         <th>₹ Amount</th>
                                                                         <th width="15%">Actions</th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody>
-                                                                    <!-- Data will be loaded via AJAX -->
-                                                                </tbody>
+                                                                <tbody></tbody>
                                                             </table>
                                                         </div>
                                                     </div>
@@ -842,7 +834,7 @@
                                                             <i class="fas fa-plus mr-1"></i>Add Deduction
                                                         </button>
                                                         <div class="table-responsive" style="height: 500px; overflow-y: auto;">
-                                                            <table class="table table-bordered table-striped" id="Deductions_table">
+                                                            <table class="table table-bordered table-striped table-hover" id="Deductions_table">
                                                                 <thead>
                                                                     <tr>
                                                                         <th><input type="checkbox" name="delet_data" id=""></th>
@@ -946,7 +938,7 @@
                                                             <i class="fas fa-plus mr-1"></i> Add Advance
                                                         </button>
                                                         <div class="table-responsive" style="height: 500px; overflow-y: auto;">
-                                                            <table class="table table-bordered table-striped" id="loan_table">
+                                                            <table class="table table-bordered table-striped table-hover" id="loan_table">
                                                                 <thead>
                                                                     <tr>
                                                                         <th><input type="checkbox" name="delet_data"></th>
@@ -1026,7 +1018,7 @@
                                                                     <hr>
                                                                     <h6 class="text-muted mb-2">Installment Breakdown</h6>
                                                                     <div class="table-responsive">
-                                                                    <table class="table table-bordered table-striped">
+                                                                    <table class="table table-bordered table-striped table-hover">
                                                                         <thead class="thead-dark">
                                                                             <tr>
                                                                                 <th>Sr. No</th>
@@ -1105,7 +1097,7 @@
                                                             <i class="fas fa-plus mr-1"></i>Add Other Payment
                                                         </button>
                                                         <div class="table-responsive">
-                                                            <table class="table table-bordered table-striped" id="other_payments_table">
+                                                            <table class="table table-bordered table-striped table-hover" id="other_payments_table">
                                                                 <thead>
                                                                     <tr>
                                                                         <th><input type="checkbox" name="delet_data" id=""></th>
@@ -1128,7 +1120,7 @@
                                                             <i class="fas fa-plus mr-1"></i>Add Overtime
                                                         </button>
                                                         <div class="table-responsive">
-                                                            <table class="table table-bordered table-striped" id="overtime_table">
+                                                            <table class="table table-bordered table-striped table-hover" id="overtime_table">
                                                                 <thead>
                                                                     <tr>
                                                                         <th><input type="checkbox" name="delet_data" id=""></th>
@@ -1171,7 +1163,7 @@
                                         </button>
 
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped table-hover">
+                                            <table class="table table-bordered table-striped table-hover table-hover" id="leave_table">
                                                 <thead>
                                                     <tr>
                                                         <th><input type="checkbox" name="delet_data" /></th>
@@ -1184,7 +1176,7 @@
                                                         <th width="15%">Actions</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="leave_table">
+                                                <tbody id="leave_table_body">
                                                     <!-- Data will be loaded via AJAX -->
                                                 </tbody>
                                             </table>
@@ -1192,6 +1184,8 @@
                                     </div>
                                 </div>
                             </div>
+
+
 
                             {{-- Leave Application Modal --}}
                             <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="leaveModalLabel" aria-hidden="true">
@@ -1344,7 +1338,7 @@
                                         </button>
 
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" id="Attendance_table">
+                                            <table class="table table-bordered table-striped table-hover" id="Attendance_table">
                                                 <thead>
                                                     <tr>
                                                         <th><input type="checkbox" /></th>
@@ -1353,7 +1347,7 @@
                                                         <th>Out Time</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="Attendance_table_body"> <!-- Changed tbody id for clarity -->
                                                     <!-- Data will be dynamically loaded here via AJAX -->
                                                 </tbody>
                                             </table>
@@ -1413,7 +1407,7 @@
                                         </button>
 
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" id="document_table">
+                                            <table class="table table-bordered table-striped table-hover" id="document_table">
                                                 <thead>
                                                     <tr>
                                                         <th>Document Type</th>
@@ -1441,6 +1435,9 @@
 @stop
 
 @section('css')
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+
 <style>
     .nav-tabs-hightlight .nav-link {
         border-left: 3px solid transparent;
@@ -1484,9 +1481,12 @@
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
 <script>
+
     function open_Deduction_form() {
         $('#deductionModal').modal('show');
     }
@@ -1798,32 +1798,30 @@
     });
 
     function load_allowances_data(url_input) {
-
         $.ajax({
-            url: url_input, // API endpoint URL
-            type: "GET", // HTTP method
+            url: url_input,
+            type: "GET",
             dataType: "json",
             headers: {
                 "Content-Type": "application/json"
             },
-            success: function(response) {
-                console.log("Response:", response); // Log the successful response
-                $("#allowances_table tbody").empty();
+            success: function (response) {
+                const table = $("#allowances_table");
+                const tableBody = table.find("tbody");
+                tableBody.empty();
 
-                // Populate Table Rows
-                var all_data = response.data;
+                const all_data = response.data;
                 all_data.forEach($allowance => {
-                    var row = `
+                    const row = `
                         <tr>
                             <td><input type="checkbox" name="delet_data" id=""></td>
                             <td>${$allowance.Month} ${$allowance.year}</td>
                             <td>${$allowance.Alloweance_Titel}</td>
                             <td>${$allowance.Allowance_Ammount_in_INR}</td>
                             <td>
-                               <button type="button" class="btn btn-sm btn-info" onclick="Allowances_view('${$allowance.id}')">
+                                <button type="button" class="btn btn-sm btn-info" onclick="Allowances_view('${$allowance.id}')">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
-
                                 <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Allowance_form('${$allowance.id}')">
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
@@ -1834,19 +1832,32 @@
                                         data-href="/delete/${$allowance.id}/alloweance">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
-
                             </td>
                         </tr>`;
-                    $("#allowances_table tbody").append(row);
+                    tableBody.append(row);
                 });
 
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error); // Log the error
+                // Re-initialize DataTables (no column mismatch!)
+                if ($.fn.DataTable.isDataTable("#allowances_table")) {
+                    table.DataTable().clear().destroy();
+                }
 
+                table.DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
             }
         });
     }
+
+
 
     function Allowances_view(id) {
         $.ajax({
@@ -1958,7 +1969,7 @@
                             <div class="col-12">
                                 <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
+                                    <table class="table table-bordered table-striped table-hover">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>Sr. No</th>
@@ -2149,69 +2160,60 @@
     load_basic_salary_data("{{url('basic_salary_api/')}}/" + {{$u_data['Employee_id']}})
 
     function load_basic_salary_data(url_input) {
-
         $.ajax({
-            url: url_input,  // API endpoint URL
-            type: "GET",  // HTTP method
+            url: url_input,
+            type: "GET",
             dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Salary Response:", response);  // Handle the successful response here
-                $("#basic_salary_table").empty();
+            success: function (response) {
+                const table = $('#basic_salary_table');
+                const tableBody = table.find('tbody');
+                tableBody.empty(); // Clear old data
 
-                // Table Header
-                var table_html_data = `
-                    <thead>
+                response.data.forEach((salary) => {
+                    const row = `
                         <tr>
-                            <th><input type="checkbox" name="delet_data" id=""></th>
-                            <th>Month-Year</th>
-                            <th>Payslip Type</th>
-                            <th>(₹) Basic Salary</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-                // Populate Table Rows
-                var all_data = response.data;
-                all_data.forEach($salary => {
-                    table_html_data += `
-                        <tr>
-                            <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$salary.month} ${$salary.year}</td>
-                            <td>${$salary.Payslip_Type}</td>
-                            <td>${$salary.Basic_Salary}</td>
-                           <td>
-                                <div class="btn-group btn-group-sm" role="group" aria-label="Basic Salary Actions">
-                                    <button type="button" class="btn btn-info" onclick="basic_salary_view('${$salary.id}')">
+                            <td><input type="checkbox" class="row_checkbox" value="${salary.id}"></td>
+                            <td>${salary.month} ${salary.year}</td>
+                            <td>${salary.Payslip_Type}</td>
+                            <td>${salary.Basic_Salary}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-info" onclick="basic_salary_view('${salary.id}')">
                                         <i class="fa-regular fa-eye"></i>
                                     </button>
-
-                                    <button type="button" class="btn btn-warning B_Salary_a" onclick="open_basic_salary_update_form('${$salary.id}')">
+                                    <button class="btn btn-warning" onclick="open_basic_salary_update_form('${salary.id}')">
                                         <i class="fa-solid fa-pencil"></i>
                                     </button>
-
-                                    <button type="button" class="btn btn-danger" onclick="confirmDeleteSalary('${$salary.id}')">
+                                    <button class="btn btn-danger" onclick="confirmDeleteSalary('${salary.id}')">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
                             </td>
-
                         </tr>`;
+                    tableBody.append(row);
                 });
 
-                table_html_data += `</tbody>`;
-                $("#basic_salary_table").html(table_html_data);
+                // Re-initialize DataTable
+                if ($.fn.DataTable.isDataTable("#basic_salary_table")) {
+                    table.DataTable().clear().destroy();
+                }
 
+                table.DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
             },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);  // Handle the error here
-
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
             }
         });
     }
+
+
 
     function basic_salary_view(id) {
         $("#basicSalaryModal").modal('show'); // Open modal
@@ -2340,7 +2342,7 @@
 
    load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
 
-    function load_deductions_data(url_input) {
+   function load_deductions_data(url_input) {
         $.ajax({
             url: url_input, // API endpoint URL
             type: "GET", // HTTP method
@@ -2350,7 +2352,9 @@
             },
             success: function(response) {
                 console.log("Deduction Response:", response); // Log the successful response
-                $("#Deductions_table").empty();
+
+                // Empty the table body
+                $("#Deductions_table tbody").empty();
 
                 // Table Header
                 var table_html_data = `
@@ -2389,10 +2393,10 @@
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
                                 <button type="button"
-                                    class="btn btn-sm btn-danger"
-                                    data-toggle="modal"
-                                    data-target="#confirmDeleteModal"
-                                    data-href="/delete/${$deduction.id}/deductions">
+                                        class="btn btn-sm btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#confirmDeleteModal"
+                                        data-href="/delete/${$deduction.id}/deductions">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </td>
@@ -2400,36 +2404,27 @@
                 });
 
                 table_html_data += `</tbody>`;
+
+                // Append the data to the table
                 $("#Deductions_table").html(table_html_data);
+
+                // Reinitialize DataTables after data is loaded
+                if ($.fn.DataTable.isDataTable('#Deductions_table')) {
+                    $('#Deductions_table').DataTable().clear().destroy();
+                }
+
+                $('#Deductions_table').DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
 
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
-            }
-        });
-    }
-
-    function Deductions_view(id) {
-        $.ajax({
-            type: "GET",
-            url: "/Deductions/" + id,
-            dataType: "json",
-            success: function(response) {
-                var r_data = response.data;
-                var modalBody = `
-                    <div>
-                        <p><strong>Deduction Title:</strong> ${r_data.deduction_Titel}</p>
-                        <p><strong>Deduction Amount:</strong> ₹${r_data.deduction_Amount_in_INR}</p>
-                        <p><strong>Month:</strong> ${r_data.Month}</p>
-                        <p><strong>Year:</strong> ${r_data.Year}</p>
-                    </div>
-                `;
-
-                $('#deductionViewModal .modal-body').html(modalBody);
-                $('#deductionViewModal').modal('show');
-            },
-            error: function(xhr, status, error) {
-                console.log(xhr.responseText);
             }
         });
     }
@@ -2493,7 +2488,7 @@
                             <td>${loan.Number_of_installment}</td>
                             <td>₹ ${loan.Loan_Amount_in_INR}</td>
                             <td>₹ ${loan.Loan_Remaining}</td>
-                           <td>
+                            <td>
                                 <button class="btn btn-sm btn-info" onclick="loan_view('${loan.id}')"><i class="fas fa-eye"></i></button>
                                 <button type="button" class="btn btn-sm btn-info" onclick="open_loan_modal('${loan.id}')">
                                     <i class="fas fa-edit"></i>
@@ -2503,13 +2498,30 @@
                         </tr>`;
                 });
 
+                // Append the rows to the table
                 $("#loan_view_table").html(table_html_data);
+
+                // Reinitialize DataTables after populating the data
+                if ($.fn.DataTable.isDataTable('#loan_table')) {
+                    $('#loan_table').DataTable().clear().destroy();
+                }
+
+                $('#loan_table').DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
+
             },
             error: function (xhr, status, error) {
                 console.error("Error:", error);
             }
         });
     }
+
 
     // Function to open the loan/advance modal
     function open_loan_modal(id = null) {
@@ -2729,7 +2741,14 @@
             },
             success: function(response) {
                 console.log("Leave Response:", response);
-                $("#leave_table").empty();
+                const $table = $('#leave_table');
+
+                // Destroy existing instance if exists
+                if ($.fn.DataTable.isDataTable($table)) {
+                    $table.DataTable().destroy();
+                }
+
+                $("#leave_table_body").empty();
 
                 let table_rows = '';
                 const all_data = response.data;
@@ -2749,27 +2768,36 @@
                                     <button class="btn btn-sm btn-info" onclick="Leave_view('${$leave.id}')" title="View">
                                         <i class="fas fa-eye"></i>
                                     </button>
-
                                     <button class="btn btn-sm btn-warning" onclick="open_Update_leave_form('${$leave.id}')" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-
                                     <a href="{{ url('/delete') }}/${$leave.id}/_leave" class="btn btn-sm btn-danger" title="Delete">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
-
                                 </div>
                             </td>
                         </tr>`;
                 });
 
-                $("#leave_table").html(table_rows);
+                $("#leave_table_body").html(table_rows);
+
+                // Re-initialize DataTable after populating
+                $table.DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
         });
     }
+
+
 
     function Leave_view(id) {
         $.ajax({
@@ -2892,8 +2920,7 @@
 
     load_attendance_data("{{url('Attendance_view_user_api/')}}/" + {{$u_data['Employee_id']}});
 
-      function load_attendance_data(url_input) {
-
+    function load_attendance_data(url_input) {
         $.ajax({
             url: url_input,
             type: "GET",
@@ -2904,7 +2931,13 @@
             success: function(response) {
                 console.log("Attendance Response:", response);
 
-                // Build table rows only
+                const $table = $('#Attendance_table');
+
+                // Destroy existing DataTable instance before reloading
+                if ($.fn.DataTable.isDataTable($table)) {
+                    $table.DataTable().destroy();
+                }
+
                 var table_html_data = "";
                 var all_data = response.data;
 
@@ -2925,14 +2958,25 @@
                         </tr>`;
                 }
 
-                // Inject only <tbody>
-                $("#Attendance_table tbody").html(table_html_data);
+                // Update only the tbody content
+                $("#Attendance_table_body").html(table_html_data);
+
+                // Reinitialize DataTable
+                $table.DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true
+                });
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
             }
         });
     }
+
 
 
 </script>
