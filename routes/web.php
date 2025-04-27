@@ -113,6 +113,10 @@ Route::get('/emergency-contact/{id}',[formsController::class,'Emergency_Contact'
 Route::get('/edit-emergency-contact/{id}',[formsController::class,'edit_Emergency_Contact'])->name('edit_Emergency_Contact');
 Route::get('/delete-emergency-contact/{id}',[formsController::class,'delete_Emergency_Contact'])->name('delete_Emergency_Contact');
 
+Route::post('/add-penalty',[user_details_Controller::class,'addPenalty'])->name('addPenalty');
+Route::delete('/penalty/{id}', [user_details_Controller::class, 'deletePenalty'])->name('deletePenalty');
+
+
 //
 Route::get('/qualifications-view/{id}',[formsController::class,'qualifications'])->name('qualifications');
 Route::get('/edit-qualifications/{id}',[formsController::class,'edit_qualifications'])->name('edit_qualifications');

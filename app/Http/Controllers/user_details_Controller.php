@@ -530,8 +530,7 @@ history.back();
               $userCount = count($userData);
 
               if ($userCount === 1) {
-
-                  foreach ($userData as $user) {
+                foreach ($userData as $user) {
                       $name = $user->f_name . " " . $user->m_name . " " . $user->l_name;
                       $email = $user->email;
                       $Employee_id = $user->Employee_id;
@@ -775,6 +774,11 @@ history.back();
                           $Department_master = DB::table('department_master')
                           ->get();
 
+                        $penalties = DB::table('penalty_master')
+                          ->where('EmpID', $Employee_id)
+                          ->orderBy('Date_of_Penalty', 'desc')
+                          ->get();
+
                       return view("user_details")
                           ->with('u_data', $dbData)
                           ->with('Department_master', $Department_master)
@@ -809,6 +813,7 @@ history.back();
                           ->with('role_masrer', $role_masrer)
                           ->with('employee_type_master', $employee_type_master)
                           ->with('leave_type_master', $leave_type_master)
+                          ->with('penalties', $penalties)
                           ->with('permissions', $permissions);
               } else {
                   echo "data not found";
@@ -2089,6 +2094,85 @@ history.back()
             }
         }
 
+    }
+
+    public function addPenalty(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required',
+            'amount' => 'required|numeric',
+            'penalty_date' => 'required|date',
+        ]);
+
+        $emp_id = $request->employee_id;
+        $amount = $request->amount;
+        $penalty_date = Carbon::parse($request->penalty_date)->format('Y-m-d');
+        $waived_off = $request->waived_off ?? 0;
+        $waived_off_by = $request->waived_off_by;
+        $waived_on = $request->waived_on ? Carbon::parse($request->waived_on)->format('Y-m-d') : null;
+        $penalty_reason = $request->penalty_reason;
+        $waive_off_reason = $request->waive_off_reason;
+        $penalty_id = $request->penalty_id;
+
+        $final_amount = $amount - $waived_off;
+
+        $paid_total = 0;
+        if ($request->has('payments')) {
+            foreach ($request->payments as $payment) {
+                $paid_total += isset($payment['amount']) ? (float)$payment['amount'] : 0;
+            }
+        }
+        
+        if ($final_amount <= $paid_total) {
+            $payment_status = "success";
+        } else {
+            $payment_status = "pending";
+        }
+        
+        if ($request->has('payments')) {
+            $payments = [];
+            foreach ($request->payments as $payment) {
+                $payments[] = [
+                    'amount' => $payment['amount'],
+                    'date' => $payment['date'],
+                ];
+            }
+            $payments = json_encode($payments);
+        } else {
+            $payments = NULL;
+        }
+
+        $data = [
+            'EmpID' => $emp_id,
+            'Amount' => $amount,
+            'Final_Amount' => $final_amount,
+            'Date_of_Penalty' => $penalty_date,
+            'Waived_Off' => $waived_off,
+            'Waived_off_By' => $waived_off_by,
+            'Waived_On' => $waived_on,
+            'Reason' => $penalty_reason,
+            'Reason_of_Waive_Off' => $waive_off_reason,
+            'payment_status' => $payment_status,
+            'extra_Info' => $payments,
+            'updated_by' => session()->get('EmployeeID'),
+            'updated_at' => now(),
+        ];
+
+        if (empty($penalty_id)) {
+            $data['created_by'] = session()->get('EmployeeID');
+            $data['created_at'] = now();
+            DB::table('penalty_master')->insert($data);
+            return back()->with('success', 'Penalty added successfully.');
+        } else {
+            DB::table('penalty_master')->where('id', $penalty_id)->update($data);
+            return back()->with('success', 'Penalty updated successfully.');
+        }
+    }
+
+    public function deletePenalty($id)
+    {
+        DB::table('penalty_master')->where('id', $id)->delete();
+        return back()->with('success', 'Penalty deleted successfully.');
     }
 
 }

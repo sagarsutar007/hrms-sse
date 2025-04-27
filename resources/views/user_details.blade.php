@@ -643,6 +643,9 @@
                                                         <a class="nav-item nav-link" id="nav-loan-tab" data-toggle="tab" href="#nav-loan" role="tab">
                                                             <i class="fas fa-hand-holding-usd mr-1"></i>Advances
                                                         </a>
+                                                        <a class="nav-item nav-link" id="nav-penalty-tab" data-toggle="tab" href="#nav-penalty" role="tab">
+                                                            <i class="fas fa-receipt mr-1"></i>Penalty
+                                                        </a>
                                                         @if ($role == '1')
                                                         <a class="nav-item nav-link" id="nav-other-payments-tab" data-toggle="tab" href="#nav-other-payments" role="tab">
                                                             <i class="fas fa-coins mr-1"></i>Other Payments
@@ -853,6 +856,164 @@
                                                         </div>
                                                     </div>
 
+                                                    <div class="tab-pane fade pt-0" id="nav-penalty" role="tabpanel">
+                                                        <button class="btn btn-sm btn-success mb-3 float-right" data-toggle="modal" data-target="#penaltyModal">
+                                                            <i class="fas fa-plus mr-1"></i>Add Penalty
+                                                        </button>
+                                                        <form action="{{ route('addPenalty') }}" method="post" id="add_penalty_form" autocomplete="off">
+                                                            @csrf
+                                                            <input type="hidden" name="employee_id" value="{{ $u_data['Employee_id'] ?? '' }}">
+                                                            <input type="hidden" name="penalty_id" id="penalty-id" value="">
+                                                            <div class="modal fade" id="penaltyModal" tabindex="-1" role="dialog" aria-labelledby="penaltyModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header bg-primary p-2">
+                                                                            <h5 class="modal-title text-white" id="penaltyModalLabel"><i class="fas fa-minus-circle mr-2"></i> Add Penalty </h5>
+                                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="row">
+                                                                                <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Amount</span>
+                                                                                    <div class="input-group">
+                                                                                        <div class="input-group-prepend">
+                                                                                            <span class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                                                                                        </div>
+                                                                                        <input type="text" class="form-control" id="penalty-amount" name="amount" value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Penalty Date</span>
+                                                                                    <div class="input-group">
+                                                                                        <div class="input-group-prepend">
+                                                                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                                                                        </div>
+                                                                                        <input type="text" class="form-control" id="penalty-date" name="penalty_date" value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Waived Off Amount</span>
+                                                                                    <div class="input-group">
+                                                                                        <div class="input-group-prepend">
+                                                                                            <span class="input-group-text"><i class="fas fa-money-bill-1"></i></span>
+                                                                                        </div>
+                                                                                        <input type="text" class="form-control" id="waived-off" name="waived_off" value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Waived Off By</span>
+                                                                                    <div class="input-group">
+                                                                                        <div class="input-group-prepend">
+                                                                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                                                        </div>
+                                                                                        <input type="text" class="form-control" id="waived-off-by" name="waived_off_by" value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Waived On</span>
+                                                                                    <div class="input-group">
+                                                                                        <div class="input-group-prepend">
+                                                                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                                                                        </div>
+                                                                                        <input type="text" class="form-control" id="waived-on" name="waived_on" value="">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!-- <div class="col-md-4 mb-3">
+                                                                                    <span class="label">Payment Status</span>
+                                                                                    <br>
+                                                                                    <div class="form-check form-check-inline mt-2">
+                                                                                        <input class="form-check-input" type="radio" name="payment_status" id="paid" value="Paid">
+                                                                                        <label class="form-check-label" for="paid">Paid</label>
+                                                                                    </div>
+                                                                                    <div class="form-check form-check-inline">
+                                                                                        <input class="form-check-input" type="radio" name="payment_status" id="pending" value="Pending" checked>
+                                                                                        <label class="form-check-label" for="pending">Pending</label>
+                                                                                    </div>
+                                                                                </div> -->
+                                                                                <div class="col-md-6 mb-3">
+                                                                                    <span class="label">Penalty Reason</span>
+                                                                                    <textarea class="form-control" name="penalty_reason" id="penalty-reason"></textarea>
+                                                                                </div>
+                                                                                <div class="col-md-6 mb-3">
+                                                                                    <span class="label">Waive Off Reason</span>
+                                                                                    <textarea class="form-control" name="waive_off_reason" id="waive-off-reason"></textarea>
+                                                                                </div>
+                                                                                <div class="col-12 mb-3">
+                                                                                    <label><strong>Payments</strong></label>
+                                                                                    <div id="payment-rows">
+                                                                                        <!-- Payment rows will be added dynamically here -->
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-success float-right mr-3" id="add-payment"><i class="fas fa-plus"></i> Add Payment</button>
+                                                                            <button type="submit" class="btn btn-primary float-right" id="save-penalty-btn">Add Penalty <i class="fas fa-arrow-right ml-1"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered table-striped table-hover" id="penalties_table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sl.</th>
+                                                                        <th>Date</th>
+                                                                        <th>Amount</th>
+                                                                        <th>Reason</th>
+                                                                        <th>Waived Off</th>
+                                                                        <th>Waived On</th>
+                                                                        <th>Payment Status</th>
+                                                                        <th width="15%">Actions</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                @foreach($penalties as $index => $penalty)
+                                                                    @php
+                                                                        $payments = $penalty->extra_Info ? json_decode($penalty->extra_Info, true) : [];
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td>{{ $index + 1 }}</td>
+                                                                        <td>{{ $penalty->Date_of_Penalty }}</td>
+                                                                        <td>{{ $penalty->Amount }}</td>
+                                                                        <td>{{ $penalty->Reason }}</td>
+                                                                        <td>{{ $penalty->Waived_Off }}</td>
+                                                                        <td>{{ $penalty->Waived_On }}</td>
+                                                                        <td>{{ ucfirst($penalty->Payment_Status) }}</td>
+                                                                        <td>
+                                                                            <button 
+                                                                                class="btn btn-sm btn-primary edit-penalty"
+                                                                                data-id="{{ $penalty->id }}"
+                                                                                data-amount="{{ $penalty->Amount }}"
+                                                                                data-date="{{ $penalty->Date_of_Penalty }}"
+                                                                                data-waived="{{ $penalty->Waived_Off }}"
+                                                                                data-waived-by="{{ $penalty->Waived_off_By }}"
+                                                                                data-waived-on="{{ $penalty->Waived_On }}"
+                                                                                data-reason="{{ $penalty->Reason }}"
+                                                                                data-waive-reason="{{ $penalty->Reason_of_Waive_Off }}"
+                                                                                data-payments='@json($payments)'
+                                                                            >
+                                                                                <i class="fas fa-edit"></i>
+                                                                            </button>
+                                                                            <form action="{{ route('deletePenalty', $penalty->id) }}" method="POST" style="display:inline;">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">
+                                                                                    <i class="fas fa-trash"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
 
                                                     <!-- Deduction Form Modal -->
                                                     <div class="modal fade" id="deductionModal" tabindex="-1" role="dialog" aria-labelledby="deductionModalLabel" aria-hidden="true">
@@ -1437,6 +1598,7 @@
 @section('css')
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 <style>
     .nav-tabs-hightlight .nav-link {
@@ -1476,6 +1638,15 @@
     .card-secondary.card-outline {
         border-top: 3px solid #6c757d;
     }
+
+    span.label {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .ui-datepicker {
+        z-index: 9999 !important;
+    }
 </style>
 @stop
 
@@ -1485,6 +1656,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 
     function open_Deduction_form() {
@@ -1496,9 +1668,9 @@
     }
     $(function () {
         // Initialize date picker
-        $('.date').datetimepicker({
-            format: 'YYYY-MM-DD'
-        });
+        // $('.date').datetimepicker({
+        //     format: 'YYYY-MM-DD'
+        // });
 
         // Initialize Select2 for dropdowns
         $('.select2').select2();
@@ -2977,8 +3149,113 @@
             }
         });
     }
+    
+    $(document).ready(function() {
+        $("#penalties_table").DataTable({
+            "columnDefs": [
+                { "orderable": false, "targets": -1 }
+            ]
+        });
 
+        $('#penaltyModal').on('shown.bs.modal', function() {
+            $("#penalty-date, #waived-on, .payment-date").datepicker({
+                dateFormat: "dd-mm-yy",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2000:2035"
+            });
+        });
 
+        let paymentIndex = 1;
+
+        function createPaymentRow(payment = { amount: '', date: '' }) {
+            const html = `
+                <div class="row payment-row mb-2">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+                            </div>
+                            <input type="text" name="payments[${paymentIndex}][amount]" class="form-control" placeholder="Paid Amount" value="${payment.amount}">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                            </div>
+                            <input type="text" name="payments[${paymentIndex}][date]" class="form-control payment-date" placeholder="Paid Date" value="${payment.date}">
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-payment"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            
+            paymentIndex++;
+            return html;
+        }
+
+        $('#add-payment').click(function() {
+            $('#payment-rows').append(createPaymentRow());
+
+            $(".payment-date").datepicker({
+                dateFormat: "dd-mm-yy",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2000:2035"
+            });
+        });
+
+        $(document).on('click', '.remove-payment', function() {
+            $(this).closest('.payment-row').remove();
+        });
+
+        $('.edit-penalty').on('click', function() {
+            $('#penalty-id').val($(this).data('id'));
+            $('#penalty-amount').val($(this).data('amount'));
+            $('#penalty-date').val($(this).data('date'));
+            $('#waived-off').val($(this).data('waived'));
+            $('#waived-off-by').val($(this).data('waived-by'));
+            $('#waived-on').val($(this).data('waived-on'));
+            $('#penalty-reason').val($(this).data('reason'));
+            $('#waive-off-reason').val($(this).data('waive-reason'));
+            
+            $('#penaltyModalLabel').html('<i class="fas fa-edit mr-2"></i> Edit Penalty');
+            $('#save-penalty-btn').html('Update Penalty <i class="fas fa-save ml-1"></i>');
+
+            // Reset old payments
+            $('#payment-rows').empty();
+            paymentIndex = 1;
+
+            let payments = $(this).data('payments');
+            if (payments && payments.length > 0) {
+                payments.forEach(function(payment) {
+                    $('#payment-rows').append(createPaymentRow(payment));
+                });
+
+                $(".payment-date").datepicker({
+                    dateFormat: "dd-mm-yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "2000:2035"
+                });
+            }
+
+            $('#penaltyModal').modal('show');
+        });
+
+        $('[data-target="#penaltyModal"]').on('click', function() {
+            $('#add_penalty_form')[0].reset();
+            $('#penalty-id').val('');
+            $('#payment-rows').empty();
+            paymentIndex = 1;
+            $('#payment-rows').append(createPaymentRow());
+
+            $('#penaltyModalLabel').html('<i class="fas fa-minus-circle mr-2"></i> Add Penalty');
+            $('#save-penalty-btn').html('Add Penalty <i class="fas fa-arrow-right ml-1"></i>');
+        });
+    });
 
 </script>
 @stop
