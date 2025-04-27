@@ -2118,12 +2118,18 @@ history.back()
 
         $paid_total = 0;
         if ($request->has('payments')) {
+            $paid_total = 0;
             foreach ($request->payments as $payment) {
                 $paid_total += isset($payment['amount']) ? (float)$payment['amount'] : 0;
             }
+            $final_amount = $amount - $waived_off;
+            $remaining_amount = $final_amount - $paid_total;
+        } else {
+            $final_amount = $amount - $waived_off;
+            $remaining_amount = $final_amount;
         }
         
-        if ($final_amount <= $paid_total) {
+        if ($remaining_amount <= 0) {
             $payment_status = "success";
         } else {
             $payment_status = "pending";
@@ -2145,7 +2151,7 @@ history.back()
         $data = [
             'EmpID' => $emp_id,
             'Amount' => $amount,
-            'Final_Amount' => $final_amount,
+            'Final_Amount' => $remaining_amount,
             'Date_of_Penalty' => $penalty_date,
             'Waived_Off' => $waived_off,
             'Waived_off_By' => $waived_off_by,
