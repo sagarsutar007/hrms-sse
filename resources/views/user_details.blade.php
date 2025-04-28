@@ -668,7 +668,6 @@
                                                                     <tr>
                                                                         <th><input type="checkbox" id="select_all_checkboxes"></th>
                                                                         <th>Month-Year</th>
-                                                                        <th>Payslip Type</th>
                                                                         <th>Basic Salary (₹)</th>
                                                                         <th>Actions</th>
                                                                     </tr>
@@ -946,7 +945,7 @@
                                                                                 </div>
 
                                                                             </div>
-                                                                            
+
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-success float-right mr-3" id="add-payment"><i class="fas fa-plus"></i> Add Payment</button>
@@ -985,27 +984,32 @@
                                                                         <td>{{ $penalty->Waived_On }}</td>
                                                                         <td>{{ ucfirst($penalty->Payment_Status) }}</td>
                                                                         <td>
-                                                                            <button 
-                                                                                class="btn btn-sm btn-primary edit-penalty"
-                                                                                data-id="{{ $penalty->id }}"
-                                                                                data-amount="{{ $penalty->Amount }}"
-                                                                                data-date="{{ $penalty->Date_of_Penalty }}"
-                                                                                data-waived="{{ $penalty->Waived_Off }}"
-                                                                                data-waived-by="{{ $penalty->Waived_off_By }}"
-                                                                                data-waived-on="{{ $penalty->Waived_On }}"
-                                                                                data-reason="{{ $penalty->Reason }}"
-                                                                                data-waive-reason="{{ $penalty->Reason_of_Waive_Off }}"
-                                                                                data-payments='@json($payments)'
-                                                                            >
-                                                                                <i class="fas fa-edit"></i>
-                                                                            </button>
-                                                                            <form action="{{ route('deletePenalty', $penalty->id) }}" method="POST" style="display:inline;">
-                                                                                @csrf
-                                                                                @method('DELETE')
-                                                                                <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">
-                                                                                    <i class="fas fa-trash"></i>
+                                                                            @if($penalty->Payment_Status !== 'success')
+                                                                                <button
+                                                                                    class="btn btn-sm btn-primary edit-penalty"
+                                                                                    data-id="{{ $penalty->id }}"
+                                                                                    data-amount="{{ $penalty->Amount }}"
+                                                                                    data-date="{{ $penalty->Date_of_Penalty }}"
+                                                                                    data-waived="{{ $penalty->Waived_Off }}"
+                                                                                    data-waived-by="{{ $penalty->Waived_off_By }}"
+                                                                                    data-waived-on="{{ $penalty->Waived_On }}"
+                                                                                    data-reason="{{ $penalty->Reason }}"
+                                                                                    data-waive-reason="{{ $penalty->Reason_of_Waive_Off }}"
+                                                                                    data-payments='@json($payments)'
+                                                                                >
+                                                                                    <i class="fas fa-edit"></i>
                                                                                 </button>
-                                                                            </form>
+
+                                                                                <form action="{{ route('deletePenalty', $penalty->id) }}" method="POST" style="display:inline;">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">
+                                                                                        <i class="fas fa-trash"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                            @else
+                                                                                <span class="badge bg-success">Paid</span>
+                                                                            @endif
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
@@ -2346,7 +2350,6 @@
                         <tr>
                             <td><input type="checkbox" class="row_checkbox" value="${salary.id}"></td>
                             <td>${salary.month} ${salary.year}</td>
-                            <td>${salary.Payslip_Type}</td>
                             <td>${salary.Basic_Salary}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
@@ -2355,9 +2358,6 @@
                                     </button>
                                     <button class="btn btn-warning" onclick="open_basic_salary_update_form('${salary.id}')">
                                         <i class="fa-solid fa-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-danger" onclick="confirmDeleteSalary('${salary.id}')">
-                                        <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
                             </td>
@@ -2549,6 +2549,27 @@
                     const againstAdvance = ($deduction.Advance_Ids && $deduction.Advance_Ids != 0) ? "Yes" : "No";
                     const paidFlag = ($deduction.Deduction_Paid_Flag == 1) ? "Yes" : "No";
 
+                    // Conditional buttons based on paid flag
+                    let actionButtons = `
+                        <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>`;
+
+                    // Only show edit and delete buttons if Deduction_Paid_Flag is not 1
+                    if ($deduction.Deduction_Paid_Flag != 1) {
+                        actionButtons += `
+                            <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#confirmDeleteModal"
+                                    data-href="/delete/${$deduction.id}/deductions">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>`;
+                    }
+
                     table_html_data += `
                         <tr>
                             <td><input type="checkbox" name="delet_data" id=""></td>
@@ -2557,21 +2578,7 @@
                             <td>${$deduction.deduction_Amount_in_INR}</td>
                             <td>${againstAdvance}</td>
                             <td>${paidFlag}</td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </button>
-                                <button type="button"
-                                        class="btn btn-sm btn-danger"
-                                        data-toggle="modal"
-                                        data-target="#confirmDeleteModal"
-                                        data-href="/delete/${$deduction.id}/deductions">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </td>
+                            <td>${actionButtons}</td>
                         </tr>`;
                 });
 
@@ -2593,13 +2600,62 @@
                     autoWidth: false,
                     info: true
                 });
-
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error); // Log the error
             }
         });
     }
+
+    function Deductions_view(id) {
+        $.ajax({
+            url: "{{ url('/Deductions') }}/" + id,
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                const deduction = response.data;
+
+                // Build the HTML content dynamically
+                const viewContent = `
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Deduction Amount:</strong> ₹ ${deduction.deduction_Amount_in_INR || '0'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Year:</strong> ${deduction.Year || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Deduction Title:</strong> ${deduction.deduction_Titel || 'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Month:</strong> ${deduction.Month || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Paid:</strong> ${deduction.Deduction_Paid_Flag == 1 ? 'Yes' : 'No'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Against Advance:</strong> ${deduction.Advance_Ids && deduction.Advance_Ids != 0 ? 'Yes' : 'No'}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Set the content inside the modal body
+                $("#deductionViewModal .modal-body").html(viewContent);
+
+                // Show the modal
+                $("#deductionViewModal").modal("show");
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching deduction details:", error);
+                alert("Unable to fetch deduction details. Please try again.");
+            }
+        });
+    }
+
 
 
     function open_Update_Deduction_form(id) {
@@ -3149,7 +3205,7 @@
             }
         });
     }
-    
+
     $(document).ready(function() {
         $("#penalties_table").DataTable({
             "columnDefs": [
@@ -3191,7 +3247,7 @@
                         <button type="button" class="btn btn-danger btn-sm remove-payment"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
-            
+
             paymentIndex++;
             return html;
         }
@@ -3220,7 +3276,7 @@
             $('#waived-on').val($(this).data('waived-on'));
             $('#penalty-reason').val($(this).data('reason'));
             $('#waive-off-reason').val($(this).data('waive-reason'));
-            
+
             $('#penaltyModalLabel').html('<i class="fas fa-edit mr-2"></i> Edit Penalty');
             $('#save-penalty-btn').html('Update Penalty <i class="fas fa-save ml-1"></i>');
 

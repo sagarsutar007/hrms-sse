@@ -660,6 +660,10 @@
         headers: {
             "Content-Type": "application/json"
         },
+        data: {
+            empId: {{ $_GET['employee_id'] ?? 'null' }},
+        },
+
         success: function(response) {
             console.log("Response:", response);
             $("#result").empty();
@@ -781,6 +785,7 @@
                     <th>Over Time (in INR)</th>
                     <th>Loan / Advance(in INR)</th>
                     <th>Deduction</th>
+                    <th>Penalty</th>
                     <th>Arrear</th>
                     <th>Arrear Reason</th>
                     <th>Daily_Rate</th>
@@ -1264,6 +1269,17 @@
                     }
                     table_html_data += `${deductions_amount}</td>`;
 
+                    // Add penalty column
+                    table_html_data += `<td id="penalty_amount${all_users_data.Employee_id}">`;
+                    if (penalty_data != null) {
+                        penalty_data.forEach(penalty => {
+                            if (penalty.EmpID === all_users_data.Employee_id) {
+                                Penalty += parseInt(penalty.Final_Amount);
+                            }
+                        });
+                    }
+                    table_html_data += `${Penalty}</td>`;
+
                     // Add arrear columns exactly as in original
                     table_html_data += `<td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
                                     <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>`;
@@ -1296,7 +1312,7 @@
                         <th colspan='2'>Employee Information</th>
                         <th colspan='2'>Attendance Details</th>
                         <th colspan='2'>Overtime</th>
-                        <th colspan='2'>Loan/ Advance/Deductions/Arrear Details</th>
+                        <th colspan='3'>Deductions & Additions</th>
                         <th colspan='2'>Salary Details</th></tr>
                     <tr><td>Name</td> <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
                     <td>Total Days</td><td>${calculationWorkingDays}</td> <td>Overtime (Hours)</td><td>${overtimeHours}</td><td>Loan/Advance (INR)</td><td>${advance}</td>
@@ -1308,13 +1324,18 @@
                     <tr> <td>Shift Hours</td> <td>${all_users_data.Shift_hours}</td>
                     <td>Days Worked</td><td>${Work}</td>
                     <td>Overtime (INR)</td><td>${Total_OT_Amount.toFixed(2)}</td>
-                    <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
+                    <td>Penalty</td><td>${Penalty}</td>
                     <td>Net Salary (INR)</td><td>${Math.round(net_salary)}</td> </tr>
                     <tr> <td colspan='2'></td>
                     <td>Days Absent</td><td>${Absent_count}</td>
                     <td colspan='2'></td>
-                    <td>Arrear Reason</td><td>${all_users_data.Arrear_Reasons ?? " "}</td>
+                    <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
                     <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
+                    </tr>
+                    <tr>
+                    <td colspan='2'></td>
+                    <td colspan='4'></td>
+                    <td>Arrear Reason</td><td colspan='3'>${all_users_data.Arrear_Reasons ?? " "}</td>
                     </tr>
                     ${terminationInfo}`;
 
@@ -1333,6 +1354,7 @@
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${overtimeHours}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
+                    <td hidden><input type="text" value="${Penalty}" style="border:none" id="penalty_amt${all_users_data.Employee_id}" hidden></td>
                     <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">`;
 
                     // Add pay/final settlement buttons with same styling as original
@@ -1426,7 +1448,13 @@
                     }
                 },
                 "stateSave": true,
-                "fixedHeader": true
+                "fixedHeader": true,
+
+                // Adding initComplete callback
+                "initComplete": function(settings, json) {
+                    // This runs after DataTables has fully initialized
+                    highlightEmployeeRow();
+                }
             });
         },
         error: function(xhr, status, error) {
@@ -1441,6 +1469,97 @@
 setInterval(() => {
     hide_animation();
 }, 1000);
+
+
+    // Add this function to your script
+    function highlightEmployeeRow() {
+        // Get employee_id from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('employee_id');
+
+        if (employeeId) {
+            // First delay to ensure the table is fully loaded
+            setTimeout(() => {
+                // Find the row for this employee (try both with and without # prefix)
+                const employeeRow = document.getElementById(`users_data_row${employeeId}`) ||
+                                document.querySelector(`tr[id="users_data_row${employeeId}"]`);
+
+                if (employeeRow) {
+                    // Add highlighting class
+                    employeeRow.classList.add('highlighted-employee');
+
+                    // Scroll to the row
+                    employeeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Add visual indicator that this is a focused view
+                    const notice = document.createElement('div');
+                    notice.className = 'alert alert-info mt-2 mb-2';
+                    notice.innerHTML = `<strong>Focused View:</strong> Showing details for Employee ID ${employeeId}`;
+                    document.querySelector('#result').prepend(notice);
+                } else {
+                    // Try again with a longer delay if the table is still loading
+                    setTimeout(() => {
+                        const retryRow = document.getElementById(`users_data_row${employeeId}`) ||
+                                        document.querySelector(`tr[id="users_data_row${employeeId}"]`);
+
+                        if (retryRow) {
+                            retryRow.classList.add('highlighted-employee');
+                            retryRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            console.error(`Employee row with ID ${employeeId} not found in the table.`);
+                        }
+                    }, 1500);
+                }
+            }, 500);
+        }
+    }
+
+    // Add CSS for the highlighted row
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            .highlighted-employee {
+                background-color: #ffffd0 !important; /* Light yellow highlight */
+                outline: 2px solid #ffc107;
+                font-weight: bold;
+            }
+
+            .highlighted-employee td {
+                position: relative;
+                z-index: 1;
+            }
+
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+                70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+            }
+
+            .highlighted-employee {
+                animation: pulse 2s infinite;
+            }
+        </style>
+    `);
+
+    // Call the highlighting function after the table is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Your existing code to load the table data
+
+        // Call highlightEmployeeRow function after the AJAX call completes
+        const originalSuccess = $.ajax;
+        $.ajax = function(options) {
+            if (options.url && options.url.includes('salary-calculations')) {
+                const originalSuccessCallback = options.success;
+                options.success = function(response) {
+                    if (originalSuccessCallback) {
+                        originalSuccessCallback(response);
+                    }
+                    // After table is created, highlight the employee row
+                    highlightEmployeeRow();
+                };
+            }
+            return originalSuccess.apply(this, arguments);
+        };
+    });
 
 
 

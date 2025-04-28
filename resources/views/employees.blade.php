@@ -296,28 +296,28 @@
 </div>
 
 <!-- Final Settlement Modal -->
+<!-- Final Settlement Modal -->
 <div class="modal fade" id="finalSettlementModal" tabindex="-1" aria-labelledby="finalSettlementLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form id="finalSettlementForm" method="POST" action="{{ route('final.settlement') }}">
-        @csrf
-        <input type="hidden" name="user_id" id="finalUserId">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="finalSettlementLabel">Final Settlement</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to proceed with final settlement for this employee?</p>
-            <!-- Optional: Add final amount, remarks, etc. -->
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Proceed</button>
-          </div>
-        </div>
-      </form>
+        <form id="finalSettlementForm" method="POST" action="{{ route('final.settlement') }}">
+            @csrf
+            <input type="hidden" name="user_id" id="finalUserId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="finalSettlementLabel">Final Settlement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to proceed with final settlement for this employee?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Proceed</button>
+                </div>
+            </div>
+        </form>
     </div>
-  </div>
+</div>
 
 @stop
 
@@ -449,6 +449,52 @@
                     next: 'Next'
                 }
             }
+        });
+
+
+        // Update your form submission code
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up the click handler for the final settlement buttons
+            document.querySelectorAll('.final-settlement-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    document.getElementById('finalUserId').value = userId;
+                });
+            });
+
+            // Set up the form submission
+            document.getElementById('finalSettlementForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const userId = document.getElementById('finalUserId').value;
+
+                // Get the CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('user_id', userId);
+                formData.append('_token', csrfToken);
+
+                // Submit the form
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    // Important: Don't set Content-Type header when using FormData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Here's the key part - actually redirect the browser
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.message || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
         });
 
         // Handle view employee click (open modal)
@@ -856,7 +902,21 @@
     $(document).on('click', '.final-settlement', function () {
         var userId = $(this).data('id');
         $('#finalUserId').val(userId);
-        $('#finalSettlementModal').modal('show');
+
+        // Check which Bootstrap version is being used
+        if (typeof bootstrap !== 'undefined') {
+            // Bootstrap 5
+            var myModal = new bootstrap.Modal(document.getElementById('finalSettlementModal'));
+            myModal.show();
+        } else {
+            // Bootstrap 4 and earlier
+            $('#finalSettlementModal').modal('show');
+        }
+    });
+
+    // Add this code to handle the modal close button properly
+    $(document).on('click', '[data-bs-dismiss="modal"]', function() {
+        $('#finalSettlementModal').modal('hide');
     });
 
 </script>

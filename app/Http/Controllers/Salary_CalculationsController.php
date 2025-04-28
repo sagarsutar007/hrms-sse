@@ -74,6 +74,37 @@ class Salary_CalculationsController extends Controller
         }
     }
 
+    public function finalSettlement(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'user_id' => 'required'
+        ]);
+
+        $userId = $request->input('user_id');
+
+        // Get the user and their termination date
+        $user = DB::table('all_users')
+            ->where('id', $userId)
+            ->first();
+
+        if (!$user || !$user->termination_date) {
+            return redirect()->back()->with('error', 'User not found or has no termination date');
+        }
+
+        // Extract month and year from termination date
+        $terminationDate = new \DateTime($user->termination_date);
+        $month = $terminationDate->format('m');
+        $year = $terminationDate->format('Y');
+
+        // Redirect directly to the salary calculations page
+        return redirect()->route('Salary_Calculations', [
+            'month' => $month,
+            'year' => $year,
+            'employee_id' => $user->Employee_id
+        ]);
+    }
+
 
     public function Salary_Calculations_api(Request $req) {
     $EmployeesID = session()->get('EmployeeID');
@@ -83,9 +114,32 @@ class Salary_CalculationsController extends Controller
     $cYear = $currentYear;
     $cMonth = $currentMonth;
 
+    $employee_id = $req->empId ?? null;
+
     if (isset($EmployeesID)) {
         // User data query looks good
-        $user_data = DB::table('all_users')
+        // $user_data = DB::table('all_users')
+        //     ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
+        //     ->leftJoin('arrear_table', function ($join) use ($cYear, $cMonth) {
+        //         $join->on('all_users.Employee_id', '=', 'arrear_table.Employee_id')
+        //             ->whereYear('arrear_table.Arrear_Month', '=', $cYear)
+        //             ->whereMonth('arrear_table.Arrear_Month', '=', $cMonth);
+        //     })
+        //     ->orderBy('all_users.Employee_id', 'asc')
+        //     ->select(
+        //         'all_users.*',
+        //         'shift_master.Shift_hours',
+        //         'shift_master.Shift_Name',
+        //         'arrear_table.Arrear_Amount',
+        //         'arrear_table.Arrear_Reasons',
+        //         'arrear_table.Paid_Flag',
+        //         'arrear_table.Paid_Amount'
+        //     )
+        //     ->paginate($req->limit);
+
+        //     $employee_id = $_GET['empId'];
+
+        $query = DB::table('all_users')
             ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
             ->leftJoin('arrear_table', function ($join) use ($cYear, $cMonth) {
                 $join->on('all_users.Employee_id', '=', 'arrear_table.Employee_id')
@@ -101,8 +155,16 @@ class Salary_CalculationsController extends Controller
                 'arrear_table.Arrear_Reasons',
                 'arrear_table.Paid_Flag',
                 'arrear_table.Paid_Amount'
-            )
-            ->paginate($req->limit);
+            );
+
+        // Check if employee_id is not null, then apply the filter
+        if (!empty($employee_id)) {
+            $query->where('all_users.Employee_id', $employee_id);
+        }
+
+        // Get the paginated results
+        $user_data = $query->paginate($req->limit);
+
 
         // THIS IS THE KEY FIX - Corrected attendance query to properly get all attendance records
         $attendance_info_data = DB::table('all_attandencetable as a')

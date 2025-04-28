@@ -241,10 +241,15 @@ Route::get('/downloade-Id-cards',[downloade_id_cards_controller::class,'download
 Route::post('/downloade-Id-cards',[downloade_id_cards_controller::class,'limit_for_daownload_id'])->name('limit_for_daownload_id');
 Route::get('/downloade-selected-id-cards/{search_input}',[downloade_id_cards_controller::class,'downloade_selected_id_cards'])->name('downloade_selected_id_cards');
 Route::get('/dounloade-user-id-catd/{id}',[downloade_id_cards_controller::class,'dounloade_user_id_catd'])->name('dounloade_user_id_catd');
+Route::get('/dounloade-user-id-catd/{ids}', [downloade_id_cards_controller::class, 'dounloade_user_id_catd'])
+    ->name('dounloade_user_id_catd');
 Route::get('/salary-calculations',[Salary_CalculationsController::class,'Salary_Calculations'])->name('Salary_Calculations');
 Route::get('/salary-calculations-api/{limit}/{month}/{year}',[Salary_CalculationsController::class,'Salary_Calculations_api'])->name('Salary_Calculations_api');
 Route::get('/salary-calculations-short-api/{limit}/{month}/{year}/{short_by}/{method}',[Salary_CalculationsController::class,'salary_calculations_short_api'])->name('salary_calculations_short_api');
 Route::get('/salary-calculations-short-search-api/{limit}/{month}/{year}/{search_inp}',[Salary_CalculationsController::class,'Salary_Calculations_search_api'])->name('Salary_Calculations_search_api');
+
+Route::post('/final-settlement', [Salary_CalculationsController::class, 'finalSettlement'])->name('final.settlement');
+
 // report
 Route::get('/report-1',[Salary_CalculationsController::class,'report_1'])->name('report_1');
 
