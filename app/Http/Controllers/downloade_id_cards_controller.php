@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class downloade_id_cards_controller extends Controller
 {
-    public function downloade_Id_cards() {
+    public function downloade_Id_cards($id) {
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
 
@@ -15,12 +15,20 @@ class downloade_id_cards_controller extends Controller
             $user_data = DB::table('all_users')
                 ->join('role_masrer', 'role_masrer.id', '=', 'all_users.Role')
                 ->select('all_users.*', 'role_masrer.roles')
-                ->where('all_users.role', '>', 1)
-                ->get();
+                ->where('all_users.role', '>', 1);
+
+            // Filter by selected IDs
+            if($id != 'all') {
+                $selectedIds = explode(',', $id);
+                $user_data = $user_data->whereIn('all_users.id', $selectedIds);
+            }
+
+            $user_data = $user_data->get();
 
             return view("downloade_Id_cards")
                 ->with('user_data', $user_data)
-                ->with('role', $role);
+                ->with('role', $role)
+                ->with('selectedIds', $id != 'all' ? explode(',', $id) : []);
         } else {
             return redirect()->route('login');
         }

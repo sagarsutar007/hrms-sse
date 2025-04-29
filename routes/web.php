@@ -238,6 +238,8 @@ Route::get('/bulk-uploade',[bulk_uoploade_controller::class,'bulk_uoploade_view'
 Route::post('/bulk-uploade',[bulk_uoploade_controller::class,'bulk_uoploade_request'])->name('bulk_uoploade_request');
 //downloade Id cards
 Route::get('/downloade-Id-cards',[downloade_id_cards_controller::class,'downloade_Id_cards'])->name('downloade_Id_cards');
+Route::get('/downloade-Id-cards/{id}', [downloade_id_cards_controller::class, 'downloade_Id_cards'])->name('downloade_Id_cards');
+Route::get('/downloade-Id-cards/{id}',[downloade_id_cards_controller::class,'downloade_Id_cards'])->name('downloade_Id_cards');
 Route::post('/downloade-Id-cards',[downloade_id_cards_controller::class,'limit_for_daownload_id'])->name('limit_for_daownload_id');
 Route::get('/downloade-selected-id-cards/{search_input}',[downloade_id_cards_controller::class,'downloade_selected_id_cards'])->name('downloade_selected_id_cards');
 Route::get('/dounloade-user-id-catd/{id}',[downloade_id_cards_controller::class,'dounloade_user_id_catd'])->name('dounloade_user_id_catd');

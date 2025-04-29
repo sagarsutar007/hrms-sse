@@ -1988,10 +1988,38 @@
 
                 const all_data = response.data;
                 all_data.forEach($allowance => {
+                    // Format month name properly
+                    const monthNames = ["January", "February", "March", "April", "May", "June",
+                                       "July", "August", "September", "October", "November", "December"];
+                    let monthName = "";
+                    let yearValue = $allowance.year;
+
+                    // Check if Month is in YYYY-MM format
+                    if (String($allowance.Month).includes("-")) {
+                        const dateParts = String($allowance.Month).split("-");
+                        if (dateParts.length === 2) {
+                            // If already in YYYY-MM format, extract month
+                            const monthIndex = parseInt(dateParts[1]) - 1;
+                            yearValue = dateParts[0]; // Use year from the date string
+                            if (monthIndex >= 0 && monthIndex < 12) {
+                                monthName = monthNames[monthIndex];
+                            }
+                        }
+                    } else if (!isNaN($allowance.Month)) {
+                        // Handle if it's just a month number
+                        const monthIndex = parseInt($allowance.Month) - 1;
+                        if (monthIndex >= 0 && monthIndex < 12) {
+                            monthName = monthNames[monthIndex];
+                        }
+                    } else {
+                        // Already a month name
+                        monthName = $allowance.Month;
+                    }
+
                     const row = `
                         <tr>
                             <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$allowance.Month} ${$allowance.year}</td>
+                            <td>${monthName} ${yearValue}</td>
                             <td>${$allowance.Alloweance_Titel}</td>
                             <td>${$allowance.Allowance_Ammount_in_INR}</td>
                             <td>
@@ -2346,24 +2374,40 @@
                 tableBody.empty(); // Clear old data
 
                 response.data.forEach((salary) => {
-                    const row = `
-                        <tr>
-                            <td><input type="checkbox" class="row_checkbox" value="${salary.id}"></td>
-                            <td>${salary.month} ${salary.year}</td>
-                            <td>${salary.Basic_Salary}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-info" onclick="basic_salary_view('${salary.id}')">
-                                        <i class="fa-regular fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-warning" onclick="open_basic_salary_update_form('${salary.id}')">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
-                    tableBody.append(row);
-                });
+                // Convert numeric month to name
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"];
+
+                const parts = salary.month.split("-"); // e.g., "2024-03"
+                const year = salary.year;
+                let monthName = "Invalid";
+
+                if (parts.length === 2) {
+                    const monthIndex = parseInt(parts[1], 10) - 1; // Convert "03" to 2
+                    if (monthIndex >= 0 && monthIndex < 12) {
+                        monthName = monthNames[monthIndex];
+                    }
+                }
+
+                const row = `
+                    <tr>
+                        <td><input type="checkbox" class="row_checkbox" value="${salary.id}"></td>
+                        <td>${monthName} ${year}</td>
+                        <td>${salary.Basic_Salary}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-info" onclick="basic_salary_view('${salary.id}')">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning" onclick="open_basic_salary_update_form('${salary.id}')">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+
 
                 // Re-initialize DataTable
                 if ($.fn.DataTable.isDataTable("#basic_salary_table")) {

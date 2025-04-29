@@ -732,7 +732,6 @@
             $('.employee-checkbox').prop('checked', $(this).prop('checked'));
         });
 
-        // Download selected ID cards
         $('#download-selected').on('click', function() {
             let selectedIds = [];
             $('.employee-checkbox:checked').each(function() {
@@ -740,7 +739,8 @@
             });
 
             if (selectedIds.length > 0) {
-                window.location.href = "{{ url('dounloade-user-id-catd') }}/" + selectedIds.join(',');
+                // Use the correct route with IDs in the URL segment as expected by your route definition
+                window.location.href = "{{ route('downloade_Id_cards', ['id' => 'placeholder']) }}".replace('placeholder', selectedIds.join(','));
             } else {
                 Swal.fire({
                     icon: 'warning',
@@ -749,6 +749,7 @@
                 });
             }
         });
+
 
         // Bulk delete
         $('#bulk-delete').on('click', function() {
