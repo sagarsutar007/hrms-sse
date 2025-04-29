@@ -436,289 +436,363 @@
     }
 
     function attendance_data_set(url_input) {
-        // Show loading spinner
-        $("#result").html('<div class="d-flex justify-content-center p-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>');
+    // Show loading spinner
+    $("#result").html('<div class="d-flex justify-content-center p-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>');
 
-        $.ajax({
-            url: url_input,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                $("#result").empty();
-                var count_flag = 1;
-                var all_data = response.data;
-                var role_number = $("#role_number").val();
-                var data_count = 1;
+    $.ajax({
+        url: url_input,
+        type: "GET",
+        dataType: "json",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        success: function(response) {
+            $("#result").empty();
+            var count_flag = 1;
+            var all_data = response.data;
+            var role_number = $("#role_number").val();
+            var data_count = 1;
 
-                // Variables for calculations
-                var Working_Day, Work, Absent, Over_Time, Over_Time_in_INR, Advance, Deduction, Penalty, Monthly_Salary, Net_Salary;
-                Work = 0;
-                Over_Time = 0;
-                Over_Time_in_INR = 0;
-                Working_Day = set_last_date;
-                var deductions_amount = 0;
-                var Penalty = 0;
-                var advance = 0;
-                var monthaly_salary = 0;
-                var net_salary = 0;
-                var Day_Total_Amount = 0;
-                var Over_Ttime_Rate = 0;
-                var Swap_Day_array_data = 0;
-                var Public_Holiday_array_data = 0;
-                var Daily_Rate = 0;
-                var leave_color = "";
-                var Half_Day_Leave = 0;
-                var Payment_Status = "";
-                var Short_Name = "";
-                var OT_Amt = 0;
-                var Daily_Amt = 0;
-                var Total_OT_Amount = 0;
-                var Total_Amount = 0;
-                var Total_all_day_Amount = 0;
-                var Weekly_Off_array_data = 0;
+            // Variables for calculations
+            var Working_Day, Work, Absent, Over_Time, Over_Time_in_INR, Advance, Deduction, Penalty, Monthly_Salary, Net_Salary;
+            Work = 0;
+            Over_Time = 0;
+            Over_Time_in_INR = 0;
+            Working_Day = set_last_date;
+            var deductions_amount = 0;
+            var Penalty = 0;
+            var advance = 0;
+            var monthaly_salary = 0;
+            var net_salary = 0;
+            var Day_Total_Amount = 0;
+            var Over_Ttime_Rate = 0;
+            var Swap_Day_array_data = 0;
+            var Public_Holiday_array_data = 0;
+            var Daily_Rate = 0;
+            var leave_color = "";
+            var Half_Day_Leave = 0;
+            var Payment_Status = "";
+            var Short_Name = "";
+            var OT_Amt = 0;
+            var Daily_Amt = 0;
+            var Total_OT_Amount = 0;
+            var Total_Amount = 0;
+            var Total_all_day_Amount = 0;
+            var Weekly_Off_array_data = 0;
+            var final_amount_before_arrear = 0; // New variable for final amount before arrear
 
-                var all_users_data = response.all_users.data;
-                var all_attandance_data = response.attendance_info_data;
-                var deductions_data = response.deductions;
-                var penalty_data = response.penalty_data;
-                var advance_data = response.advance_data;
-                var public_holiday_data = response.holiday_data;
-                var leave_data = response.leave_data;
+            // Safely get data from response, providing empty arrays as fallbacks
+            var all_users_data = response.all_users?.data || [];
+            var all_attandance_data = response.attendance_info_data || [];
+            var deductions_data = response.deductions || [];
+            var penalty_data = response.penalty_data || [];
+            var advance_data = response.advance_data || [];
+            var public_holiday_data = response.holiday_data || []; // Holiday master data
+            var holiday_swap_data = response.holiday_swap_data || [];  // CHANGED: Use separate variable for swap dates
+            var leave_data = response.leave_data || [];
+            var holiday_count = response.holiday_count || 0;
 
-                // Build table HTML with sticky columns
-                var table_html_data = `
-                <table id="id_of_table" class="table table-bordered table-striped table-hover sticky-table">
-                    <thead>
-                        <tr>
-                            <th class="sticky-col">Sr. N.</th>
-                            <th class="sticky-col-2">Name <i class="fas fa-sort" onclick="short_data('f_name')" id="f_name_span"></i></th>
-                            <th class="sticky-col-3">Employee Id <i class="fas fa-sort" onclick="short_data('Employee_id')" id="Employee_id_span"></i></th>
-                            <th class="sticky-col-4">Shift hrs <i class="fas fa-sort" onclick="short_data('Shift_hours')" id="Shift_hours_span"></i></th>`;
+            // Build table HTML with sticky columns
+            var table_html_data = `
+            <table id="id_of_table" class="table table-bordered table-striped table-hover sticky-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">Sr. N.</th>
+                        <th class="sticky-col-2">Name <i class="fas fa-sort" onclick="short_data('f_name')" id="f_name_span"></i></th>
+                        <th class="sticky-col-3">Employee Id <i class="fas fa-sort" onclick="short_data('Employee_id')" id="Employee_id_span"></i></th>
+                        <th class="sticky-col-4">Shift hrs <i class="fas fa-sort" onclick="short_data('Shift_hours')" id="Shift_hours_span"></i></th>`;
 
-                const startDate = new Date(start_d);
-                const endDate = new Date(end_d);
-                const dates = [];
-                let currentDate = new Date(startDate);
+            const startDate = new Date(start_d);
+            const endDate = new Date(end_d);
+            const dates = [];
+            let currentDate = new Date(startDate);
 
-                while (currentDate <= endDate) {
-                    dates.push(new Date(currentDate));
-                    currentDate.setDate(currentDate.getDate() + 1);
+            while (currentDate <= endDate) {
+                dates.push(new Date(currentDate));
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            dates.forEach(date => {
+                const formattedDate = date.toLocaleDateString("en-US", {
+                    day: "2-digit",
+                    month: "short"
+                });
+                table_html_data += `<th class="date-header">${formattedDate}</th>`;
+            });
+
+            table_html_data += `
+                        <th>Total Day</th>
+                        <th>Working Day</th>
+                        <th>Work (in day)</th>
+                        <th>Absent</th>
+                        <th>Over Time</th>
+                        <th>Over Time Rate</th>
+                        <th>Over Time (in INR)</th>
+                        <th>Loan / Advance(in INR)</th>
+                        <th>Deduction</th>
+                        <th>Penalty</th>
+                        <th>Final Amount Before Arrear</th>
+                        <th>Arrear</th>
+                        <th>Arrear Reason</th>
+                        <th>Daily Rate</th>
+                        <th>Monthly Salary</th>
+                        <th>Net Salary</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            // Process user data
+            all_users_data.forEach(all_users_data => {
+                table_html_data += `
+                <tr>
+                    <td class="sticky-col">${data_count}</td>
+                    <td class="sticky-col-2">${all_users_data.f_name} ${all_users_data.m_name || ''} ${all_users_data.l_name || ''}</td>
+                    <td class="sticky-col-3">${all_users_data.Employee_id}</td>
+                    <td class="sticky-col-4">${all_users_data.Shift_hours}</td>`;
+
+                var Employee_Daily_Rate = all_users_data.salary / set_last_date;
+                data_count++;
+
+                // Process attendance for each date
+                dates.forEach(date => {
+                    const formattedDate = formatDateToYYYYMMDD(date);
+
+                    // Use safe filter operations with null checks
+                    const filteredData = all_attandance_data.filter(all_att_data =>
+                        all_att_data.Employee_id === all_users_data.Employee_id &&
+                        formattedDate === all_att_data.attandence_Date
+                    );
+
+                    // Use safe filter with null check for public holidays
+                    const public_holiday_filter_data = public_holiday_data.filter(holiday =>
+                        formattedDate === holiday.holiday_Date
+                    );
+
+                    // Use safe filter with null check for swap dates
+                    const swap_date_filter_data = holiday_swap_data.filter(swap_data =>
+                        swap_data.Employee_id === all_users_data.Employee_id &&
+                        formattedDate === swap_data.Swap_Date
+                    );
+
+                    // Use safe filter with null check for leave data
+                    const leave_filter_data = leave_data.filter(leave_d =>
+                        leave_d.Employee_id === all_users_data.Employee_id &&
+                        leave_d.Start_Date <= formattedDate &&
+                        leave_d.End_Date >= formattedDate
+                    );
+
+                    if (leave_filter_data.length > 0) {
+                        leave_filter_data.forEach(leave_data_item => {
+                            leave_color = leave_data_item.Color || "";
+                            Half_Day_Leave = leave_data_item.Half_Day || 0;
+                            Payment_Status = leave_data_item.Payment_Status || "";
+                            Short_Name = leave_data_item.Short_Name || "";
+                        });
+                    } else {
+                        // Reset leave variables when no leave found
+                        leave_color = "";
+                        Half_Day_Leave = 0;
+                        Payment_Status = "";
+                        Short_Name = "";
+                    }
+
+                    OT_Amt = 0;
+                    Daily_Amt = 0;
+
+                    // Reset swap day flag for each date
+                    Swap_Day_array_data = 0;
+                    Public_Holiday_array_data = 0;
+                    Weekly_Off_array_data = 0;
+
+                    filteredData.forEach(element => {
+                        Swap_Day_array_data = element.Swap_Day || 0;
+                        Public_Holiday_array_data = element.Public_Holiday || 0;
+                        Daily_Rate = element.Daily_Rate || 0;
+                        Over_Ttime_Rate = element.Over_Ttime_Rate || 0;
+                        Weekly_Off_array_data = element.WeeklyOff || 0;
+                    });
+
+                    // Determine cell background color
+                    let cellBackgroundColor = '';
+                    let cellStatusText = 'Absent';
+                    let statusClass = '';
+
+                    // FIXED: Check for swap date first (highest priority)
+                    if (swap_date_filter_data.length > 0) {
+                        cellBackgroundColor = 'style="background-color: orange;"';
+                        statusClass = 'swap-day';
+                        cellStatusText = 'Present'; // Usually swap days are marked as present
+                    } else if (Swap_Day_array_data == 1) {
+                        // If marked as swap day in attendance data
+                        cellBackgroundColor = 'style="background-color: orange;"';
+                        statusClass = 'swap-day';
+                        cellStatusText = 'Present';
+                    } else if (Public_Holiday_array_data == 1) {
+                        cellBackgroundColor = 'style="background-color: yellow;"';
+                        statusClass = 'holiday';
+                        cellStatusText = 'Absent';
+                    } else if (Weekly_Off_array_data == 1) {
+                        cellBackgroundColor = 'style="background-color: cyan;"';
+                        statusClass = 'weekly-off';
+                        cellStatusText = 'Absent';
+                    } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
+                        cellBackgroundColor = 'style="background-color: cyan;"';
+                        statusClass = 'weekly-off';
+                        cellStatusText = 'Absent';
+                    } else if (public_holiday_filter_data.length > 0) {
+                        cellBackgroundColor = 'style="background-color: yellow;"';
+                        statusClass = 'holiday';
+                        cellStatusText = 'Absent';
+                    } else if (leave_filter_data.length > 0) {
+                        if (Half_Day_Leave == 1) {
+                            cellBackgroundColor = `style="background: linear-gradient(to right, ${leave_color} 50%, transparent 50%);"`;
+                            statusClass = 'half-day-leave';
+                            cellStatusText = 'Absent';
+                        } else {
+                            cellBackgroundColor = `style="background-color: ${leave_color};"`;
+                            statusClass = 'leave';
+                            cellStatusText = 'Absent';
+                        }
+                    }
+
+                    // If no attendance record and not a special day, show as absent
+                    if (filteredData.length === 0) {
+                        // For swap days, still show as Present
+                        if (swap_date_filter_data.length > 0) {
+                            table_html_data += `<td class="status-cell swap-day" style="background-color: orange;">Present</td>`;
+                            Work++; // Count as worked day
+                        } else {
+                            table_html_data += `<td class="status-cell ${statusClass}" ${cellBackgroundColor}>${cellStatusText}</td>`;
+                        }
+
+                        if (Half_Day_Leave == 0 && Payment_Status == "Paid") {
+                            Daily_Amt = Employee_Daily_Rate;
+                        }
+                    } else {
+                        filteredData.forEach(all_att_data => {
+                            if (Half_Day_Leave == 1 && Payment_Status == "Paid") {
+                                Daily_Amt = all_att_data.Daily_Rate / 2;
+                            } else {
+                                Daily_Amt = all_att_data.Daily_Rate;
+                            }
+
+                            OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
+                            Total_OT_Amount = Total_OT_Amount + OT_Amt;
+
+                            table_html_data += `<td class="status-cell ${statusClass}" ${cellBackgroundColor}>Present</td>`;
+                            Work++;
+                            Over_Time += all_att_data.Overtime;
+                        });
+                    }
+
+                    Total_all_day_Amount = Total_all_day_Amount + Daily_Amt;
+                });
+
+                // Calculate summaries
+                var Absent_count = Working_Day - holiday_count - Work;
+                if (Absent_count <= 0) {
+                    Absent_count = 0;
                 }
 
-                dates.forEach(date => {
-                    const formattedDate = date.toLocaleDateString("en-US", {
-                        day: "2-digit",
-                        month: "short"
+                Total_Amount = Total_all_day_Amount + Total_OT_Amount;
+
+                // Add summary columns
+                table_html_data += `
+                    <td>${Working_Day}</td>
+                    <td>${Working_Day - holiday_count}</td>
+                    <td>${Work}</td>
+                    <td>${Absent_count}</td>
+                    <td>${Over_Time}</td>
+                    <td>${Over_Ttime_Rate.toFixed(2)}</td>
+                    <td>${Total_OT_Amount.toFixed(2)}</td>`;
+
+                // Process advance/loan
+                table_html_data += `<td>`;
+                if (advance_data.length > 0) {
+                    advance_data.forEach(advance_data_item => {
+                        if (advance_data_item.Employee_id == all_users_data.Employee_id) {
+                            advance = advance + (parseFloat(advance_data_item.Loan_Amount_in_INR) || 0);
+                        }
                     });
-                    table_html_data += `<th class="date-header">${formattedDate}</th>`;
-                });
+                }
+                table_html_data += `${advance}</td>`;
+
+                // Process deductions
+                table_html_data += `<td>`;
+                if (deductions_data.length > 0) {
+                    deductions_data.forEach(deduction => {
+                        if (deduction.Employee_id == all_users_data.Employee_id) {
+                            deductions_amount = deductions_amount + (parseFloat(deduction.deduction_Amount_in_INR) || 0);
+                        }
+                    });
+                }
+                table_html_data += `${deductions_amount.toFixed(2)}</td>`;
+
+                // Process penalty
+                table_html_data += `<td>`;
+                if (penalty_data.length > 0) {
+                    penalty_data.forEach(penalty => {
+                        if (penalty.EmpID == all_users_data.Employee_id) {
+                            Penalty = Penalty + parseFloat(penalty.Final_Amount || 0);
+                        }
+                    });
+                }
+                table_html_data += `${Penalty.toFixed(2)}</td>`;
+
+                // Calculate final amount before arrear
+                final_amount_before_arrear = Total_Amount - Penalty - deductions_amount - advance;
+                table_html_data += `<td>${final_amount_before_arrear.toFixed(2)}</td>`;
+
+                // Editable fields for arrears
+                table_html_data += `
+                    <td contenteditable="true" oninput="validateNumber(this)" class="arrear-amount">0</td>
+                    <td contenteditable="true" class="arrear-reason"></td>`;
+
+                // Final calculations
+                monthaly_salary = Total_Amount;
+                net_salary = final_amount_before_arrear; // Net salary is the final amount before arrear (arrear will be added via JS)
 
                 table_html_data += `
-                            <th>Total Day</th>
-                            <th>Working Day</th>
-                            <th>Work (in day)</th>
-                            <th>Absent</th>
-                            <th>Over Time</th>
-                            <th>Over Time Rate</th>
-                            <th>Over Time (in INR)</th>
-                            <th>Loan / Advance(in INR)</th>
-                            <th>Deduction</th>
-                            <th>Arrear</th>
-                            <th>Arrear Reason</th>
-                            <th>Daily Rate</th>
-                            <th>Monthly Salary</th>
-                            <th>Net Salary</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                    <td>${Daily_Rate.toFixed(2)}</td>
+                    <td>${monthaly_salary.toFixed(2)}</td>
+                    <td class="net-salary">${net_salary.toFixed(2)}</td>
+                </tr>`;
 
-                // Process user data
-                all_users_data.forEach(all_users_data => {
-                    table_html_data += `
-                    <tr>
-                        <td class="sticky-col">${data_count}</td>
-                        <td class="sticky-col-2">${all_users_data.f_name} ${all_users_data.m_name || ''} ${all_users_data.l_name || ''}</td>
-                        <td class="sticky-col-3">${all_users_data.Employee_id}</td>
-                        <td class="sticky-col-4">${all_users_data.Shift_hours}</td>`;
+                // Reset variables for next employee
+                Work = 0;
+                Over_Time = 0;
+                deductions_amount = 0;
+                Penalty = 0;
+                advance = 0;
+                Over_Ttime_Rate = 0;
+                Daily_Rate = 0;
+                Total_OT_Amount = 0;
+                Total_Amount = 0;
+                Total_all_day_Amount = 0;
+                final_amount_before_arrear = 0;
+            });
 
-                    var Employee_Daily_Rate = all_users_data.salary / set_last_date;
-                    data_count++;
+            table_html_data += `</tbody></table>`;
 
-                    // Process attendance for each date
-                    dates.forEach(date => {
-                        const formattedDate = formatDateToYYYYMMDD(date);
+            // Display table
+            $("#result").html(table_html_data);
 
-                        const filteredData = all_attandance_data.filter(all_att_data =>
-                            all_att_data.Employee_id === all_users_data.Employee_id &&
-                            formattedDate === all_att_data.attandence_Date
-                        );
+            // Add event listener to update net salary when arrear amount changes
+            $(".arrear-amount").on("input", function() {
+                const row = $(this).closest("tr");
+                const arrearAmount = parseFloat($(this).text()) || 0;
+                const finalAmountBeforeArrear = parseFloat(row.find("td").eq(-3).text());
+                const netSalary = finalAmountBeforeArrear + arrearAmount;
+                row.find(".net-salary").text(netSalary.toFixed(2));
+            });
 
-                        const public_holiday_filter_data = public_holiday_data.filter(public_holiday_data =>
-                            formattedDate === public_holiday_data.holiday_Date
-                        );
-
-                        const leave_filter_data = leave_data.filter(leave_d =>
-                            leave_d.Employee_id === all_users_data.Employee_id &&
-                            leave_d.Start_Date <= formattedDate &&
-                            leave_d.End_Date >= formattedDate
-                        );
-
-                        if (leave_filter_data.length > 0) {
-                            leave_filter_data.forEach(leave_data_item => {
-                                leave_color = leave_data_item.Color;
-                                Half_Day_Leave = leave_data_item.Half_Day;
-                                Payment_Status = leave_data_item.Payment_Status;
-                                Short_Name = leave_data_item.Short_Name;
-                            });
-                        }
-
-                        OT_Amt = 0;
-                        Daily_Amt = 0;
-
-                        filteredData.forEach(element => {
-                            Swap_Day_array_data = element.Swap_Day;
-                            Public_Holiday_array_data = element.Public_Holiday;
-                            Daily_Rate = element.Daily_Rate;
-                            Over_Ttime_Rate = element.Over_Ttime_Rate;
-                            Weekly_Off_array_data = element.WeeklyOff;
-                        });
-
-                        // Determine cell background color
-                        let cellBackgroundColor = '';
-                        let cellStatusText = 'Absent';
-                        let statusClass = '';
-
-                        if (Swap_Day_array_data == 1) {
-                            cellBackgroundColor = 'style="background-color: orange;"';
-                            statusClass = 'swap-day';
-                        } else if (Public_Holiday_array_data == 1) {
-                            cellBackgroundColor = 'style="background-color: yellow;"';
-                            statusClass = 'holiday';
-                        } else if (Weekly_Off_array_data == 1) {
-                            cellBackgroundColor = 'style="background-color: cyan;"';
-                            statusClass = 'weekly-off';
-                        } else if (all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
-                            cellBackgroundColor = 'style="background-color: cyan;"';
-                            statusClass = 'weekly-off';
-                        } else if (public_holiday_filter_data.length > 0) {
-                            cellBackgroundColor = 'style="background-color: yellow;"';
-                            statusClass = 'holiday';
-                        } else if (leave_filter_data.length > 0) {
-                            if (Half_Day_Leave == 1) {
-                                cellBackgroundColor = `style="background: linear-gradient(to right, ${leave_color} 50%, transparent 50%);"`;
-                                statusClass = 'half-day-leave';
-                            } else {
-                                cellBackgroundColor = `style="background-color: ${leave_color};"`;
-                                statusClass = 'leave';
-                            }
-                        }
-
-                        if (filteredData.length === 0) {
-                            table_html_data += `<td class="status-cell ${statusClass}" ${cellBackgroundColor}>${cellStatusText}</td>`;
-
-                            if (Half_Day_Leave == 0 && Payment_Status == "Paid") {
-                                Daily_Amt = Employee_Daily_Rate;
-                            }
-                        } else {
-                            filteredData.forEach(all_att_data => {
-                                if (Half_Day_Leave == 1 && Payment_Status == "Paid") {
-                                    Daily_Amt = all_att_data.Daily_Rate / 2;
-                                } else {
-                                    Daily_Amt = all_att_data.Daily_Rate;
-                                }
-
-                                OT_Amt = all_att_data.Overtime * all_att_data.Over_Ttime_Rate;
-                                Total_OT_Amount = Total_OT_Amount + OT_Amt;
-
-                                table_html_data += `<td class="status-cell ${statusClass}" ${cellBackgroundColor}>Present</td>`;
-                                Work++;
-                                Over_Time += all_att_data.Overtime;
-                            });
-                        }
-
-                        Total_all_day_Amount = Total_all_day_Amount + Daily_Amt;
-                    });
-
-                    // Calculate summaries
-                    var Absent_count = Working_Day - response.holiday_count - Work;
-                    if (Absent_count <= 0) {
-                        Absent_count = 0;
-                    }
-
-                    Total_Amount = Total_all_day_Amount + Total_OT_Amount;
-
-                    // Add summary columns
-                    table_html_data += `
-                        <td>${Working_Day}</td>
-                        <td>${Working_Day - response.holiday_count}</td>
-                        <td>${Work}</td>
-                        <td>${Absent_count}</td>
-                        <td>${Over_Time}</td>
-                        <td>${Over_Ttime_Rate.toFixed(2)}</td>
-                        <td>${Total_OT_Amount.toFixed(2)}</td>`;
-
-                    // Process advance/loan
-                    table_html_data += `<td>`;
-                    if (advance_data != "") {
-                        advance_data.forEach(advance_data_item => {
-                            if (advance_data_item.Employee_id == all_users_data.Employee_id) {
-                                advance = advance + advance_data_item.Loan_Amount_in_INR;
-                            }
-                        });
-                    }
-                    table_html_data += `${advance}</td>`;
-
-                    // Process deductions
-                    table_html_data += `<td>`;
-                    if (deductions_data != "") {
-                        deductions_data.forEach(deduction => {
-                            if (deduction.Employee_id == all_users_data.Employee_id) {
-                                deductions_amount = deductions_amount + deduction.deduction_Amount_in_INR;
-                            }
-                        });
-                    }
-                    table_html_data += `${deductions_amount}</td>`;
-
-                    // Editable fields for arrears
-                    table_html_data += `
-                        <td contenteditable="true" oninput="validateNumber(this)"></td>
-                        <td contenteditable="true"></td>`;
-
-                    // Final calculations
-                    monthaly_salary = Total_Amount;
-                    net_salary = monthaly_salary - Penalty - deductions_amount - advance;
-
-                    table_html_data += `
-                        <td>${Daily_Rate.toFixed(2)}</td>
-                        <td>${monthaly_salary.toFixed(2)}</td>
-                        <td>${net_salary.toFixed(2)}</td>
-                    </tr>`;
-
-                    // Reset variables for next employee
-                    Work = 0;
-                    Over_Time = 0;
-                    deductions_amount = 0;
-                    Penalty = 0;
-                    advance = 0;
-                    Over_Ttime_Rate = 0;
-                    Daily_Rate = 0;
-                    Total_OT_Amount = 0;
-                    Total_Amount = 0;
-                    Total_all_day_Amount = 0;
-                });
-
-                table_html_data += `</tbody></table>`;
-
-                // Display table
-                $("#result").html(table_html_data);
-
-                // Apply any view mode settings
+            // Apply any view mode settings
+            if (typeof toggleCompactView === 'function') {
                 toggleCompactView();
+            }
 
-                // Build pagination
+            // Build pagination if available
+            if (response.all_users && response.all_users.links) {
                 var pagination_data = response.all_users.links;
                 var pagination_html = `<nav aria-label="Page navigation"><ul class="pagination">`;
 
@@ -737,23 +811,147 @@
                 </div>`;
 
                 $("#pagination_div").html(pagination_html);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
-                $("#result").html(`
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle mr-1"></i>
-                    Error loading data. Please try again.
-                </div>`);
             }
-        });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            $("#result").html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                Error loading data. Please try again.
+            </div>`);
+        }
+    });
+}
+
+
+// Updated JavaScript function for processing dates in the report view
+
+function processAttendanceData(startDate, endDate, userData, attendanceData, holidayData, holidayMasterData, leaveData) {
+    // Check if all required data is available
+    if (!userData || !Array.isArray(userData)) {
+        console.error("User data is missing or invalid");
+        return '<tr><td colspan="20">No user data available</td></tr>';
     }
 
-    function validateNumber(cell) {
-        const value = cell.innerText;
-        if (!/^\d*$/.test(value)) {
-            cell.innerText = value.replace(/\D/g, '');
+    // Ensure other data arrays exist, provide empty arrays as fallback
+    attendanceData = attendanceData || [];
+    holidayData = holidayData || [];
+    holidayMasterData = holidayMasterData || [];
+    leaveData = leaveData || [];
+
+    const dates = getDatesInRange(startDate, endDate);
+    let html = '';
+
+    userData.forEach(user => {
+        html += '<tr>';
+        html += `<td>${user.f_name || ''} ${user.l_name || ''}</td>`;
+        html += `<td>${user.Employee_id || ''}</td>`;
+
+        dates.forEach(date => {
+            const formattedDate = formatDate(date); // YYYY-MM-DD format
+
+            // Find attendance for this employee on this date - with null checks
+            const attendance = attendanceData.find(att =>
+                att && att.Employee_id === user.Employee_id &&
+                att.attandence_Date === formattedDate
+            );
+
+            // Check for holiday - with null checks
+            const isHoliday = holidayMasterData.some(holiday =>
+                holiday && holiday.holiday_Date === formattedDate
+            );
+
+            // Check specifically for swap date - with null checks
+            const swapDate = holidayData.find(holiday =>
+                holiday && holiday.Employee_id === user.Employee_id &&
+                holiday.Swap_Date === formattedDate
+            );
+
+            // Check for leave - with null checks
+            const leave = leaveData.find(leave =>
+                leave && leave.Employee_id === user.Employee_id &&
+                new Date(leave.Start_Date) <= date &&
+                new Date(leave.End_Date) >= date
+            );
+
+            // Set cell style and content based on status
+            let cellClass = '';
+            let cellContent = 'Absent';
+            let cellStyle = '';
+
+            if (attendance) {
+                cellClass = 'present';
+                cellContent = 'Present';
+                cellStyle = 'background-color: #d4edda;'; // Light green for present
+            } else if (swapDate) {
+                // This is specifically a swap day
+                cellClass = 'swap-day';
+                cellContent = 'Present'; // Swap days are typically marked as present
+                cellStyle = 'background-color: orange;';
+            } else if (isHoliday) {
+                cellClass = 'holiday';
+                cellContent = 'Absent'; // Default for holidays
+                cellStyle = 'background-color: yellow;';
+            } else if (user.Weekly_Off === date.toLocaleDateString('en-US', { weekday: 'long' })) {
+                cellClass = 'weekly-off';
+                cellContent = 'Absent';
+                cellStyle = 'background-color: cyan;';
+            } else if (leave) {
+                cellClass = 'leave';
+                cellContent = 'Absent';
+
+                if (leave.Half_Day === 1) {
+                    cellStyle = `background: linear-gradient(to right, ${leave.Color || '#ffffff'} 50%, transparent 50%);`;
+                } else {
+                    cellStyle = `background-color: ${leave.Color || '#ffffff'};`;
+                }
+            }
+
+            html += `<td class="${cellClass}" style="${cellStyle}">${cellContent}</td>`;
+        });
+
+        // Add summary columns - you can calculate these based on the attendance data
+        const workDays = calculateWorkDays(user.Employee_id, attendanceData, startDate, endDate);
+        const absentDays = dates.length - workDays;
+
+        html += `<td>${dates.length}</td>`;  // Total days
+        html += `<td>${dates.length - getHolidayCount(holidayMasterData, startDate, endDate)}</td>`; // Working days
+        html += `<td>${workDays}</td>`;  // Work days
+        html += `<td>${absentDays}</td>`; // Absent days
+        html += '</tr>';
+    });
+
+    return html;
+}
+
+// Helper function to check if a date is a swap date - with null safety
+function isSwapDate(employeeId, date, holidayData) {
+    if (!holidayData || !Array.isArray(holidayData)) {
+        return false;
+    }
+
+    const formattedDate = formatDate(date);
+
+    // Check ONLY for exact swap date match
+    return holidayData.some(holiday =>
+        holiday &&
+        holiday.Employee_id === employeeId &&
+        holiday.Swap_Date === formattedDate
+    );
+}
+    // Add this function to validate number input in editable cells
+    function validateNumber(element) {
+        let value = element.innerText;
+        value = value.replace(/[^0-9.]/g, '');
+
+        // Ensure only one decimal point
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
         }
+
+        element.innerText = value;
     }
 
     function printTable() {

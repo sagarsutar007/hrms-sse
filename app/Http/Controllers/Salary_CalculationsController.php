@@ -44,29 +44,56 @@ class Salary_CalculationsController extends Controller
         $role = session()->get('role');
 
         if(isset($EmployeesID)) {
+            // Get user data
             $user_data = DB::table('all_users')
                 ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
-                ->select('all_users.*', 'shift_master.Shift_hours')
+                ->select('all_users.*', 'shift_master.Shift_hours', 'shift_master.Shift_Name')
                 ->get();
 
-            // Get regular attendance data
+            // Get regular attendance data without filtering
             $attendance_info_data = DB::table('all_attandencetable')
                 ->orderBy('attandence_Date', 'ASC')
                 ->get();
 
-            // Get holiday data including swap dates
+            // Get holiday data with swap dates
             $holiday_data = DB::table('all_holiday')
-                ->select('Employee_id', 'Holiday_Date', 'Swap_Date')
+                ->select('Employee_id', 'Holiday_Date as holiday_Date', 'Swap_Date')
+                ->get();
+
+            // Holiday master data
+            $holiday_master_data = DB::table('holiday_master')
+                ->select('holiday_Date')
+                ->get();
+
+            // Get leave data with proper type information for styling
+            $leave_data = DB::table('_leave')
+                ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id')
+                ->select(
+                    '_leave.Employee_id',
+                    '_leave.Start_Date',
+                    '_leave.End_Date',
+                    '_leave.Half_Day',
+                    'leave_type_master.Name',
+                    'leave_type_master.Color',
+                    'leave_type_master.Short_Name',
+                    'leave_type_master.Payment_Status'
+                )
                 ->get();
 
             // Get leave type data for styling
             $leave_type_master_data = DB::table('leave_type_master')
                 ->get();
 
+            // For debugging
+            \Log::info('Attendance records: ' . count($attendance_info_data));
+            \Log::info('Holiday swap records: ' . count($holiday_data));
+
             return view("report_1")
                 ->with('user_data', $user_data)
                 ->with('attendance_info_data', $attendance_info_data)
-                ->with('holiday_data', $holiday_data)  // Pass holiday data separately
+                ->with('holiday_data', $holiday_data)
+                ->with('holiday_master_data', $holiday_master_data)
+                ->with('leave_data', $leave_data)
                 ->with('leave_type_master_data', $leave_type_master_data)
                 ->with('role', $role);
         } else {
