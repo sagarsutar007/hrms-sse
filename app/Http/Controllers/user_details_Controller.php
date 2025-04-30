@@ -1389,12 +1389,6 @@ return response()->json([
                     ], 201); // 201 Created
                 }
 
-
-
-
-
-
-
             } else if ($formType == "Deduction_form") {
 
                 $emp_id = $freq->Employee_Id;
@@ -2128,13 +2122,13 @@ history.back()
             $final_amount = $amount - $waived_off;
             $remaining_amount = $final_amount;
         }
-        
+
         if ($remaining_amount <= 0) {
             $payment_status = "success";
         } else {
             $payment_status = "pending";
         }
-        
+
         if ($request->has('payments')) {
             $payments = [];
             foreach ($request->payments as $payment) {
