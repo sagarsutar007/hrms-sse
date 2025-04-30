@@ -176,15 +176,10 @@
                                 <div class="col-12">
                                     <p><strong>Name:</strong> <span id="modal-name"></span></p>
                                     <p><strong>Employee ID:</strong> <span id="modal-employee-id"></span></p>
-                                    <p><strong>Password:</strong> <span id="modal-password"></span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="redirectBtn">Go to Employees</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -194,36 +189,37 @@
 @section('js')
 <script>
     $('#employeeForm').on('submit', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    $.ajax({
-        url: $(this).attr('action'),
-        type: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                // Populate modal with employee details - fix field names to match response
-                $('#modal-name').text(response.F_name + ' ' + response.L_name);
-                $('#modal-employee-id').text(response.Employee_id);
-                $('#modal-password').text(response.Password);
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Populate modal with employee details
+                    $('#modal-name').text(response.F_name + ' ' + response.L_name);
+                    $('#modal-employee-id').text(response.Employee_id);
+                    $('#modal-password').text(response.Password);
 
-                // Show the success modal
-                $('#successModal').modal('show');
+                    // Show the success modal
+                    $('#successModal').modal('show');
 
-                // Set redirect URL
-                $('#redirectBtn').on('click', function() {
-                    window.location.href = "{{ route('view_employee') }}";
-                });
-            } else {
-                alert(response.Message || 'An error occurred');
+                    // Redirect after 3 seconds
+                    setTimeout(function() {
+                        window.location.href = "{{ url('employees') }}"; // Redirect to employees view page
+                    }, 3000);
+                } else {
+                    alert(response.Message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                console.error('AJAX Error:', xhr);
+                alert('An error occurred: ' + xhr.statusText);
             }
-        },
-        error: function(xhr) {
-            console.error('AJAX Error:', xhr);
-            alert('An error occurred: ' + xhr.statusText);
-        }
+        });
     });
-});
 </script>
+
 @endsection

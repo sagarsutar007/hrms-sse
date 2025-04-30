@@ -497,6 +497,33 @@
             });
         });
 
+        $(document).ready(function() {
+        // Check if checkboxes are being properly rendered
+        setTimeout(function() {
+            console.log("Number of checkboxes found:", $('.employee-checkbox').length);
+
+            if ($('.employee-checkbox').length === 0) {
+                console.error("No checkboxes found with class 'employee-checkbox'");
+
+                // Check what classes actually exist on checkboxes
+                $('input[type="checkbox"]').each(function() {
+                    console.log("Checkbox found with classes:", $(this).attr('class'));
+                });
+            }
+        }, 2000); // Wait for table to fully render
+
+        // Ensure event delegation for dynamic elements
+        $(document).on('change', '.employee-checkbox', function() {
+            console.log("Checkbox changed:", $(this).val());
+        });
+
+        // Fix for select-all checkbox
+        $(document).on('change', '#select-all', function() {
+            var isChecked = $(this).prop('checked');
+            console.log("Select all changed to:", isChecked);
+            $('.employee-checkbox').prop('checked', isChecked);
+        });
+    });
         // Handle view employee click (open modal)
         $('#employees-table').on('click', '.view-employee', function() {
             var employeeId = $(this).data('id');
@@ -751,49 +778,42 @@
         });
 
 
-        // Bulk delete
-        $('#bulk-delete').on('click', function() {
-            let selectedIds = [];
-            $('.employee-checkbox:checked').each(function() {
-                selectedIds.push($(this).val());
-            });
+        $(function(){
+            // Click handler for bulk delete
+            $('#bulk-delete').click(function(){
+                var all_ids = [];
 
-            if (selectedIds.length > 0) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete them!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
+                // Gather all checked employee checkboxes
+                $('.employee-checkbox:checked').each(function(){
+                    all_ids.push($(this).val());
+                });
+
+                // Debug log
+                console.log("Selected IDs:", all_ids);
+
+                if(all_ids.length > 0) {
+                    if(confirm("Are you sure you want to delete these employees?")) {
                         $.ajax({
                             url: "{{ route('delete_employee') }}",
                             type: "POST",
                             data: {
-                                ids: selectedIds,
+                                ids: all_ids,
                                 _token: '{{ csrf_token() }}'
                             },
-                            success: function(response) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    response.success,
-                                    'success'
-                                );
-                                table.ajax.reload();
+                            success: function(response){
+                                alert(response.success);
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error:", xhr.responseText);
+                                alert("An error occurred while deleting employees");
                             }
                         });
                     }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No employees selected',
-                    text: 'Please select at least one employee to delete.'
-                });
-            }
+                } else {
+                    alert("Please select at least one employee to delete");
+                }
+            });
         });
 
         $('.custom-file-input').on('change', function () {

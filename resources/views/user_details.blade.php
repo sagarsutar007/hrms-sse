@@ -977,11 +977,11 @@
                                                                     @endphp
                                                                     <tr>
                                                                         <td>{{ $index + 1 }}</td>
-                                                                        <td>{{ $penalty->Date_of_Penalty }}</td>
+                                                                        <td>{{ \Carbon\Carbon::parse($penalty->Date_of_Penalty)->format('d-m-Y') }}</td>
                                                                         <td>{{ $penalty->Amount }}</td>
                                                                         <td>{{ $penalty->Reason }}</td>
                                                                         <td>{{ $penalty->Waived_Off }}</td>
-                                                                        <td>{{ $penalty->Waived_On }}</td>
+                                                                        <td>{{ \Carbon\Carbon::parse($penalty->Waived_On)->format('d-m-Y') }}</td>
                                                                         <td>{{ ucfirst($penalty->Payment_Status) }}</td>
                                                                         <td>
                                                                             @if($penalty->Payment_Status !== 'success')
@@ -1107,7 +1107,6 @@
                                                                 <thead>
                                                                     <tr>
                                                                         <th><input type="checkbox" name="delet_data"></th>
-                                                                        <th>Advance Title</th>
                                                                         <th>Month-Year</th>
                                                                         <th>Reason</th>
                                                                         <th>Number of installment</th>
@@ -1159,19 +1158,10 @@
                                                                     <div class="row">
                                                                     <div class="col-md-6">
                                                                         <div class="form-group">
-                                                                            <label for="loan_title">Title <span class="text-danger">*</span></label>
-                                                                            <input type="text" name="Title" id="loan_title" class="form-control" placeholder="Advance title" required>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
                                                                             <label for="loan_amount">(₹) Amount <span class="text-danger">*</span></label>
                                                                             <input type="number" name="Amount" id="loan_amount" class="form-control" placeholder="Amount in INR" onkeyup="genrate_table()" required>
                                                                         </div>
                                                                     </div>
-                                                                    </div>
-
-                                                                    <div class="row">
                                                                     <div class="col-md-6">
                                                                         <div class="form-group">
                                                                             <label for="number_of_loan_installment">Number of Installments <span class="text-danger">*</span></label>
@@ -2155,14 +2145,13 @@
                     var modalContent = `
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <h5><strong>Title:</strong> ${r_data.Title}</h5>
+                                <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
                                 <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
                                 <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
                             </div>
                             <div class="col-md-6">
                                 <h5><strong>Month:</strong> ${r_data.Month}</h5>
                                 <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
-                                <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
                             </div>
                         </div>
                     `;
@@ -2733,20 +2722,22 @@
     load_loan_data("{{ url('loan_view_api/' . $u_data['Employee_id']) }}");
 
     function load_loan_data(url_input) {
-        $.ajax({
-            url: url_input,
-            type: "GET",
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function (response) {
-                console.log("Loan Response:", response);
-                $("#loan_view_table").empty(); // tbody only
+    // Show a loading indicator
+    $.ajax({
+        url: url_input,
+        type: "GET",
+        dataType: "json",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        success: function (response) {
+            console.log("Loan Response:", response);
+            $("#loan_view_table").empty(); // Clear tbody contents
 
-                let table_html_data = ``;
-                let all_data = response.data;
+            let table_html_data = ``;
+            let all_data = response.data;
 
+            if (all_data && all_data.length > 0) {
                 all_data.forEach(loan => {
                     const date = new Date(loan.Month);
                     const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
@@ -2754,7 +2745,6 @@
                     table_html_data += `
                         <tr>
                             <td><input type="checkbox" name="delet_data"></td>
-                            <td>${loan.Title}</td>
                             <td>${formattedDate}</td>
                             <td>${loan.Reason}</td>
                             <td>${loan.Number_of_installment}</td>
@@ -2769,30 +2759,34 @@
                             </td>
                         </tr>`;
                 });
-
-                // Append the rows to the table
-                $("#loan_view_table").html(table_html_data);
-
-                // Reinitialize DataTables after populating the data
-                if ($.fn.DataTable.isDataTable('#loan_table')) {
-                    $('#loan_table').DataTable().clear().destroy();
-                }
-
-                $('#loan_table').DataTable({
-                    responsive: true,
-                    ordering: true,
-                    paging: true,
-                    searching: true,
-                    autoWidth: false,
-                    info: true
-                });
-
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", error);
+            } else {
+                table_html_data = '<tr><td colspan="7" class="text-center">No loan data available</td></tr>';
             }
-        });
-    }
+
+            // Append the rows to the table
+            $("#loan_view_table").html(table_html_data);
+
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#loan_table')) {
+                $('#loan_table').DataTable().clear().destroy();
+            }
+
+            // Initialize DataTable with the new data
+            $('#loan_table').DataTable({
+                responsive: true,
+                ordering: true,
+                paging: true,
+                searching: true,
+                autoWidth: false,
+                info: true
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+            $("#loan_view_table").html('<tr><td colspan="7" class="text-center">Error loading data. Please try again.</td></tr>');
+        }
+    });
+}
 
 
     // Function to open the loan/advance modal
@@ -2826,7 +2820,6 @@
 
                         // For other fields (using the IDs from the screenshot)
                         $("#loan_reason").val(r_data.Reason || "");
-                        $("#loan_title").val(r_data.Title || "");
                         $("#loan_amount").val(r_data.Loan_Amount_in_INR || "");
                         $("#number_of_loan_installment").val(r_data.Number_of_installment || "");
 
@@ -2939,7 +2932,7 @@
             event.preventDefault();
 
             // Make sure all required fields are filled
-            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_title').val() || !$('#loan_reason').val()) {
+            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_reason').val()) {
                 alert('Please fill all required fields');
                 return;
             }
@@ -2955,7 +2948,6 @@
                 Month: formattedDate, // Use "2025-03-01" format
                 Amount: $('#loan_amount').val(),
                 Number_of_installment: $('#number_of_loan_installment').val(),
-                Title: $('#loan_title').val(),
                 Reason: $('#loan_reason').val(),
                 loan_Id_input: $('#loan_Id_input').val() || '',
                 _token: $('input[name="_token"]').val()
@@ -2982,9 +2974,7 @@
                         $('#add_loan_form')[0].reset();
                         $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
                         // Check if function exists to avoid undefined errors
-                        if(typeof load_loan_data === 'function') {
-                            load_loan_data("{{url('loan_view_api/')}}/" + $('input[name="Employee_Id"]').val());
-                        }
+                        window.location.reload();
                     } else {
                         alert('Error: ' + response.message);
                     }
@@ -3000,6 +2990,8 @@
             });
         });
     });
+
+
 
 
     load_leave_data("{{ url('Leave_view_api/' . $u_data['Employee_id']) }}");
@@ -3031,8 +3023,8 @@
                         <tr>
                             <td><input type="checkbox" name="delet_data"></td>
                             <td>${$leave.Leave_Type}</td>
-                            <td>${$leave.Start_Date}</td>
-                            <td>${$leave.End_Date}</td>
+                            <td>${formatDate($leave.Start_Date)}</td>
+                            <td>${formatDate($leave.End_Date)}</td>
                             <td>${$leave.notification}</td>
                             <td>${$leave.Total_Days}</td>
                             <td>${$leave.created_at}</td>
@@ -3069,6 +3061,15 @@
             }
         });
     }
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+
 
 
 
@@ -3204,6 +3205,7 @@
             success: function(response) {
                 console.log("Attendance Response:", response);
 
+
                 const $table = $('#Attendance_table');
 
                 // Destroy existing DataTable instance before reloading
@@ -3219,7 +3221,7 @@
                         table_html_data += `
                             <tr>
                                 <td><input type="checkbox" /></td>
-                                <td>${$attendance.attandence_Date}</td>
+                                <td>${formatDate($attendance.attandence_Date)}</td>
                                 <td>${$attendance.in_time}</td>
                                 <td>${$attendance.out_time}</td>
                             </tr>`;
