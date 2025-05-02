@@ -296,7 +296,6 @@
 </div>
 
 <!-- Final Settlement Modal -->
-<!-- Final Settlement Modal -->
 <div class="modal fade" id="finalSettlementModal" tabindex="-1" aria-labelledby="finalSettlementLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form id="finalSettlementForm" method="POST" action="{{ route('final.settlement') }}">

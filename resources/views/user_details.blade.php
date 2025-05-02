@@ -2130,123 +2130,249 @@
 
 
 
+    // Function to generate installment table with correct date handling
+function genrate_table(existingInstallments = null) {
+    // Clear previous results
+    $("#monthList").empty();
+
+    // Remove any existing hidden input container
+    $(".installment-hidden-inputs").remove();
+
+    // Create a new container for hidden inputs
+    const hiddenInputsContainer = $("<div class='installment-hidden-inputs'></div>");
+    $("#add_loan_form").append(hiddenInputsContainer);
+
+    if (existingInstallments && existingInstallments.length > 0) {
+        // Display existing installments with proper date formatting
+        for (let i = 0; i < existingInstallments.length; i++) {
+            const installment = existingInstallments[i];
+
+            // Format the month display
+            let displayMonth = installment.Month || 'Unknown';
+            if (displayMonth && displayMonth.includes('-')) {
+                const [year, month] = displayMonth.split('-');
+                if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
+                    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+                    displayMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
+                }
+            }
+
+            $("#monthList").append(`
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${displayMonth}</td>
+                    <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
+                </tr>
+            `);
+
+            hiddenInputsContainer.append(`
+                <input type="hidden" name="installments[${i}][Month]" value="${installment.Month || ''}">
+                <input type="hidden" name="installments[${i}][Amount]" value="${parseFloat(installment.Amount || 0).toFixed(2)}">
+                <input type="hidden" name="installments[${i}][Id]" value="${installment.Id || ''}">
+            `);
+        }
+    } else {
+        // Calculate new installments
+        const selectedDate = $("#loan_month").val(); // Format: YYYY-MM
+        const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
+        const advance_amount = parseFloat($("#loan_amount").val()) || 0;
+
+        if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
+            // Parse the selected date properly
+            const [year, month] = selectedDate.split('-').map(num => parseInt(num, 10));
+
+            // Start from the next month after the selected month
+            let currentMonth = month;
+            let currentYear = year;
+
+            for (let i = 0; i < number_of_loop; i++) {
+                // Calculate the next month
+                currentMonth++;
+                if (currentMonth > 12) {
+                    currentMonth = 1;
+                    currentYear++;
+                }
+
+                // Create a date object for formatting
+                const monthDate = new Date(currentYear, currentMonth - 1, 1);
+                const monthName = monthDate.toLocaleString("default", { month: "long" });
+                const displayYear = monthDate.getFullYear();
+                const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
+
+                // Format for the hidden input: YYYY-MM
+                const monthYearString = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+
+                $("#monthList").append(`
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${monthName} ${displayYear}</td>
+                        <td>${installmentAmount}</td>
+                    </tr>
+                `);
+
+                hiddenInputsContainer.append(`
+                    <input type="hidden" name="installments[${i}][Month]" value="${monthYearString}">
+                    <input type="hidden" name="installments[${i}][Amount]" value="${installmentAmount}">
+                `);
+            }
+        }
+    }
+}
+
+    // Function to view loan/advance details with proper date formatting
     function loan_view(id) {
-        $.ajax({
-            type: "GET",
-            url: "/Loan/" + id,
-            dataType: "json",
-            success: function (response) {
-                console.log("Loan Response:", response);
+            $.ajax({
+                type: "GET",
+                url: "/Loan/" + id,
+                dataType: "json",
+                success: function (response) {
+                    console.log("Loan Response:", response);
 
-                if (response.success) {
-                    var r_data = response.data;
+                    if (response.success) {
+                        var r_data = response.data;
 
-                    // Basic loan information
-                    var modalContent = `
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
-                                <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
-                                <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <h5><strong>Month:</strong> ${r_data.Month}</h5>
-                                <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
-                            </div>
-                        </div>
-                    `;
-
-                    // Installment breakdown section
-                    modalContent += `
-                        <div class="row">
-                            <div class="col-12">
-                                <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-hover">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>Sr. No</th>
-                                                <th>Month - Year</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                    `;
-
-                    if (r_data.installments && r_data.installments.length > 0) {
-                        // Show actual installment records
-                        r_data.installments.forEach((installment, index) => {
-                            modalContent += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${installment.Month || 'N/A'}</td>
-                                    <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
-                                </tr>
-                            `;
-                        });
-                    } else {
-                        // Generate installments if missing
-                        const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
-                        const numberOfInstallments = parseInt(r_data.Number_of_installment);
-
-                        if (totalAmount && numberOfInstallments) {
-                            const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
-
-                            let startDate;
-                            if (r_data.Month) {
-                                startDate = new Date(r_data.Month + '-01');
-                            } else {
-                                startDate = new Date();
+                        // Format the month for display if it exists
+                        let displayMonth = r_data.Month;
+                        if (displayMonth && displayMonth.includes('-')) {
+                            const dateParts = displayMonth.split('-');
+                            // Create a date object and format it
+                            if (dateParts.length >= 2) {
+                                const monthDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, 1);
+                                displayMonth = monthDate.toLocaleString("default", { year: 'numeric', month: 'long' });
                             }
+                        }
 
-                            const baseYear = startDate.getFullYear();
-                            const baseMonth = startDate.getMonth() + 1; // Start from next month
+                        // Basic loan information
+                        var modalContent = `
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
+                                    <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
+                                    <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><strong>Month:</strong> ${displayMonth}</h5>
+                                    <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
+                                </div>
+                            </div>
+                        `;
 
-                            for (let i = 0; i < numberOfInstallments; i++) {
-                                const monthDate = new Date(baseYear, baseMonth + i, 1);
-                                const monthName = monthDate.toLocaleString("default", { month: "long" });
-                                const year = monthDate.getFullYear();
+                        // Installment breakdown section
+                        modalContent += `
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-hover">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Sr. No</th>
+                                                    <th>Month - Year</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                        `;
+
+                        if (r_data.installments && r_data.installments.length > 0) {
+                            // Show actual installment records with proper formatting
+                            r_data.installments.forEach((installment, index) => {
+                                // Format the installment month
+                                let formattedMonth = installment.Month || 'N/A';
+                                if (formattedMonth && formattedMonth.includes('-')) {
+                                    const [year, month] = formattedMonth.split('-');
+                                    if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
+                                        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+                                        formattedMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
+                                    }
+                                }
 
                                 modalContent += `
                                     <tr>
-                                        <td>${i + 1}</td>
-                                        <td>${monthName} ${year}</td>
-                                        <td>₹ ${installmentAmount}</td>
+                                        <td>${index + 1}</td>
+                                        <td>${formattedMonth}</td>
+                                        <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            // Generate installments if missing
+                            const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
+                            const numberOfInstallments = parseInt(r_data.Number_of_installment);
+
+                            if (totalAmount && numberOfInstallments) {
+                                const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
+
+                                // Parse the loan month properly
+                                let baseYear, baseMonth;
+                                if (r_data.Month && r_data.Month.includes('-')) {
+                                    const dateParts = r_data.Month.split('-');
+                                    baseYear = parseInt(dateParts[0]);
+                                    baseMonth = parseInt(dateParts[1]);
+                                } else {
+                                    // Fallback to current date
+                                    const now = new Date();
+                                    baseYear = now.getFullYear();
+                                    baseMonth = now.getMonth() + 1;
+                                }
+
+                                // Start from next month after loan month
+                                for (let i = 0; i < numberOfInstallments; i++) {
+                                    // Calculate next month properly
+                                    let currentMonth = baseMonth + 1 + i;
+                                    let currentYear = baseYear;
+
+                                    // Handle year rollover
+                                    while (currentMonth > 12) {
+                                        currentMonth -= 12;
+                                        currentYear++;
+                                    }
+
+                                    // Create date object for proper formatting
+                                    const monthDate = new Date(currentYear, currentMonth - 1, 1);
+                                    const monthName = monthDate.toLocaleString("default", { month: "long" });
+                                    const year = monthDate.getFullYear();
+
+                                    modalContent += `
+                                        <tr>
+                                            <td>${i + 1}</td>
+                                            <td>${monthName} ${year}</td>
+                                            <td>₹ ${installmentAmount}</td>
+                                        </tr>
+                                    `;
+                                }
+                            } else {
+                                modalContent += `
+                                    <tr>
+                                        <td colspan="3" class="text-center">No installment data available</td>
                                     </tr>
                                 `;
                             }
-                        } else {
-                            modalContent += `
-                                <tr>
-                                    <td colspan="3" class="text-center">No installment data available</td>
-                                </tr>
-                            `;
                         }
-                    }
 
-                    modalContent += `
-                                        </tbody>
-                                    </table>
+                        modalContent += `
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
 
-                    $("#loanViewModalContent").html(modalContent);
-                    $("#loanViewModal").modal("show");
+                        $("#loanViewModalContent").html(modalContent);
+                        $("#loanViewModal").modal("show");
 
-                } else {
-                    $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
+                    } else {
+                        $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
+                        $("#loanViewModal").modal("show");
+                    }
+                },
+                error: function (xhr) {
+                    console.log("Error:", xhr.responseText);
+                    $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
                     $("#loanViewModal").modal("show");
                 }
-            },
-            error: function (xhr) {
-                console.log("Error:", xhr.responseText);
-                $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
-                $("#loanViewModal").modal("show");
-            }
-        });
-    }
+            });
+        }
 
 
     $('#confirmDeleteModal').on('show.bs.modal', function(e) {
@@ -2689,35 +2815,110 @@
         });
     }
 
+    function open_Deduction_form() {
+        $('#deductionModal').modal('show');
+        // Reset form fields
+        $("#add_deductions_form")[0].reset();
+        $("#add_deductions_form_header").html('<i class="fas fa-minus-circle mr-2"></i> Add Deduction');
+        $("#Deduction_id_input").val("");
+    }
 
+    // Function to close the deduction form modal
+    function close_Deduction_form() {
+        $('#deductionModal').modal('hide');
+        $("#add_deductions_form")[0].reset();
+    }
 
+    // Function to open the update deduction form with existing data
     function open_Update_Deduction_form(id) {
-        open_Deduction_form()
+        open_Deduction_form();
         $("#add_deductions_form_header").text("Update Deduction");
         $("#Deduction_id_input").val(id);
         $.ajax({
-        type: "GET",
-        url: "{{url("/Deductions/")}}/"+id,
-        dataType: "json",
-        success: function(response) {
-        console.log(response);
-        var r_data = response.data
-        $("#Deduction_Title").val(r_data.deduction_Titel);
-        $("#Deduction_Amount").val(r_data.deduction_Amount_in_INR);
-        // Extract the 'YYYY-MM' part from 'YYYY-MM-DD'
-        const deductionMonth = r_data.deductions_Month.substring(0, 7); // This will extract '2025-06'
+            type: "GET",
+            url: "{{url('/Deductions/')}}/"+id,
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                var r_data = response.data
+                $("#Deduction_Title").val(r_data.deduction_Titel);
+                $("#Deduction_Amount").val(r_data.deduction_Amount_in_INR);
 
-        // Set the value of the month input
-        $("#Deduction_month").val(deductionMonth);
+                // Extract the 'YYYY-MM' part from 'YYYY-MM-DD'
+                const deductionMonth = r_data.deductions_Month.substring(0, 7);
 
-        },
-        error: function(xhr, status, error) {
-        console.log(xhr.responseText);
-        // Handle the error here
-        }
+                // Set the value of the month input
+                $("#Deduction_month").val(deductionMonth);
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                // Handle the error here
+                alert("Error loading deduction details.");
+            }
         });
-
     }
+
+    // Helper function to get the next month from a given month string (YYYY-MM)
+    function getNextMonth(dateString) {
+        let date = new Date(dateString + "-01"); // Add day to make valid date
+        date.setMonth(date.getMonth() + 1);
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
+    }
+
+    // Set up form submission handler to change the month value
+    $(document).ready(function() {
+        // Modify the form submission to increment the month
+        $("#add_deductions_form").submit(function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Get the selected month
+            const selectedMonth = $("#Deduction_month").val();
+
+            // Calculate the next month (when the deduction will actually be applied)
+            const appliedMonth = getNextMonth(selectedMonth);
+
+            // Create a copy of the form data
+            var formData = new FormData(this);
+
+            // Update the Month_Year field to the next month
+            formData.set('Month_Year', appliedMonth);
+
+            // Log what we're submitting
+            console.log("Original selected month:", selectedMonth);
+            console.log("Applied month (shifted forward):", appliedMonth);
+
+            // Submit the modified form data via AJAX
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    console.log(response);
+
+                    // Close the modal
+                    close_Deduction_form();
+
+                    // Show success message
+                    alert("Deduction saved successfully! The deduction will be applied from " + appliedMonth);
+
+                    // Reload the page or update the table
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                    alert("Error saving deduction. Please try again.");
+                }
+            });
+        });
+    });
+
+    // If you're using a button to submit the form instead of the form's submit event
+    $("#_submit_btn").click(function() {
+        // Trigger the form submission
+        $("#add_deductions_form").submit();
+    });
 
     load_loan_data("{{ url('loan_view_api/' . $u_data['Employee_id']) }}");
 
@@ -2790,6 +2991,7 @@
 
 
     // Function to open the loan/advance modal
+    // Modified function to open loan modal with proper date handling
     function open_loan_modal(id = null) {
         // Reset the form first
         $("#add_loan_form")[0].reset();
@@ -2849,7 +3051,7 @@
         $("#loanModal").modal("show");
     }
 
-    // Modify your genrate_table function to include hidden inputs
+    // Fixed genrate_table function to correctly handle month increments
     function genrate_table(existingInstallments = null) {
         // Clear previous results
         $("#monthList").empty();
@@ -2862,12 +3064,24 @@
         $("#add_loan_form").append(hiddenInputsContainer);
 
         if (existingInstallments && existingInstallments.length > 0) {
+            // Display existing installments with proper date formatting
             for (let i = 0; i < existingInstallments.length; i++) {
                 const installment = existingInstallments[i];
+
+                // Format the month display
+                let displayMonth = installment.Month || 'Unknown';
+                if (displayMonth && displayMonth.includes('-')) {
+                    const [year, month] = displayMonth.split('-');
+                    if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
+                        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+                        displayMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
+                    }
+                }
+
                 $("#monthList").append(`
                     <tr>
                         <td>${i + 1}</td>
-                        <td>${installment.Month || 'Unknown'}</td>
+                        <td>${displayMonth}</td>
                         <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
                     </tr>
                 `);
@@ -2879,21 +3093,35 @@
                 `);
             }
         } else {
-            const selectedDate = $("#loan_month").val();
+            // Calculate new installments
+            const selectedDate = $("#loan_month").val(); // Format: YYYY-MM
             const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
             const advance_amount = parseFloat($("#loan_amount").val()) || 0;
 
             if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
-                const startDate = new Date(selectedDate);
-                const year = startDate.getFullYear();
-                const startMonth = startDate.getMonth() + 1; // Start from next month
+                // Parse the selected date properly
+                const [year, month] = selectedDate.split('-').map(num => parseInt(num, 10));
+
+                // Start from the next month after the selected month
+                let currentMonth = month;
+                let currentYear = year;
 
                 for (let i = 0; i < number_of_loop; i++) {
-                    const monthDate = new Date(year, startMonth + i, 1);
+                    // Calculate the next month
+                    currentMonth++;
+                    if (currentMonth > 12) {
+                        currentMonth = 1;
+                        currentYear++;
+                    }
+
+                    // Create a date object for formatting
+                    const monthDate = new Date(currentYear, currentMonth - 1, 1);
                     const monthName = monthDate.toLocaleString("default", { month: "long" });
                     const displayYear = monthDate.getFullYear();
                     const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
-                    const monthYearString = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
+
+                    // Format for the hidden input: YYYY-MM
+                    const monthYearString = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
 
                     $("#monthList").append(`
                         <tr>
@@ -2911,6 +3139,74 @@
             }
         }
     }
+
+    $(document).ready(function() {
+        // Auto-generate installment table when form values change
+        $("#loan_month, #loan_amount, #number_of_loan_installment").on("change", function() {
+            genrate_table();
+        });
+
+        $('#loan_form_submit_btn').on('click', function(event) {
+            event.preventDefault();
+
+            // Make sure all required fields are filled
+            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_reason').val()) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Format the month input for the backend as "YYYY-MM-DD"
+            var monthInput = $('#loan_month').val(); // Format: "2025-03"
+            var formattedDate = monthInput + "-01"; // Add day to make it "2025-03-01"
+
+            var formData = {
+                form_type: "Loan_form",
+                Employee_Id: $('input[name="Employee_Id"]').val(),
+                Month: formattedDate, // Use "2025-03-01" format
+                Amount: $('#loan_amount').val(),
+                Number_of_installment: $('#number_of_loan_installment').val(),
+                Reason: $('#loan_reason').val(),
+                loan_Id_input: $('#loan_Id_input').val() || '',
+                _token: $('input[name="_token"]').val()
+            };
+
+            console.log("Form data being sent:", formData);
+
+            $.ajax({
+                url: $('#add_loan_form').attr('action'),
+                method: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                },
+                beforeSend: function() {
+                    // Show loading state
+                    $('#loan_form_submit_btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                },
+                success: function(response) {
+                    console.log("Success response:", response);
+                    if(response.success) {
+                        alert(response.message);
+                        $('#loanModal').modal('hide');
+                        $('#add_loan_form')[0].reset();
+                        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr.responseText);
+                    alert('An error occurred. Please try again later.');
+                },
+                complete: function() {
+                    // Re-enable button
+                    $('#loan_form_submit_btn').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Submit');
+                }
+            });
+        });
+    });
 
 
     // Make sure your edit buttons use this function

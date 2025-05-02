@@ -76,7 +76,6 @@ Route::post('/Add-Users',[registrationController::class,'Add_Users'])->name('Add
 Route::get('/Forgot-Password',[forgot_password_controller::class,'forgot_password_view'])->name('forgot_password_view');
 Route::post('/Forgot-Password',[forgot_password_controller::class,'forgot_password'])->name('forgot_password');
 
-Route::post('/final-settlement', [EmployeeController::class, 'finalSettlement'])->name('final.settlement');
 
 Route::get('/employees',[EmployeeController::class,'view_employee'])->name('view_employee');
 Route::get('/swipe-list',[EmployeeController::class,'view_swipe_users'])->name('view_swipe_users');
