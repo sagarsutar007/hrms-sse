@@ -421,9 +421,28 @@ return [
         'url' => '/calendar',
     ],
     [
-        'text' => 'Super Admin Settings',
+        'text' => 'Settings',
         'icon' => 'fas fa-cogs',
-        'url' => '/super-admin-settings',
+        'submenu' => [
+            [
+                'text' => 'Super Admin Settings',
+                'url'  => 'super-admin-settings',
+                'icon' => 'fas fa-user-shield',
+                // 'can'  => 'isSuperAdmin',
+            ],
+            [
+                'text' => 'Admin Settings',
+                'url'  => 'admin',
+                'icon' => 'fas fa-user-cog',
+                // 'can'  => 'isAdmin',
+            ],
+            [
+                'text' => 'HR Settings',
+                'url'  => 'HR-page',
+                'icon' => 'fas fa-user-tie',
+                // 'can'  => 'isHR',
+            ],
+        ],
     ],
 ],
 
