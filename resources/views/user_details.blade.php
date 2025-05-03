@@ -1022,55 +1022,56 @@
                                                     <!-- Deduction Form Modal -->
                                                     <div class="modal fade" id="deductionModal" tabindex="-1" role="dialog" aria-labelledby="deductionModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog modal-lg" role="document">
-                                                        <div class="modal-content">
+                                                            <div class="modal-content">
+                                                                <form action="{{ route('form_request') }}" method="post" id="add_deductions_form">
+                                                                    @csrf
+                                                                    <input type="text" name="form_type" value="Deduction_form" hidden>
+                                                                    <input type="number" name="Deduction_id_input" id="Deduction_id_input" hidden>
+                                                                    <input type="text" name="Employee_Id" style="padding: 5px 10px; width:100%;" value="<?php if(isset($u_data['Employee_id'])){ echo $u_data['Employee_id']; } ?>" hidden>
 
-                                                            <form action="{{ route('form_request') }}" method="post" id="add_deductions_form">
-                                                            @csrf
-                                                            <input type="text" name="form_type" value="Deduction_form" hidden>
-                                                            <input type="number" name="Deduction_id_input" id="Deduction_id_input" hidden>
-                                                            <input type="text" name="Employee_Id" style="padding: 5px 10px; width:100%;" value="<?php if(isset($u_data['Employee_id'])){ echo $u_data['Employee_id']; } ?>" hidden>
+                                                                    <!-- Modal Header -->
+                                                                    <div class="modal-header bg-primary">
+                                                                        <h5 class="modal-title text-white" id="add_deductions_form_header">
+                                                                            <i class="fas fa-minus-circle mr-2"></i> Add Deduction
+                                                                        </h5>
+                                                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" onclick="close_Deduction_form()">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
 
-                                                            <!-- Modal Header -->
-                                                            <div class="modal-header bg-primary">
-                                                                <h5 class="modal-title text-white" id="add_deductions_form_header">
-                                                                <i class="fas fa-minus-circle mr-2"></i> Add Deduction
-                                                                </h5>
-                                                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" onclick="close_Deduction_form()">
-                                                                <span aria-hidden="true">&times;</span>
-                                                                </button>
+                                                                    <!-- Modal Body -->
+                                                                    <div class="modal-body">
+                                                                        <div class="alert alert-info">
+                                                                            <i class="fas fa-info-circle mr-1"></i> Deductions are applied to the month <strong>following</strong> the selected month.
+                                                                        </div>
+
+                                                                        <div class="form-group row">
+                                                                            <div class="col-md-6">
+                                                                                <label class="input_lable_p">Select Month *</label>
+                                                                                <input type="month" class="form-control" id="Deduction_month" name="Month_Year" required>
+                                                                                <small class="text-muted">Deduction will apply to the following month</small>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <label class="input_lable_p">Deduction Title *</label>
+                                                                                <input type="text" class="form-control" name="Deduction_Title" id="Deduction_Title" placeholder="Deduction Title *" required>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label class="input_lable_p">(₹) Deduction Amount *</label>
+                                                                            <input type="text" class="form-control" name="Deduction_Amount" id="Deduction_Amount" placeholder="Deduction Amount" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Modal Footer -->
+                                                                    <div class="modal-footer justify-content-between">
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="close_Deduction_form()">
+                                                                            <i class="fas fa-times mr-1"></i> Cancel
+                                                                        </button>
+                                                                        <input type="submit" value="Submit" class="btn btn-success" id="_submit_btn">
+                                                                    </div>
+                                                                </form>
                                                             </div>
-
-                                                            <!-- Modal Body -->
-                                                            <div class="modal-body">
-
-                                                                <div class="form-group row">
-                                                                <div class="col-md-6">
-                                                                    <label class="input_lable_p">Month *</label>
-                                                                    <input type="month" class="form-control" id="Deduction_month" name="Month_Year" required>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label class="input_lable_p">Deduction Title *</label>
-                                                                    <input type="text" class="form-control" name="Deduction_Title" id="Deduction_Title" placeholder="Deduction Title *" required>
-                                                                </div>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                <label class="input_lable_p">(₹) Deduction Amount *</label>
-                                                                <input type="text" class="form-control" name="Deduction_Amount" id="Deduction_Amount" placeholder="Deduction Amount" required>
-                                                                </div>
-
-                                                            </div>
-
-                                                            <!-- Modal Footer -->
-                                                            <div class="modal-footer justify-content-between">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="close_Deduction_form()">
-                                                                <i class="fas fa-times mr-1"></i> Cancel
-                                                                </button>
-                                                                <input type="submit" value="Submit" class="btn btn-success" id="_submit_btn">
-                                                            </div>
-
-                                                            </form>
-                                                        </div>
                                                         </div>
                                                     </div>
 
@@ -2130,250 +2131,167 @@
 
 
 
-    // Function to generate installment table with correct date handling
-function genrate_table(existingInstallments = null) {
-    // Clear previous results
-    $("#monthList").empty();
-
-    // Remove any existing hidden input container
-    $(".installment-hidden-inputs").remove();
-
-    // Create a new container for hidden inputs
-    const hiddenInputsContainer = $("<div class='installment-hidden-inputs'></div>");
-    $("#add_loan_form").append(hiddenInputsContainer);
-
-    if (existingInstallments && existingInstallments.length > 0) {
-        // Display existing installments with proper date formatting
-        for (let i = 0; i < existingInstallments.length; i++) {
-            const installment = existingInstallments[i];
-
-            // Format the month display
-            let displayMonth = installment.Month || 'Unknown';
-            if (displayMonth && displayMonth.includes('-')) {
-                const [year, month] = displayMonth.split('-');
-                if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
-                    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-                    displayMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
-                }
-            }
-
-            $("#monthList").append(`
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${displayMonth}</td>
-                    <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
-                </tr>
-            `);
-
-            hiddenInputsContainer.append(`
-                <input type="hidden" name="installments[${i}][Month]" value="${installment.Month || ''}">
-                <input type="hidden" name="installments[${i}][Amount]" value="${parseFloat(installment.Amount || 0).toFixed(2)}">
-                <input type="hidden" name="installments[${i}][Id]" value="${installment.Id || ''}">
-            `);
-        }
-    } else {
-        // Calculate new installments
-        const selectedDate = $("#loan_month").val(); // Format: YYYY-MM
-        const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
-        const advance_amount = parseFloat($("#loan_amount").val()) || 0;
-
-        if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
-            // Parse the selected date properly
-            const [year, month] = selectedDate.split('-').map(num => parseInt(num, 10));
-
-            // Start from the next month after the selected month
-            let currentMonth = month;
-            let currentYear = year;
-
-            for (let i = 0; i < number_of_loop; i++) {
-                // Calculate the next month
-                currentMonth++;
-                if (currentMonth > 12) {
-                    currentMonth = 1;
-                    currentYear++;
-                }
-
-                // Create a date object for formatting
-                const monthDate = new Date(currentYear, currentMonth - 1, 1);
-                const monthName = monthDate.toLocaleString("default", { month: "long" });
-                const displayYear = monthDate.getFullYear();
-                const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
-
-                // Format for the hidden input: YYYY-MM
-                const monthYearString = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
-
-                $("#monthList").append(`
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td>${monthName} ${displayYear}</td>
-                        <td>${installmentAmount}</td>
-                    </tr>
-                `);
-
-                hiddenInputsContainer.append(`
-                    <input type="hidden" name="installments[${i}][Month]" value="${monthYearString}">
-                    <input type="hidden" name="installments[${i}][Amount]" value="${installmentAmount}">
-                `);
-            }
-        }
-    }
-}
-
-    // Function to view loan/advance details with proper date formatting
     function loan_view(id) {
-            $.ajax({
-                type: "GET",
-                url: "/Loan/" + id,
-                dataType: "json",
-                success: function (response) {
-                    console.log("Loan Response:", response);
+        $.ajax({
+            type: "GET",
+            url: "/Loan/" + id,
+            dataType: "json",
+            success: function (response) {
+                console.log("Loan Response:", response);
 
-                    if (response.success) {
-                        var r_data = response.data;
+                if (response.success) {
+                    var r_data = response.data;
 
-                        // Format the month for display if it exists
-                        let displayMonth = r_data.Month;
-                        if (displayMonth && displayMonth.includes('-')) {
-                            const dateParts = displayMonth.split('-');
-                            // Create a date object and format it
-                            if (dateParts.length >= 2) {
-                                const monthDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, 1);
-                                displayMonth = monthDate.toLocaleString("default", { year: 'numeric', month: 'long' });
-                            }
-                        }
-
-                        // Basic loan information
-                        var modalContent = `
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
-                                    <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
-                                    <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
-                                </div>
-                                <div class="col-md-6">
-                                    <h5><strong>Month:</strong> ${displayMonth}</h5>
-                                    <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
-                                </div>
+                    // Basic loan information
+                    var modalContent = `
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5><strong>Reason:</strong> ${r_data.Reason}</h5>
+                                <h5><strong>Amount:</strong> ₹ ${r_data.Loan_Amount_in_INR}</h5>
+                                <h5><strong>Installments:</strong> ${r_data.Number_of_installment}</h5>
                             </div>
-                        `;
-
-                        // Installment breakdown section
-                        modalContent += `
-                            <div class="row">
-                                <div class="col-12">
-                                    <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-hover">
-                                            <thead class="thead-dark">
-                                                <tr>
-                                                    <th>Sr. No</th>
-                                                    <th>Month - Year</th>
-                                                    <th>Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                        `;
-
-                        if (r_data.installments && r_data.installments.length > 0) {
-                            // Show actual installment records with proper formatting
-                            r_data.installments.forEach((installment, index) => {
-                                // Format the installment month
-                                let formattedMonth = installment.Month || 'N/A';
-                                if (formattedMonth && formattedMonth.includes('-')) {
-                                    const [year, month] = formattedMonth.split('-');
-                                    if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
-                                        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-                                        formattedMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
-                                    }
-                                }
-
-                                modalContent += `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${formattedMonth}</td>
-                                        <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
-                                    </tr>
-                                `;
-                            });
-                        } else {
-                            // Generate installments if missing
-                            const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
-                            const numberOfInstallments = parseInt(r_data.Number_of_installment);
-
-                            if (totalAmount && numberOfInstallments) {
-                                const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
-
-                                // Parse the loan month properly
-                                let baseYear, baseMonth;
-                                if (r_data.Month && r_data.Month.includes('-')) {
-                                    const dateParts = r_data.Month.split('-');
-                                    baseYear = parseInt(dateParts[0]);
-                                    baseMonth = parseInt(dateParts[1]);
-                                } else {
-                                    // Fallback to current date
-                                    const now = new Date();
-                                    baseYear = now.getFullYear();
-                                    baseMonth = now.getMonth() + 1;
-                                }
-
-                                // Start from next month after loan month
-                                for (let i = 0; i < numberOfInstallments; i++) {
-                                    // Calculate next month properly
-                                    let currentMonth = baseMonth + 1 + i;
-                                    let currentYear = baseYear;
-
-                                    // Handle year rollover
-                                    while (currentMonth > 12) {
-                                        currentMonth -= 12;
-                                        currentYear++;
-                                    }
-
-                                    // Create date object for proper formatting
-                                    const monthDate = new Date(currentYear, currentMonth - 1, 1);
-                                    const monthName = monthDate.toLocaleString("default", { month: "long" });
-                                    const year = monthDate.getFullYear();
-
-                                    modalContent += `
-                                        <tr>
-                                            <td>${i + 1}</td>
-                                            <td>${monthName} ${year}</td>
-                                            <td>₹ ${installmentAmount}</td>
-                                        </tr>
-                                    `;
-                                }
-                            } else {
-                                modalContent += `
-                                    <tr>
-                                        <td colspan="3" class="text-center">No installment data available</td>
-                                    </tr>
-                                `;
-                            }
-                        }
-
-                        modalContent += `
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                            <div class="col-md-6">
+                                <h5><strong>Month:</strong> ${r_data.Month}</h5>
+                                <h5><strong>Year:</strong> ${r_data.Year || ''}</h5>
                             </div>
-                        `;
+                        </div>
+                    `;
 
-                        $("#loanViewModalContent").html(modalContent);
-                        $("#loanViewModal").modal("show");
+                    // Installment breakdown section
+                    modalContent += `
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="mb-3"><strong>Installment Breakdown</strong></h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Sr. No</th>
+                                                <th>Month - Year</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                    `;
 
+                    if (r_data.installments && r_data.installments.length > 0) {
+                        // Show actual installment records - sort them to ensure proper order
+                        const sortedInstallments = [...r_data.installments].sort((a, b) => {
+                            // Try to parse dates for comparison
+                            const dateA = new Date(a.Month?.replace(/(\w+)\s+(\d{4})/, "$2-$1-01") || "");
+                            const dateB = new Date(b.Month?.replace(/(\w+)\s+(\d{4})/, "$2-$1-01") || "");
+
+                            if (!isNaN(dateA) && !isNaN(dateB)) {
+                                return dateA - dateB;
+                            }
+                            return 0; // Keep original order if can't parse
+                        });
+
+                        sortedInstallments.forEach((installment, index) => {
+                            modalContent += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${installment.Month || 'N/A'}</td>
+                                    <td>₹ ${parseFloat(installment.Amount || 0).toFixed(2)}</td>
+                                </tr>
+                            `;
+                        });
                     } else {
-                        $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
-                        $("#loanViewModal").modal("show");
+                        // Generate installments if missing
+                        const totalAmount = parseFloat(r_data.Loan_Amount_in_INR);
+                        const numberOfInstallments = parseInt(r_data.Number_of_installment);
+
+                        if (totalAmount && numberOfInstallments) {
+                            const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
+
+                            // Parse the date properly
+                            let startDate;
+                            try {
+                                // Check if Month is in yyyy-mm-dd format
+                                if (r_data.Month && r_data.Month.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                    startDate = new Date(r_data.Month);
+                                }
+                                // Check if Month is in yyyy-mm format
+                                else if (r_data.Month && r_data.Month.match(/^\d{4}-\d{2}$/)) {
+                                    startDate = new Date(r_data.Month + "-01");
+                                }
+                                // Otherwise use current date
+                                else {
+                                    startDate = new Date();
+                                }
+
+                                // Validate that we have a valid date
+                                if (isNaN(startDate.getTime())) {
+                                    startDate = new Date(); // Use current date as fallback
+                                }
+                            } catch (e) {
+                                console.error("Date parsing error:", e);
+                                startDate = new Date(); // Use current date as fallback
+                            }
+
+                            // UPDATED: Start with NEXT month after the loan month (to match backend logic)
+                            const baseYear = startDate.getFullYear();
+                            let baseMonth = startDate.getMonth() + 1 + 1; // +1 for zero-based months, +1 for NEXT month
+
+                            // Handle month overflow
+                            let adjustedBaseYear = baseYear;
+                            if (baseMonth > 12) {
+                                baseMonth = baseMonth - 12;
+                                adjustedBaseYear++;
+                            }
+
+                            for (let i = 0; i < numberOfInstallments; i++) {
+                                // Calculate each installment month
+                                const currentMonth = (baseMonth + i - 1) % 12 + 1; // Convert to 1-12 range
+                                const currentYear = adjustedBaseYear + Math.floor((baseMonth + i - 1) / 12);
+
+                                // Create date object for formatting
+                                const monthDate = new Date(currentYear, currentMonth - 1, 1);
+
+                                // Format the date properly
+                                const monthName = monthDate.toLocaleString("default", { month: "long" });
+                                const formattedDate = `${monthName} ${currentYear}`;
+
+                                modalContent += `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${formattedDate}</td>
+                                        <td>₹ ${installmentAmount}</td>
+                                    </tr>
+                                `;
+                            }
+                        } else {
+                            modalContent += `
+                                <tr>
+                                    <td colspan="3" class="text-center">No installment data available</td>
+                                </tr>
+                            `;
+                        }
                     }
-                },
-                error: function (xhr) {
-                    console.log("Error:", xhr.responseText);
-                    $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
+
+                    modalContent += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    $("#loanViewModalContent").html(modalContent);
+                    $("#loanViewModal").modal("show");
+
+                } else {
+                    $("#loanViewModalContent").html(`<p class="text-danger">${response.message}</p>`);
                     $("#loanViewModal").modal("show");
                 }
-            });
-        }
-
+            },
+            error: function (xhr) {
+                console.log("Error:", xhr.responseText);
+                $("#loanViewModalContent").html(`<p class="text-danger">Something went wrong.</p>`);
+                $("#loanViewModal").modal("show");
+            }
+        });
+    }
 
     $('#confirmDeleteModal').on('show.bs.modal', function(e) {
         var href = $(e.relatedTarget).data('href');
@@ -2673,98 +2591,133 @@ function genrate_table(existingInstallments = null) {
 
    load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
 
-   function load_deductions_data(url_input) {
-        $.ajax({
-            url: url_input, // API endpoint URL
-            type: "GET", // HTTP method
-            dataType: "json",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(response) {
-                console.log("Deduction Response:", response); // Log the successful response
-
-                // Empty the table body
-                $("#Deductions_table tbody").empty();
-
-                // Table Header
-                var table_html_data = `
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" name="delet_data" id=""></th>
-                            <th>Month-Year</th>
-                            <th>Title</th>
-                            <th>(₹) Amount</th>
-                            <th>Against Advance</th>
-                            <th>Paid Flag</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-                // Populate Table Rows
-                var all_data = response.data;
-                all_data.forEach($deduction => {
-                    const againstAdvance = ($deduction.Advance_Ids && $deduction.Advance_Ids != 0) ? "Yes" : "No";
-                    const paidFlag = ($deduction.Deduction_Paid_Flag == 1) ? "Yes" : "No";
-
-                    // Conditional buttons based on paid flag
-                    let actionButtons = `
-                        <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
-                            <i class="fa-regular fa-eye"></i>
-                        </button>`;
-
-                    // Only show edit and delete buttons if Deduction_Paid_Flag is not 1
-                    if ($deduction.Deduction_Paid_Flag != 1) {
-                        actionButtons += `
-                            <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
-                                <i class="fa-solid fa-pencil"></i>
-                            </button>
-                            <button type="button"
-                                    class="btn btn-sm btn-danger"
-                                    data-toggle="modal"
-                                    data-target="#confirmDeleteModal"
-                                    data-href="/delete/${$deduction.id}/deductions">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>`;
+   // First, load the deductions
+function load_deductions_data(url_input) {
+    // First, fetch all loans to create a lookup table
+    $.ajax({
+        url: "/api/loans", // Endpoint that returns all loans for the employee
+        type: "GET",
+        dataType: "json",
+        success: function(loansResponse) {
+            // Create a lookup map of loan IDs to reasons
+            var loanReasons = {};
+            if (loansResponse.success && loansResponse.data) {
+                loansResponse.data.forEach(function(loan) {
+                    loanReasons[loan.id] = loan.Reason;
+                    if (loan.Loan_id) {
+                        loanReasons[loan.Loan_id] = loan.Reason;
                     }
-
-                    table_html_data += `
-                        <tr>
-                            <td><input type="checkbox" name="delet_data" id=""></td>
-                            <td>${$deduction.Month}</td>
-                            <td>${$deduction.deduction_Titel}</td>
-                            <td>${$deduction.deduction_Amount_in_INR}</td>
-                            <td>${againstAdvance}</td>
-                            <td>${paidFlag}</td>
-                            <td>${actionButtons}</td>
-                        </tr>`;
                 });
+            }
 
-                table_html_data += `</tbody>`;
+            // Now fetch and display deductions with loan reasons
+            fetchDeductions(url_input, loanReasons);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching loans:", error);
+            // Still try to fetch deductions even if loans fetch fails
+            fetchDeductions(url_input, {});
+        }
+    });
+}
 
-                // Append the data to the table
-                $("#Deductions_table").html(table_html_data);
+function fetchDeductions(url_input) {
+    $.ajax({
+        url: url_input,
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+            console.log("Deduction Response:", response);
 
-                // Reinitialize DataTables after data is loaded
-                if ($.fn.DataTable.isDataTable('#Deductions_table')) {
-                    $('#Deductions_table').DataTable().clear().destroy();
+            // Empty the table body
+            $("#Deductions_table tbody").empty();
+
+            // Table Header
+            var table_html_data = `
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" name="delet_data" id=""></th>
+                        <th>Month-Year</th>
+                        <th>Title/Reason</th>
+                        <th>(₹) Amount</th>
+                        <th>Against Advance</th>
+                        <th>Paid Flag</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            // Populate Table Rows
+            var all_data = response.data;
+            all_data.forEach(function($deduction) {
+                const againstAdvance = ($deduction.Advance_Ids && $deduction.Advance_Ids != 0) ? "Yes" : "No";
+                const paidFlag = ($deduction.Deduction_Paid_Flag == 1) ? "Yes" : "No";
+
+                // Combine title and reason if available
+                let titleDisplay = $deduction.deduction_Titel || "";
+
+                // Check if this deduction is against an advance and we have a reason for it
+                if (againstAdvance === "Yes" && $deduction.loan_reason) {
+                    titleDisplay += ` <small class="text-muted">(${$deduction.loan_reason})</small>`;
                 }
 
-                $('#Deductions_table').DataTable({
-                    responsive: true,
-                    ordering: true,
-                    paging: true,
-                    searching: true,
-                    autoWidth: false,
-                    info: true
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error:", error); // Log the error
+                // Conditional buttons based on paid flag
+                let actionButtons = `
+                    <button type="button" class="btn btn-sm btn-info" onclick="Deductions_view('${$deduction.id}')">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>`;
+
+                // Only show edit and delete buttons if Deduction_Paid_Flag is not 1
+                if ($deduction.Deduction_Paid_Flag != 1) {
+                    actionButtons += `
+                        <button type="button" class="btn btn-sm btn-primary" onclick="open_Update_Deduction_form('${$deduction.id}')">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                data-toggle="modal"
+                                data-target="#confirmDeleteModal"
+                                data-href="/delete/${$deduction.id}/deductions">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>`;
+                }
+
+                table_html_data += `
+                    <tr>
+                        <td><input type="checkbox" name="delet_data" id=""></td>
+                        <td>${$deduction.Month || ""}</td>
+                        <td>${titleDisplay}</td>
+                        <td>${$deduction.deduction_Amount_in_INR ? parseFloat($deduction.deduction_Amount_in_INR).toFixed(2) : ""}</td>
+                        <td>${againstAdvance}</td>
+                        <td>${paidFlag}</td>
+                        <td>${actionButtons}</td>
+                    </tr>`;
+            });
+
+            table_html_data += `</tbody>`;
+
+            // Append the data to the table
+            $("#Deductions_table").html(table_html_data);
+
+            // Reinitialize DataTables after data is loaded
+            if ($.fn.DataTable.isDataTable('#Deductions_table')) {
+                $('#Deductions_table').DataTable().clear().destroy();
             }
-        });
-    }
+
+            $('#Deductions_table').DataTable({
+                responsive: true,
+                ordering: true,
+                paging: true,
+                searching: true,
+                autoWidth: false,
+                info: true
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+        }
+    });
+}
 
     function Deductions_view(id) {
         $.ajax({
@@ -2815,112 +2768,101 @@ function genrate_table(existingInstallments = null) {
         });
     }
 
-    function open_Deduction_form() {
-        $('#deductionModal').modal('show');
-        // Reset form fields
-        $("#add_deductions_form")[0].reset();
-        $("#add_deductions_form_header").html('<i class="fas fa-minus-circle mr-2"></i> Add Deduction');
-        $("#Deduction_id_input").val("");
-    }
 
-    // Function to close the deduction form modal
-    function close_Deduction_form() {
-        $('#deductionModal').modal('hide');
-        $("#add_deductions_form")[0].reset();
-    }
 
-    // Function to open the update deduction form with existing data
     function open_Update_Deduction_form(id) {
         open_Deduction_form();
         $("#add_deductions_form_header").text("Update Deduction");
         $("#Deduction_id_input").val(id);
+
         $.ajax({
             type: "GET",
-            url: "{{url('/Deductions/')}}/"+id,
+            url: "{{url('/Deductions/')}}/" + id,
             dataType: "json",
             success: function(response) {
                 console.log(response);
-                var r_data = response.data
+                var r_data = response.data;
                 $("#Deduction_Title").val(r_data.deduction_Titel);
                 $("#Deduction_Amount").val(r_data.deduction_Amount_in_INR);
 
-                // Extract the 'YYYY-MM' part from 'YYYY-MM-DD'
-                const deductionMonth = r_data.deductions_Month.substring(0, 7);
+                // Extract the date from deductions_Month and convert back to the original input month
+                // The stored deductions_Month is for the next month (e.g., "2025-04-15" for April)
+                // We need to display the previous month (e.g., "2025-03" for March)
+                const deductionFullDate = r_data.deductions_Month; // e.g., "2025-04-15"
+                const parts = deductionFullDate.split('-');
+
+                // Get the year and month from the stored date
+                let year = parseInt(parts[0]);
+                let month = parseInt(parts[1]);
+
+                // Calculate the previous month (the month that was originally selected)
+                month = month - 1;
+                if (month === 0) {
+                    month = 12;
+                    year = year - 1;
+                }
+
+                // Format month with leading zero if needed
+                const formattedMonth = month.toString().padStart(2, '0');
+
+                // Create the value in YYYY-MM format for the month input
+                const originalMonth = `${year}-${formattedMonth}`;
 
                 // Set the value of the month input
-                $("#Deduction_month").val(deductionMonth);
+                $("#Deduction_month").val(originalMonth);
             },
             error: function(xhr, status, error) {
                 console.log(xhr.responseText);
                 // Handle the error here
-                alert("Error loading deduction details.");
             }
         });
     }
 
-    // Helper function to get the next month from a given month string (YYYY-MM)
-    function getNextMonth(dateString) {
-        let date = new Date(dateString + "-01"); // Add day to make valid date
-        date.setMonth(date.getMonth() + 1);
-        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0');
-    }
+    $("#add_deductions_form").on('submit', function(e) {
+        e.preventDefault();
 
-    // Set up form submission handler to change the month value
-    $(document).ready(function() {
-        // Modify the form submission to increment the month
-        $("#add_deductions_form").submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
+        // Show loading indicator if needed
+        // $("#_submit_btn").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+        $("#_submit_btn").prop('disabled', true);
 
-            // Get the selected month
-            const selectedMonth = $("#Deduction_month").val();
-
-            // Calculate the next month (when the deduction will actually be applied)
-            const appliedMonth = getNextMonth(selectedMonth);
-
-            // Create a copy of the form data
-            var formData = new FormData(this);
-
-            // Update the Month_Year field to the next month
-            formData.set('Month_Year', appliedMonth);
-
-            // Log what we're submitting
-            console.log("Original selected month:", selectedMonth);
-            console.log("Applied month (shifted forward):", appliedMonth);
-
-            // Submit the modified form data via AJAX
-            $.ajax({
-                url: $(this).attr('action'),
-                type: $(this).attr('method'),
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log(response);
-
-                    // Close the modal
+        $.ajax({
+            type: "POST",
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function(response) {
+                if (response.success) {
+                    // Success message
+                    alert(response.message);
+                    // Close modal
                     close_Deduction_form();
-
-                    // Show success message
-                    alert("Deduction saved successfully! The deduction will be applied from " + appliedMonth);
-
-                    // Reload the page or update the table
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.log(xhr.responseText);
-                    alert("Error saving deduction. Please try again.");
+                    // Reload data or update UI as needed
+                    location.reload(); // or update just the table
+                } else {
+                    // Error message
+                    alert("Error: " + response.message);
                 }
-            });
+                $("#_submit_btn").prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error submitting form:", xhr.responseText);
+                alert("An error occurred. Please try again.");
+                $("#_submit_btn").prop('disabled', false);
+            }
         });
     });
 
-    // If you're using a button to submit the form instead of the form's submit event
-    $("#_submit_btn").click(function() {
-        // Trigger the form submission
-        $("#add_deductions_form").submit();
+    // Optional: Form validation
+    $("#Deduction_Amount").on('input', function() {
+        // Allow only numbers and decimal point
+        $(this).val($(this).val().replace(/[^0-9.]/g, ''));
     });
 
+
+
     load_loan_data("{{ url('loan_view_api/' . $u_data['Employee_id']) }}");
+
+
 
     function load_loan_data(url_input) {
     // Show a loading indicator
@@ -2991,7 +2933,6 @@ function genrate_table(existingInstallments = null) {
 
 
     // Function to open the loan/advance modal
-    // Modified function to open loan modal with proper date handling
     function open_loan_modal(id = null) {
         // Reset the form first
         $("#add_loan_form")[0].reset();
@@ -3051,7 +2992,7 @@ function genrate_table(existingInstallments = null) {
         $("#loanModal").modal("show");
     }
 
-    // Fixed genrate_table function to correctly handle month increments
+    // Modify your genrate_table function to include hidden inputs
     function genrate_table(existingInstallments = null) {
         // Clear previous results
         $("#monthList").empty();
@@ -3064,24 +3005,12 @@ function genrate_table(existingInstallments = null) {
         $("#add_loan_form").append(hiddenInputsContainer);
 
         if (existingInstallments && existingInstallments.length > 0) {
-            // Display existing installments with proper date formatting
             for (let i = 0; i < existingInstallments.length; i++) {
                 const installment = existingInstallments[i];
-
-                // Format the month display
-                let displayMonth = installment.Month || 'Unknown';
-                if (displayMonth && displayMonth.includes('-')) {
-                    const [year, month] = displayMonth.split('-');
-                    if (!isNaN(parseInt(year)) && !isNaN(parseInt(month))) {
-                        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-                        displayMonth = date.toLocaleString("default", { month: "long" }) + " " + date.getFullYear();
-                    }
-                }
-
                 $("#monthList").append(`
                     <tr>
                         <td>${i + 1}</td>
-                        <td>${displayMonth}</td>
+                        <td>${installment.Month || 'Unknown'}</td>
                         <td>${parseFloat(installment.Amount || 0).toFixed(2)}</td>
                     </tr>
                 `);
@@ -3093,35 +3022,21 @@ function genrate_table(existingInstallments = null) {
                 `);
             }
         } else {
-            // Calculate new installments
-            const selectedDate = $("#loan_month").val(); // Format: YYYY-MM
+            const selectedDate = $("#loan_month").val();
             const number_of_loop = parseInt($("#number_of_loan_installment").val()) || 0;
             const advance_amount = parseFloat($("#loan_amount").val()) || 0;
 
             if (selectedDate && number_of_loop > 0 && advance_amount > 0) {
-                // Parse the selected date properly
-                const [year, month] = selectedDate.split('-').map(num => parseInt(num, 10));
-
-                // Start from the next month after the selected month
-                let currentMonth = month;
-                let currentYear = year;
+                const startDate = new Date(selectedDate);
+                const year = startDate.getFullYear();
+                const startMonth = startDate.getMonth() + 1; // Start from next month
 
                 for (let i = 0; i < number_of_loop; i++) {
-                    // Calculate the next month
-                    currentMonth++;
-                    if (currentMonth > 12) {
-                        currentMonth = 1;
-                        currentYear++;
-                    }
-
-                    // Create a date object for formatting
-                    const monthDate = new Date(currentYear, currentMonth - 1, 1);
+                    const monthDate = new Date(year, startMonth + i, 1);
                     const monthName = monthDate.toLocaleString("default", { month: "long" });
                     const displayYear = monthDate.getFullYear();
                     const installmentAmount = (advance_amount / number_of_loop).toFixed(2);
-
-                    // Format for the hidden input: YYYY-MM
-                    const monthYearString = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+                    const monthYearString = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
 
                     $("#monthList").append(`
                         <tr>
@@ -3139,74 +3054,6 @@ function genrate_table(existingInstallments = null) {
             }
         }
     }
-
-    $(document).ready(function() {
-        // Auto-generate installment table when form values change
-        $("#loan_month, #loan_amount, #number_of_loan_installment").on("change", function() {
-            genrate_table();
-        });
-
-        $('#loan_form_submit_btn').on('click', function(event) {
-            event.preventDefault();
-
-            // Make sure all required fields are filled
-            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_reason').val()) {
-                alert('Please fill all required fields');
-                return;
-            }
-
-            // Format the month input for the backend as "YYYY-MM-DD"
-            var monthInput = $('#loan_month').val(); // Format: "2025-03"
-            var formattedDate = monthInput + "-01"; // Add day to make it "2025-03-01"
-
-            var formData = {
-                form_type: "Loan_form",
-                Employee_Id: $('input[name="Employee_Id"]').val(),
-                Month: formattedDate, // Use "2025-03-01" format
-                Amount: $('#loan_amount').val(),
-                Number_of_installment: $('#number_of_loan_installment').val(),
-                Reason: $('#loan_reason').val(),
-                loan_Id_input: $('#loan_Id_input').val() || '',
-                _token: $('input[name="_token"]').val()
-            };
-
-            console.log("Form data being sent:", formData);
-
-            $.ajax({
-                url: $('#add_loan_form').attr('action'),
-                method: "POST",
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
-                },
-                beforeSend: function() {
-                    // Show loading state
-                    $('#loan_form_submit_btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
-                },
-                success: function(response) {
-                    console.log("Success response:", response);
-                    if(response.success) {
-                        alert(response.message);
-                        $('#loanModal').modal('hide');
-                        $('#add_loan_form')[0].reset();
-                        $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
-                        // Reload the page to reflect changes
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', xhr.responseText);
-                    alert('An error occurred. Please try again later.');
-                },
-                complete: function() {
-                    // Re-enable button
-                    $('#loan_form_submit_btn').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Submit');
-                }
-            });
-        });
-    });
 
 
     // Make sure your edit buttons use this function

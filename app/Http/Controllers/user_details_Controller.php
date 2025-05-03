@@ -1300,8 +1300,16 @@ return response()->json([
                         DB::table('deductions')->where('Advance_Ids', $loan_Id_input)->delete();
 
                         // Recalculate and insert updated deductions
+                        // Start from next month instead of current month
                         $year = date('Y', strtotime($Month));
-                        $month = date('n', strtotime($Month));
+                        $month = date('n', strtotime($Month)) + 1; // Add 1 to start from next month
+
+                        // Adjust year if month goes beyond December
+                        if ($month > 12) {
+                            $month = 1;
+                            $year++;
+                        }
+
                         $deduction_amount = $Amount / $Number_of_installment;
                         $months = [];
 
@@ -1328,7 +1336,7 @@ return response()->json([
 
                         return response()->json([
                             'success' => true,
-                            'message' => 'Loan and related deductions updated successfully.',
+                            'message' => 'Loan and related deductions updated successfully. First installment will apply from next month.',
                         ], 201); // 201 Created
                     } else {
                         return response()->json([
@@ -1358,8 +1366,16 @@ return response()->json([
                     ]);
 
                     // Generate deductions and insert into the database
+                    // Start from next month instead of current month
                     $year = date('Y', strtotime($Month));
-                    $month = date('n', strtotime($Month));
+                    $month = date('n', strtotime($Month)) + 1; // Add 1 to start from next month
+
+                    // Adjust year if month goes beyond December
+                    if ($month > 12) {
+                        $month = 1;
+                        $year++;
+                    }
+
                     $deduction_amount = $Amount / $Number_of_installment;
 
                     for ($i = 1; $i <= $Number_of_installment; $i++) {
@@ -1385,7 +1401,7 @@ return response()->json([
 
                     return response()->json([
                         'success' => true,
-                        'message' => 'Loan and related deductions inserted successfully.',
+                        'message' => 'Loan and related deductions inserted successfully. First installment will apply from next month.',
                     ], 201); // 201 Created
                 }
 
@@ -1396,120 +1412,107 @@ return response()->json([
                 $Deduction_Title = $freq->Deduction_Title;
                 $Deduction_Amount = $freq->Deduction_Amount;
                 $Deduction_id_input = $freq->Deduction_id_input;
+
+                // Start deduction from next month
+                // Parse the original month and year
+                if (!preg_match('/^\d{4}-\d{2}$/', $Month_Year)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid Month_Year format. Expected format: YYYY-MM.',
+                    ], 400); // Bad Request
+                }
+
+                [$year, $month] = explode('-', $Month_Year);
+
+                // Calculate next month
+                $nextMonth = intval($month) + 1;
+                $nextYear = intval($year);
+
+                // Adjust if month overflows
+                if ($nextMonth > 12) {
+                    $nextMonth = 1;
+                    $nextYear++;
+                }
+
+                // Format the next month with leading zero if needed
+                $nextMonth = str_pad($nextMonth, 2, '0', STR_PAD_LEFT);
+                $nextMonthYear = "$nextYear-$nextMonth";
+
+                // Format the month for display
+                $months = [
+                    '01' => "January", '02' => "February", '03' => "March",
+                    '04' => "April", '05' => "May", '06' => "June",
+                    '07' => "July", '08' => "August", '09' => "September",
+                    '10' => "October", '11' => "November", '12' => "December"
+                ];
+
+                if (!isset($months[$nextMonth])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid month provided.',
+                    ], 400); // Bad Request
+                }
+
                 if (isset($Deduction_id_input)) {
+                    // Update the database record
+                    $updated = DB::table('deductions')
+                        ->where('id', $Deduction_id_input)
+                        ->update([
+                            'Month' => $months[$nextMonth] . ' ' . $nextYear, // Example: "February 2025"
+                            'deductions_Month' => "$nextYear-$nextMonth-15", // Example: "2025-02-15"
+                            'Year' => $nextYear,
+                            'deduction_Titel' => $Deduction_Title,
+                            'deduction_Amount_in_INR' => $Deduction_Amount,
+                            'updated_at' => now(),
+                        ]);
 
-// Extract Year and Month
-$Month_Year = $freq->Month_Year; // Example: '2025-01'
-if (!preg_match('/^\d{4}-\d{2}$/', $Month_Year)) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Invalid Month_Year format. Expected format: YYYY-MM.',
-    ], 400); // Bad Request
-}
+                    // Respond based on the update status
+                    if ($updated) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Data updated successfully. Deduction will apply from next month.',
+                        ], 201); // 201 Created
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Data not updated.',
+                        ], 400); // 400 Bad Request
+                    }
+                } else {
+                    // Ensure EmployeeID exists in session
+                    $created_by = session()->get('EmployeeID');
+                    if (!$created_by) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Employee ID is required.',
+                        ], 400); // Bad Request
+                    }
 
-[$year, $month] = explode('-', $Month_Year);
+                    // Insert Deduction
+                    $inserted = DB::table('deductions')->insertOrIgnore([
+                        'Employee_id' => $emp_id,
+                        'Month' => $months[$nextMonth] . ' ' . $nextYear, // Example: "February 2025"
+                        'deductions_Month' => $nextYear . '-' . $nextMonth . '-15', // Example: "2025-02-15"
+                        'Year' => $nextYear, // Next year
+                        'deduction_Titel' => $Deduction_Title,
+                        'deduction_Amount_in_INR' => $Deduction_Amount,
+                        'created_by' => $created_by,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
 
-// Format the month for display
-$months = [
-    '01' => "January", '02' => "February", '03' => "March",
-    '04' => "April", '05' => "May", '06' => "June",
-    '07' => "July", '08' => "August", '09' => "September",
-    '10' => "October", '11' => "November", '12' => "December"
-];
-
-if (!isset($months[$month])) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Invalid month provided.',
-    ], 400); // Bad Request
-}
-
-// Update the database record
-$updated = DB::table('deductions')
-    ->where('id', $Deduction_id_input)
-    ->update([
-        'Month' => $months[$month] . ' ' . $year, // Example: "January 2025"
-        'deductions_Month' => "$year-$month-15", // Example: "2025-01-15"
-        'deduction_Titel' => $Deduction_Title,
-        'deduction_Amount_in_INR' => $Deduction_Amount,
-        'updated_at' => now(),
-    ]);
-
-// Respond based on the update status
-if ($updated) {
-    return response()->json([
-        'success' => true,
-        'message' => 'Data updated successfully.',
-    ], 201); // 201 Created
-} else {
-    return response()->json([
-        'success' => false,
-        'message' => 'Data not updated.',
-    ], 400); // 400 Bad Request
-}
-                }else{
-
-
-// Extract Year and Month
-$Month_Year = $freq->Month_Year; // Example: '2025-01'
-if (!preg_match('/^\d{4}-\d{2}$/', $Month_Year)) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Invalid Month_Year format. Expected format: YYYY-MM.',
-    ], 400); // Bad Request
-}
-
-[$year, $month] = explode('-', $Month_Year);
-
-// Format the month for display
-$months = [
-    '01' => "January", '02' => "February", '03' => "March",
-    '04' => "April", '05' => "May", '06' => "June",
-    '07' => "July", '08' => "August", '09' => "September",
-    '10' => "October", '11' => "November", '12' => "December"
-];
-
-if (!isset($months[$month])) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Invalid month provided.',
-    ], 400); // Bad Request
-}
-
-// Ensure EmployeeID exists in session
-$created_by = session()->get('EmployeeID');
-if (!$created_by) {
-    return response()->json([
-        'success' => false,
-        'message' => 'Employee ID is required.',
-    ], 400); // Bad Request
-}
-
-// Insert Deduction
-$inserted = DB::table('deductions')->insertOrIgnore([
-    'Employee_id' => $emp_id,
-    'Month' => $months[$month] . ' ' . $year, // Example: "January 2025"
-    'deductions_Month' => $year . '-' . $month . '-15', // Example: "2025-01-15"
-    'Year' => $year, // Year extracted from Month_Year
-    'deduction_Titel' => $Deduction_Title,
-    'deduction_Amount_in_INR' => $Deduction_Amount,
-    'created_by' => $created_by,
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
-
-// Response Based on Insertion Status
-if ($inserted) {
-    return response()->json([
-        'success' => true,
-        'message' => 'Deduction inserted successfully.',
-    ], 201); // Created
-} else {
-    return response()->json([
-        'success' => false,
-        'message' => 'Data not inserted.',
-    ], 400); // Bad Request
-}
+                    // Response Based on Insertion Status
+                    if ($inserted) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Deduction inserted successfully. Deduction will apply from next month.',
+                        ], 201); // Created
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Data not inserted.',
+                        ], 400); // Bad Request
+                    }
                 }
             } else if ($formType == "Other_Payment_form") {
 
@@ -2173,6 +2176,28 @@ history.back()
     {
         DB::table('penalty_master')->where('id', $id)->delete();
         return back()->with('success', 'Penalty deleted successfully.');
+    }
+
+    // Alternative approach: join with loan table directly
+    public function getDeductions(Request $request)
+    {
+        $employeeId = $request->input('employee_id');
+
+        // Use a left join to directly get loan reasons in a single query
+        $deductions = DB::table('deductions as d')
+            ->leftJoin('loan as l', function($join) {
+                $join->on('d.Advance_Ids', '=', 'l.id')
+                     ->orOn('d.Advance_Ids', '=', 'l.Loan_id');
+            })
+            ->where('d.Employee_id', $employeeId)
+            ->select('d.*', 'l.Reason as loan_reason')
+            ->orderBy('d.deductions_Month', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $deductions
+        ]);
     }
 
 }
