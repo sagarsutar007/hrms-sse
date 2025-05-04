@@ -66,9 +66,9 @@
                             <input type="search" class="form-control" name="search_input" id="search_input"
                                 placeholder="Search by name & Email">
                             <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary" id="search_btn">
+                                {{-- <button type="submit" class="btn btn-primary" id="search_btn">
                                     <i class="fas fa-search"></i> Search
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
                     </form>

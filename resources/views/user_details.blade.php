@@ -2862,10 +2862,8 @@ function fetchDeductions(url_input) {
 
     load_loan_data("{{ url('loan_view_api/' . $u_data['Employee_id']) }}");
 
-
-
     function load_loan_data(url_input) {
-    // Show a loading indicator
+    // Show a loading indicator (optional)
     $.ajax({
         url: url_input,
         type: "GET",
@@ -2889,10 +2887,10 @@ function fetchDeductions(url_input) {
                         <tr>
                             <td><input type="checkbox" name="delet_data"></td>
                             <td>${formattedDate}</td>
-                            <td>${loan.Reason}</td>
-                            <td>${loan.Number_of_installment}</td>
-                            <td>₹ ${loan.Loan_Amount_in_INR}</td>
-                            <td>₹ ${loan.Loan_Remaining}</td>
+                            <td>${loan.Reason || '-'}</td>
+                            <td>${loan.Number_of_installment || '-'}</td>
+                            <td>₹ ${loan.Loan_Amount_in_INR || '0'}</td>
+                            <td>₹ ${loan.Loan_Remaining || '0'}</td>
                             <td>
                                 <button class="btn btn-sm btn-info" onclick="loan_view('${loan.id}')"><i class="fas fa-eye"></i></button>
                                 <button type="button" class="btn btn-sm btn-info" onclick="open_loan_modal('${loan.id}')">
@@ -2902,27 +2900,46 @@ function fetchDeductions(url_input) {
                             </td>
                         </tr>`;
                 });
+
+                // Update the table body with rows
+                $("#loan_view_table").html(table_html_data);
+
+                // Destroy and reinitialize DataTable only if there's data
+                if ($.fn.DataTable.isDataTable('#loan_table')) {
+                    $('#loan_table').DataTable().clear().destroy();
+                }
+
+                $('#loan_table').DataTable({
+                    responsive: true,
+                    ordering: true,
+                    paging: true,
+                    searching: true,
+                    autoWidth: false,
+                    info: true,
+                    columns: [
+                        { orderable: false }, // checkbox
+                        null,                 // Month-Year
+                        null,                 // Reason
+                        null,                 // Installment
+                        null,                 // Amount
+                        null,                 // Remaining
+                        { orderable: false }  // Actions
+                    ]
+                });
+
             } else {
+                // Show fallback row only, skip DataTable initialization
                 table_html_data = '<tr><td colspan="7" class="text-center">No loan data available</td></tr>';
+                $("#loan_view_table").html(table_html_data);
+
+                // Destroy any existing DataTable
+                if ($.fn.DataTable.isDataTable('#loan_table')) {
+                    $('#loan_table').DataTable().clear().destroy();
+                }
             }
 
-            // Append the rows to the table
-            $("#loan_view_table").html(table_html_data);
-
-            // Destroy existing DataTable if it exists
-            if ($.fn.DataTable.isDataTable('#loan_table')) {
-                $('#loan_table').DataTable().clear().destroy();
-            }
-
-            // Initialize DataTable with the new data
-            $('#loan_table').DataTable({
-                responsive: true,
-                ordering: true,
-                paging: true,
-                searching: true,
-                autoWidth: false,
-                info: true
-            });
+            // Debug log of rendered HTML
+            console.log("Generated HTML:", table_html_data);
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -2930,6 +2947,7 @@ function fetchDeductions(url_input) {
         }
     });
 }
+
 
 
     // Function to open the loan/advance modal
@@ -3345,55 +3363,72 @@ function fetchDeductions(url_input) {
             headers: {
                 "Content-Type": "application/json"
             },
-            success: function(response) {
+            success: function (response) {
                 console.log("Attendance Response:", response);
 
-
                 const $table = $('#Attendance_table');
+                let table_html_data = "";
+                const all_data = response.data;
 
-                // Destroy existing DataTable instance before reloading
-                if ($.fn.DataTable.isDataTable($table)) {
-                    $table.DataTable().destroy();
-                }
+                // Clear existing rows
+                $("#Attendance_table_body").empty();
 
-                var table_html_data = "";
-                var all_data = response.data;
-
-                if (all_data.length > 0) {
+                if (all_data && all_data.length > 0) {
                     all_data.forEach($attendance => {
                         table_html_data += `
                             <tr>
                                 <td><input type="checkbox" /></td>
                                 <td>${formatDate($attendance.attandence_Date)}</td>
-                                <td>${$attendance.in_time}</td>
-                                <td>${$attendance.out_time}</td>
+                                <td>${$attendance.in_time || '-'}</td>
+                                <td>${$attendance.out_time || '-'}</td>
                             </tr>`;
                     });
+
+                    $("#Attendance_table_body").html(table_html_data);
+
+                    // Destroy and reinitialize DataTable
+                    if ($.fn.DataTable.isDataTable($table)) {
+                        $table.DataTable().clear().destroy();
+                    }
+
+                    $table.DataTable({
+                        responsive: true,
+                        ordering: true,
+                        paging: true,
+                        searching: true,
+                        autoWidth: false,
+                        info: true,
+                        columns: [
+                            { orderable: false }, // checkbox
+                            null,                 // Attendance Date
+                            null,                 // In Time
+                            null                  // Out Time
+                        ]
+                    });
+
                 } else {
-                    table_html_data += `
+                    table_html_data = `
                         <tr>
                             <td colspan="4" class="text-center">No attendance records found</td>
                         </tr>`;
+                    $("#Attendance_table_body").html(table_html_data);
+
+                    // Destroy any existing DataTable to avoid error
+                    if ($.fn.DataTable.isDataTable($table)) {
+                        $table.DataTable().clear().destroy();
+                    }
                 }
 
-                // Update only the tbody content
-                $("#Attendance_table_body").html(table_html_data);
-
-                // Reinitialize DataTable
-                $table.DataTable({
-                    responsive: true,
-                    ordering: true,
-                    paging: true,
-                    searching: true,
-                    autoWidth: false,
-                    info: true
-                });
+                // Debug log
+                console.log("Generated Attendance HTML:", table_html_data);
             },
-            error: function(xhr, status, error) {
-                console.error("Error:", error);
+            error: function (xhr, status, error) {
+                console.error("Error loading attendance data:", error);
+                $("#Attendance_table_body").html('<tr><td colspan="4" class="text-center">Error loading data. Please try again.</td></tr>');
             }
         });
     }
+
 
     $(document).ready(function() {
         $("#penalties_table").DataTable({
