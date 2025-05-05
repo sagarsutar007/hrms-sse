@@ -116,8 +116,11 @@ class Salary_CalculationsController extends Controller
             ->first();
 
         if (!$user || !$user->termination_date) {
-            return redirect()->back()->with('error', 'User not found or has no termination date');
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found or has no termination date'
+        ]);
+    }
 
         // Extract month and year from termination date
         $terminationDate = new \DateTime($user->termination_date);
@@ -393,124 +396,159 @@ class Salary_CalculationsController extends Controller
 
 
 
-    public function Salary_Calculations_search_api(Request $req){
-      $EmployeesID = session()->get('EmployeeID');
+    public function Salary_Calculations_search_api(Request $req)
+    {
+        $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
         $search_by_inp = $req->search_inp;
+        $employee_id = $req->employee_id; // Add this to get the employee_id parameter
 
-      if(isset( $EmployeesID)){
-      $user_data = DB::table('all_users')
-      ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
-     ->select('all_users.*', 'shift_master.Shift_hours')
-     ->whereAny([
-      'f_name',
-      'l_name',
-      'm_name',
-      'Employee_id',
-      'email',
-      'mobile_number',
-  ], 'like', '%'.$search_by_inp.'%')
-     ->paginate($req->limit );
+        if ($EmployeesID) {
+            // User data with or without search filter
+            $query = DB::table('all_users')
+                    ->join('shift_master', 'all_users.shift_time', '=', 'shift_master.id')
+                    ->select('all_users.*', 'shift_master.Shift_hours');
 
-      //attendance_info
-      $attendance_info_data = DB::table('all_attandencetable as a')
-            ->leftJoin('all_holiday as h', function($join) {
-                $join->on('a.Employee_id', '=', 'h.Employee_id');
-                // No additional conditions in the join itself
-            })
-            ->where(function($query) use ($req) {
-                $query->whereMonth('a.attandence_Date', $req->month)
-                    ->whereYear('a.attandence_Date', $req->year);
-            })
-            ->where(function($query) use ($req) {
-                // Either the attendance date matches the holiday date
-                $query->where(function($q) {
-                    $q->whereRaw('a.attandence_Date = h.Holiday_Date');
-                })
-                // Or the attendance date matches the swap date
-                ->orWhere(function($q) {
-                    $q->whereRaw('a.attandence_Date = h.Swap_Date');
+            // If employee_id is provided, filter by that specific ID
+            if ($employee_id) {
+                $query->where('all_users.Employee_id', $employee_id);
+            }
+            // Otherwise, use the search input if provided
+            else if ($search_by_inp !== 'all') {
+                $query->where(function ($q) use ($search_by_inp) {
+                    $q->where('f_name', 'like', '%' . $search_by_inp . '%')
+                    ->orWhere('l_name', 'like', '%' . $search_by_inp . '%')
+                    ->orWhere('m_name', 'like', '%' . $search_by_inp . '%')
+                    ->orWhere('Employee_id', 'like', '%' . $search_by_inp . '%')
+                    ->orWhere('email', 'like', '%' . $search_by_inp . '%')
+                    ->orWhere('mobile_number', 'like', '%' . $search_by_inp . '%');
                 });
-            })
-            ->select(
-                'a.*',
-                'h.Holiday_Date',
-                'h.Swap_Date'
-            )
-            ->get();
+            }
 
+            $user_data = $query->paginate($req->limit);
 
- //calendar_data
- $calendar_data = DB::table('calendar')
- ->where('month', $req->month)
- ->where('year',  $req->year)
- ->get();
+            // Attendance info with holidays
+            $attendance_query = DB::table('all_attandencetable as a')
+                ->leftJoin('all_holiday as h', function ($join) {
+                    $join->on('a.Employee_id', '=', 'h.Employee_id');
+                })
+                ->whereMonth('a.attandence_Date', $req->month)
+                ->whereYear('a.attandence_Date', $req->year)
+                ->where(function ($query) {
+                    $query->whereRaw('a.attandence_Date = h.Holiday_Date')
+                        ->orWhereRaw('a.attandence_Date = h.Swap_Date');
+                });
 
-      $deductions_data = DB::table('deductions')
-      ->where('Month', $req->year . "-" . $req->month )
+            // Filter attendance by employee_id if provided
+            if ($employee_id) {
+                $attendance_query->where('a.Employee_id', $employee_id);
+            }
 
-      ->get();
+            $attendance_info_data = $attendance_query->select('a.*', 'h.Holiday_Date', 'h.Swap_Date')->get();
 
-      $yearMonth = $req->year . "-" . $req->month . "-01"; // Convert input year and month to a valid date
+            // Other required data
+            $calendar_data = DB::table('calendar')
+                ->where('month', $req->month)
+                ->where('year', $req->year)
+                ->get();
 
-      $advance_data = DB::table('loan')
-      ->whereDate('start_month','<=', $yearMonth )
-       ->whereDate('end_month' , '>=',$yearMonth )
-      ->get();
+            $deductions_query = DB::table('deductions')
+                ->where('Month', $req->year . "-" . $req->month);
 
-      $penalty_data = DB::table('penalty_master')
-      ->whereMonth('created_at', $req->month)
-      ->whereYear('created_at',  $req->year)
-      ->get();
+            // Filter deductions by employee_id if provided
+            if ($employee_id) {
+                $deductions_query->where('Employee_id', $employee_id);
+            }
 
-      $other_payments_data = DB::table('other_payments')
-      ->whereMonth('created_at', $req->month)
-      ->whereYear('created_at',  $req->year)
-      ->get();
-      $holiday_quri = DB::table('holiday_master')
-      ->whereMonth('holiday_Date', $req->month)
-      ->whereYear('holiday_Date',  $req->year)
-      ->get()
-      ->toArray();
+            $deductions_data = $deductions_query->get();
 
-      $deductions_quri = DB::table('deductions')
-      ->whereMonth('deductions_Month', $req->month)
-      ->whereYear('deductions_Month',  $req->year)
+            $yearMonth = $req->year . "-" . $req->month . "-01";
 
-      ->get()
-      ->toArray();
+            $advance_query = DB::table('loan')
+                ->whereDate('start_month', '<=', $yearMonth)
+                ->whereDate('end_month', '>=', $yearMonth);
 
-      $holiday_count = count($holiday_quri);
-      //leave data
-      $leave_quri = DB::table('_leave')
-      ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id')
-      ->get()
-      ->toArray();
+            // Filter advance/loan by employee_id if provided
+            if ($employee_id) {
+                $advance_query->where('Employee_id', $employee_id);
+            }
 
+            $advance_data = $advance_query->get();
 
+            $penalty_query = DB::table('penalty_master')
+                ->whereMonth('created_at', $req->month)
+                ->whereYear('created_at', $req->year);
 
+            // Filter penalty data by employee_id if provided
+            if ($employee_id) {
+                $penalty_query->where('Employee_id', $employee_id);
+            }
 
-      $arr = array(
-        'status'=>'true',
-        'message' => 'data Found',
-        'all_users'=> $user_data,
-        'attendance_info_data'=> $attendance_info_data,
-        'deductions'=> $deductions_data,
-        'other_payments'=> $other_payments_data,
-        'advance_data'=> $advance_data,
-        'penalty_data'=> $penalty_data,
-        'holiday_count'=> $holiday_count,
-        'leave_data'=> $leave_quri,
-        'calendar_data'=> $calendar_data,
-        'holiday_data'=> $holiday_quri,
-        'deductions_data'=> $deductions_quri,
-        'role'=> $role
-         );
-      echo json_encode($arr);
-        }else{
-          return redirect()->route('login');
+            $penalty_data = $penalty_query->get();
+
+            $other_payments_query = DB::table('other_payments')
+                ->whereMonth('created_at', $req->month)
+                ->whereYear('created_at', $req->year);
+
+            // Filter other payments by employee_id if provided
+            if ($employee_id) {
+                $other_payments_query->where('Employee_id', $employee_id);
+            }
+
+            $other_payments_data = $other_payments_query->get();
+
+            $holiday_quri = DB::table('holiday_master')
+                ->whereMonth('holiday_Date', $req->month)
+                ->whereYear('holiday_Date', $req->year)
+                ->get()
+                ->toArray();
+
+            $deductions_query_array = DB::table('deductions')
+                ->whereMonth('deductions_Month', $req->month)
+                ->whereYear('deductions_Month', $req->year);
+
+            // Filter deductions array by employee_id if provided
+            if ($employee_id) {
+                $deductions_query_array->where('Employee_id', $employee_id);
+            }
+
+            $deductions_quri = $deductions_query_array->get()->toArray();
+
+            $holiday_count = count($holiday_quri);
+
+            $leave_query = DB::table('_leave')
+                ->join('leave_type_master', '_leave.Leave_Type', '=', 'leave_type_master.id');
+
+            // Filter leave data by employee_id if provided
+            if ($employee_id) {
+                $leave_query->where('_leave.Employee_id', $employee_id);
+            }
+
+            $leave_quri = $leave_query->get()->toArray();
+
+            $arr = array(
+                'status' => 'true',
+                'message' => 'data Found',
+                'all_users' => $user_data,
+                'attendance_info_data' => $attendance_info_data,
+                'deductions' => $deductions_data,
+                'other_payments' => $other_payments_data,
+                'advance_data' => $advance_data,
+                'penalty_data' => $penalty_data,
+                'holiday_count' => $holiday_count,
+                'leave_data' => $leave_quri,
+                'calendar_data' => $calendar_data,
+                'holiday_data' => $holiday_quri,
+                'deductions_data' => $deductions_quri,
+                'role' => $role
+            );
+
+            echo json_encode($arr);
+        } else {
+            return redirect()->route('login');
         }
     }
+
 
 
 

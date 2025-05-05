@@ -64,7 +64,7 @@
                 @csrf
                 <input type="search" name="search_val" id="search_input" class="form-control"
                     placeholder="Search Employee by Name Number etc" required onkeyup="serch_on_key_presh()">
-                <button type="submit" id="search_btn" class="btn btn-outline-secondary">Search</button>
+                {{-- <button type="submit" id="search_btn" class="btn btn-outline-secondary">Search</button> --}}
             </form>
         </div>
 
@@ -456,32 +456,73 @@
         // Set the cookie
         document.cookie = "myJavascriptVar=" + encodeURIComponent(myJavascriptVar) + "; path=/;";
 
+        //Start for showing filtered data of terminated employee
+
+        // Function to get URL parameter by name
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
         var Working_Day;
         var limit = 50;
-        var s_month = new Date().getMonth();
-        var s_year = new Date().getFullYear();
-        var inp = ""
+
+        // Get URL parameters for month, year, and employee_id
+        var urlMonth = getUrlParameter('month');
+        var urlYear = getUrlParameter('year');
+        var urlEmployeeId = getUrlParameter('employee_id');
+
+        // Use URL parameters if available, otherwise use current month/year
+        var s_month = urlMonth ? parseInt(urlMonth) - 1 : new Date().getMonth();
+        var s_year = urlYear ? parseInt(urlYear) : new Date().getFullYear();
+        var inp = urlEmployeeId || "";
         var month = "";
         var year = "";
 
         function getLastDateOfMonth(year, month) {
             // Month is 0-based (0 = January, 11 = December)
             return new Date(year, month + 1, 0).getDate();
-            }
-            var set_last_date = getLastDateOfMonth(s_year, s_month)
-            s_month = s_month + 1
-            var start_d = s_year + "-" + s_month + "-01"
-            var end_d = s_year + "-" + s_month + "-" + set_last_date
-            var page_url;
-            arrear_year = s_year
-            arrear_month = s_month
-            lode_data();
-
-            function lode_data() {
-
-            page_url = "{{url('/salary-calculations-api')}}/" + limit + "/" + s_month + "/" + s_year
-            attendance_data_set(page_url)
         }
+
+        var set_last_date = getLastDateOfMonth(s_year, s_month);
+        s_month = s_month + 1;
+        var start_d = s_year + "-" + s_month + "-01";
+        var end_d = s_year + "-" + s_month + "-" + set_last_date;
+        var page_url;
+        arrear_year = s_year;
+        arrear_month = s_month;
+
+        // Initialize the page with the URL parameters
+        lode_data();
+
+        function lode_data() {
+            // Get the employee ID from URL
+            var employeeId = getUrlParameter('employee_id');
+
+            // Construct the base URL
+            page_url = "{{url('/salary-calculations-api')}}/" + limit + "/" + s_month + "/" + s_year;
+
+            // Add employee_id parameter if it exists
+            if (employeeId) {
+                page_url += "?employee_id=" + employeeId;
+            }
+
+            attendance_data_set(page_url);
+        }
+
+        // Update the month selector if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const monthSelector = document.getElementById("month-selector");
+            if (monthSelector && urlMonth && urlYear) {
+                // Format the date to YYYY-MM for the month selector
+                const formattedMonth = urlMonth.padStart(2, '0');
+                monthSelector.value = `${urlYear}-${formattedMonth}`;
+            }
+        });
+
+        //End for showing filtered data of terminated employee
 
         const formatDateToYYYYMMDD = (date) => {
             const f_year = date.getFullYear();
@@ -553,15 +594,16 @@
         }
 
         function serch_on_key_presh() {
-        inp = $("#search_input").val();
-        if (month == "") {
-            month = s_month
-        }
-        if (year == "") {
-            year = s_year;
-        }
-        page_url = "{{url('/salary-calculations-short-search-api')}}/" + limit + "/" + month + "/" + year + "/" + inp
-        attendance_data_set(page_url)
+            let inp = $("#search_input").val().trim();
+
+            // Use the global variables that are set in set_month_for_data()
+            let month = arrear_month;  // This is already 1-based from your function
+            let year = arrear_year;
+
+            if (inp === "") inp = "all"; // fallback when search input is empty
+
+            let page_url = "{{ url('/salary-calculations-short-search-api') }}/" + limit + "/" + month + "/" + year + "/" + inp;
+            attendance_data_set(page_url);
         }
 
         $('#pagination_div').on('click', '.page-btn', function () {
@@ -652,7 +694,6 @@
 
         // First, let's modify how the table columns are created
         function attendance_data_set(url_input) {
-    show_animation();
     $.ajax({
         url: url_input,
         type: "GET",
@@ -1410,7 +1451,7 @@
 
             // Display the table
             $("#result").html(table_html_data);
-            hide_animation();
+
 
             // Add DataTables initialization
             $('#salary_table').DataTable({
@@ -1429,7 +1470,7 @@
                     [0, "asc"]
                 ],
                 "autoWidth": false,
-                "responsive": true,
+                "responsive": false,
                 "dom": 'Bfrtip',
                 "buttons": [
                     'copy', 'csv', 'excel', 'pdf', 'print'
@@ -1448,18 +1489,13 @@
                     }
                 },
                 "stateSave": true,
-                "fixedHeader": true,
-
-                // Adding initComplete callback
-                "initComplete": function(settings, json) {
-                    // This runs after DataTables has fully initialized
-                    highlightEmployeeRow();
-                }
+                "columnDefs": [{ "targets": "_all", "defaultContent": "" }],
+                "fixedHeader": true
             });
         },
         error: function(xhr, status, error) {
             console.error("Error:", error);
-            hide_animation();
+
             $("#result").html(`
 <div class="alert alert-danger">Error loading data: ${error}</div>
 `);
@@ -1467,103 +1503,8 @@
     });
 }
 setInterval(() => {
-    hide_animation();
+
 }, 1000);
-
-
-    // Add this function to your script
-    function highlightEmployeeRow() {
-        // Get employee_id from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const employeeId = urlParams.get('employee_id');
-
-        if (employeeId) {
-            // First delay to ensure the table is fully loaded
-            setTimeout(() => {
-                // Find the row for this employee (try both with and without # prefix)
-                const employeeRow = document.getElementById(`users_data_row${employeeId}`) ||
-                                document.querySelector(`tr[id="users_data_row${employeeId}"]`);
-
-                if (employeeRow) {
-                    // Add highlighting class
-                    employeeRow.classList.add('highlighted-employee');
-
-                    // Scroll to the row
-                    employeeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                    // Add visual indicator that this is a focused view
-                    const notice = document.createElement('div');
-                    notice.className = 'alert alert-info mt-2 mb-2';
-                    notice.innerHTML = `<strong>Focused View:</strong> Showing details for Employee ID ${employeeId}`;
-                    document.querySelector('#result').prepend(notice);
-                } else {
-                    // Try again with a longer delay if the table is still loading
-                    setTimeout(() => {
-                        const retryRow = document.getElementById(`users_data_row${employeeId}`) ||
-                                        document.querySelector(`tr[id="users_data_row${employeeId}"]`);
-
-                        if (retryRow) {
-                            retryRow.classList.add('highlighted-employee');
-                            retryRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        } else {
-                            console.error(`Employee row with ID ${employeeId} not found in the table.`);
-                        }
-                    }, 1500);
-                }
-            }, 500);
-        }
-    }
-
-    // Add CSS for the highlighted row
-    document.head.insertAdjacentHTML('beforeend', `
-        <style>
-            .highlighted-employee {
-                background-color: #ffffd0 !important; /* Light yellow highlight */
-                outline: 2px solid #ffc107;
-                font-weight: bold;
-            }
-
-            .highlighted-employee td {
-                position: relative;
-                z-index: 1;
-            }
-
-            @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-                70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-            }
-
-            .highlighted-employee {
-                animation: pulse 2s infinite;
-            }
-        </style>
-    `);
-
-    // Call the highlighting function after the table is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Your existing code to load the table data
-
-        // Call highlightEmployeeRow function after the AJAX call completes
-        const originalSuccess = $.ajax;
-        $.ajax = function(options) {
-            if (options.url && options.url.includes('salary-calculations')) {
-                const originalSuccessCallback = options.success;
-                options.success = function(response) {
-                    if (originalSuccessCallback) {
-                        originalSuccessCallback(response);
-                    }
-                    // After table is created, highlight the employee row
-                    highlightEmployeeRow();
-                };
-            }
-            return originalSuccess.apply(this, arguments);
-        };
-    });
-
-
-
-
 
         function validateNumber(cell, Employee_id) {
         const value = cell.innerText;
@@ -1641,7 +1582,7 @@ setInterval(() => {
 
         function salary_paid_function(employee_id){
 
-            show_animation();
+
             var input_month = $('#month-selector').val();
             if (input_month !="") {
                 arrear_month = input_month;
@@ -1696,19 +1637,6 @@ setInterval(() => {
                     }
                 });
             }
-
-
-        const currentDate = new Date();
-        let c_year = currentDate.getFullYear();
-        let c_month = currentDate.getMonth() + 1;
-        let daysInMonth = new Date(c_year, c_month, 0).getDate();
-        let datesRow = document.getElementById("datesRow");
-        for (let day = 1; day <= daysInMonth; day++) {
-            let th = document.createElement("th");
-            th.textContent = `${day} / ${c_month} / ${c_year}`;
-            datesRow.appendChild(th);
-        }
-
 
         $(function (e) {
             var all_ids = [];
@@ -1947,5 +1875,25 @@ setInterval(() => {
             }
         }
     }
+
+    $(document).ready(function () {
+                let datesRow = document.getElementById("datesRow");
+                if (!datesRow) {
+                    console.error("Element with id='datesRow' not found!");
+                    return;
+                }
+
+                const currentDate = new Date();
+                let c_year = currentDate.getFullYear();
+                let c_month = currentDate.getMonth() + 1;
+                let daysInMonth = new Date(c_year, c_month, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    let th = document.createElement("th");
+                    th.textContent = `${day} / ${c_month} / ${c_year}`;
+                    datesRow.appendChild(th);
+                }
+            });
+
     </script>
 @stop

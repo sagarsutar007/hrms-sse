@@ -310,6 +310,7 @@
                     <p>Are you sure you want to proceed with final settlement for this employee?</p>
                 </div>
                 <div class="modal-footer">
+                    <!-- This cancel button works out of the box in Bootstrap 5 -->
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger">Proceed</button>
                 </div>
@@ -318,10 +319,12 @@
     </div>
 </div>
 
+
 @stop
 
 @section('js')
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
@@ -349,23 +352,22 @@
                                 var nameCell = user.f_name + ' ' + (user.m_name || '') + ' ' + (user.l_name || '');
 
                                 // Create the actions cell with view opening modal
-                                var actionsCell = '';
+                                var actionsCell = '<div class="action-btns">' +
+                                    '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
+                                    '<i class="fas fa-eye"></i></a> ';
 
                                 if (!user.termination_date) {
-                                    actionsCell = '<div class="action-btns">' +
-                                        '<a href="javascript:void(0);" class="text-primary view-employee cursor-pointer" data-id="' + user.id + '" title="View">' +
-                                        '<i class="fas fa-eye"></i></a> ' +
-                                        '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
+                                    actionsCell += '<a href="user-details/' + user.id + '" class="text-warning" title="Edit">' +
                                         '<i class="fas fa-pencil-alt"></i></a> ' +
                                         '<a href="dounloade-user-id-catd/' + user.id + '" class="text-success" title="Download ID Card">' +
-                                        '<i class="fas fa-download"></i></a>' +
-                                        '</div>';
+                                        '<i class="fas fa-download"></i></a>';
                                 } else {
-                                    actionsCell = '<div class="action-btns">' +
-                                        '<a href="javascript:void(0);" class="final-settlement" data-id="' + user.id + '" title="Final Settlement">' +
-                                        '<i class="fas fa-file-invoice-dollar text-danger"></i></a>' +
-                                        '</div>';
+                                    actionsCell += '<a href="javascript:void(0);" class="final-settlement" data-id="' + user.id + '" title="Final Settlement">' +
+                                        '<i class="fas fa-file-invoice-dollar text-danger"></i></a>';
                                 }
+
+                                actionsCell += '</div>';
+
 
                                 // Push the formatted row data
                                 data.push({
@@ -509,7 +511,7 @@
                     console.log("Checkbox found with classes:", $(this).attr('class'));
                 });
             }
-        }, 2000); // Wait for table to fully render
+        }, 2000);
 
         // Ensure event delegation for dynamic elements
         $(document).on('change', '.employee-checkbox', function() {
@@ -923,21 +925,11 @@
         var userId = $(this).data('id');
         $('#finalUserId').val(userId);
 
-        // Check which Bootstrap version is being used
-        if (typeof bootstrap !== 'undefined') {
-            // Bootstrap 5
-            var myModal = new bootstrap.Modal(document.getElementById('finalSettlementModal'));
-            myModal.show();
-        } else {
-            // Bootstrap 4 and earlier
-            $('#finalSettlementModal').modal('show');
-        }
+        // Open using Bootstrap 5 modal
+        var myModal = new bootstrap.Modal(document.getElementById('finalSettlementModal'));
+        myModal.show();
     });
 
-    // Add this code to handle the modal close button properly
-    $(document).on('click', '[data-bs-dismiss="modal"]', function() {
-        $('#finalSettlementModal').modal('hide');
-    });
 
 </script>
 @stop

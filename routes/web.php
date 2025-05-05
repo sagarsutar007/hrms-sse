@@ -248,6 +248,9 @@ Route::get('/salary-calculations',[Salary_CalculationsController::class,'Salary_
 Route::get('/salary-calculations-api/{limit}/{month}/{year}',[Salary_CalculationsController::class,'Salary_Calculations_api'])->name('Salary_Calculations_api');
 Route::get('/salary-calculations-short-api/{limit}/{month}/{year}/{short_by}/{method}',[Salary_CalculationsController::class,'salary_calculations_short_api'])->name('salary_calculations_short_api');
 Route::get('/salary-calculations-short-search-api/{limit}/{month}/{year}/{search_inp}',[Salary_CalculationsController::class,'Salary_Calculations_search_api'])->name('Salary_Calculations_search_api');
+Route::get('/salary-calculations-short-search-api/{limit}/{month}/{year}/{search}', [SalaryController::class, 'shortSearch'])
+    ->where('search', '.*'); // allows empty or multi-word search
+
 
 Route::post('/final-settlement', [Salary_CalculationsController::class, 'finalSettlement'])->name('final.settlement');
 

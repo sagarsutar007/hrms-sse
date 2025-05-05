@@ -659,9 +659,9 @@
                                                 <div class="tab-content py-3 px-1" id="salary-nav-tabContent">
                                                     <!-- Basic Salary Tab -->
                                                     <div class="tab-pane fade show active" id="nav-basic-salary" role="tabpanel">
-                                                        <button class="btn btn-sm btn-success mb-3" onclick="open_Basic_Salary_form()">
+                                                        {{-- <button class="btn btn-sm btn-success mb-3" onclick="open_Basic_Salary_form()">
                                                             <i class="fas fa-plus mr-1"></i>Add Basic Salary
-                                                        </button>
+                                                        </button> --}}
                                                         <div class="table-responsive" style="height: 500px; overflow-y: auto;">
                                                             <table class="table table-bordered table-striped table-hover" id="basic_salary_table">
                                                                 <thead>
@@ -1593,6 +1593,7 @@
 @section('css')
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 <style>
@@ -1651,6 +1652,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 
@@ -1662,12 +1664,6 @@
         $('#deductionModal').modal('hide');
     }
     $(function () {
-        // Initialize date picker
-        // $('.date').datetimepicker({
-        //     format: 'YYYY-MM-DD'
-        // });
-
-        // Initialize Select2 for dropdowns
         $('.select2').select2();
 
         // Custom file input
@@ -2123,14 +2119,6 @@
         });
     }
 
-
-
-    $(document).ready(function() {
-        load_deductions_data("{{url('Deductions_view_api/')}}/" + {{$u_data['Employee_id']}});
-    });
-
-
-
     function loan_view(id) {
         $.ajax({
             type: "GET",
@@ -2342,10 +2330,6 @@
             }
         });
     }
-
-    $(document).ready(function() {
-        load_overtime_data("{{url('overtime_view_api/')}}/" + {{$u_data['Employee_id']}});
-    });
 
     function load_overtime_data(url_input) {
 
@@ -2595,7 +2579,7 @@
 function load_deductions_data(url_input) {
     // First, fetch all loans to create a lookup table
     $.ajax({
-        url: "/api/loans", // Endpoint that returns all loans for the employee
+        url: url_input, // Endpoint that returns all loans for the employee
         type: "GET",
         dataType: "json",
         success: function(loansResponse) {
@@ -2939,7 +2923,7 @@ function fetchDeductions(url_input) {
             }
 
             // Debug log of rendered HTML
-            console.log("Generated HTML:", table_html_data);
+            // console.log("Generated HTML:", table_html_data);
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
@@ -3420,7 +3404,7 @@ function fetchDeductions(url_input) {
                 }
 
                 // Debug log
-                console.log("Generated Attendance HTML:", table_html_data);
+                // console.log("Generated Attendance HTML:", table_html_data);
             },
             error: function (xhr, status, error) {
                 console.error("Error loading attendance data:", error);
