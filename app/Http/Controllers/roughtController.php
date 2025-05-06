@@ -1093,67 +1093,110 @@ history.back()
 
 public function add_arrear_api(Request $req)
 {
-    // Validate the incoming request
-    $validatedData = $req->validate([
-        'Employee_Id'   => 'required|integer',
-        'Arrear_Amount' => 'required|numeric|min:0',
-        'Arrear_Reason' => 'required|string|max:255',
-    ]);
+    try {
+        // Log the incoming request data for debugging
+        \Log::info('Arrear API request data:', $req->all());
 
-    // Get current date and year
-    $currentMonth = now()->format('m');
-    $currentYear = now()->format('Y');
-
-    // Check if the arrear entry already exists
-    $existingArrear = DB::table('arrear_table')
-        ->where('Employee_id', $validatedData['Employee_Id'])
-        ->whereMonth('Arrear_Month', $currentMonth)
-        ->whereYear('Arrear_Month', $currentYear)
-        ->first();
-
-    if ($existingArrear) {
-        // Update existing arrear entry
-        $updateSuccess = DB::table('arrear_table')
-            ->where('id', $existingArrear->id) // Assuming "id" is the primary key
-            ->update([
-                'Arrear_Amount' => $validatedData['Arrear_Amount'],
-                'Arrear_Reasons'=> $validatedData['Arrear_Reason'],
-
-            ]);
-
-        if ($updateSuccess) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Arrear updated successfully',
-            ], 200); // HTTP 200: OK
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update arrear entry',
-            ], 500); // HTTP 500: Internal Server Error
-        }
-    } else {
-        // Insert new arrear entry
-        $insertSuccess = DB::table('arrear_table')->insert([
-            'Employee_id'   => $validatedData['Employee_Id'],
-            'Arrear_Amount' => $validatedData['Arrear_Amount'],
-            'Arrear_Reasons'=> $validatedData['Arrear_Reason'],
-            'Arrear_Month'  => now(),
-            'Arrear_Year'   => $currentYear,
-
+        // Validate the incoming request
+        $validatedData = $req->validate([
+            'Employee_Id'   => 'required',
+            'Arrear_Amount' => 'required|numeric|min:0',
+            'Arrear_Reason' => 'required|string|max:255',
+            'Arrear_Month'  => 'required|string', // Changed to match the form field
+            'Paid_Flag'     => 'required|integer|in:0,1',
+            'Paid_Amount'   => 'required|numeric',
+            'OT_Amount'     => 'required|numeric',
+            'OT_Hours'      => 'required|numeric',
         ]);
 
-        if ($insertSuccess) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Arrear added successfully',
-            ], 201); // HTTP 201: Created
-        } else {
+        // Parse the submitted month/year (format: YYYY-MM)
+        $parts = explode('-', $validatedData['Arrear_Month']);
+        if (count($parts) !== 2) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to add arrear entry',
-            ], 500); // HTTP 500: Internal Server Error
+                'message' => 'Invalid date format. Expected YYYY-MM',
+            ], 400);
         }
+
+        $year = $parts[0];
+        $month = $parts[1];
+
+        // Check if the arrear entry already exists
+        $existingArrear = DB::table('arrear_table')
+            ->where('Employee_id', $validatedData['Employee_Id'])
+            ->whereMonth('Arrear_Month', $month)
+            ->whereYear('Arrear_Month', $year)
+            ->first();
+
+        if ($existingArrear) {
+            // Update existing arrear entry
+            $updateSuccess = DB::table('arrear_table')
+                ->where('id', $existingArrear->id)
+                ->update([
+                    'Arrear_Amount'  => $validatedData['Arrear_Amount'],
+                    'Arrear_Reasons' => $validatedData['Arrear_Reason'], // Note: DB column has "s" at the end
+                    'Paid_Flag'      => $validatedData['Paid_Flag'],
+                    'Paid_Amount'    => $validatedData['Paid_Amount'],
+                    'OT_Amount'      => $validatedData['OT_Amount'],
+                    'OT_Hours'       => $validatedData['OT_Hours'],
+                ]);
+
+            if ($updateSuccess) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Arrear updated successfully',
+                ], 200);
+            } else {
+                \Log::error('Failed to update arrear entry', ['arrear_id' => $existingArrear->id]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to update arrear entry',
+                ], 500);
+            }
+        } else {
+            // Create date object from year and month
+            $arrearDate = \Carbon\Carbon::createFromDate($year, $month, 1);
+
+            // Insert new arrear entry
+            $insertSuccess = DB::table('arrear_table')->insert([
+                'Employee_id'    => $validatedData['Employee_Id'],
+                'Arrear_Amount'  => $validatedData['Arrear_Amount'],
+                'Arrear_Reasons' => $validatedData['Arrear_Reason'], // Note: DB column has "s" at the end
+                'Arrear_Month'   => $arrearDate,
+                'Arrear_Year'    => $year,
+                'Paid_Flag'      => $validatedData['Paid_Flag'],
+                'Paid_Amount'    => $validatedData['Paid_Amount'],
+                'Salary_amount'  => 0,
+                'OT_Amount'      => $validatedData['OT_Amount'],
+                'OT_Hours'       => $validatedData['OT_Hours'],
+            ]);
+
+            if ($insertSuccess) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Arrear added successfully',
+                ], 201);
+            } else {
+                \Log::error('Failed to insert new arrear entry', [
+                    'employee_id' => $validatedData['Employee_Id'],
+                    'month' => $month,
+                    'year' => $year
+                ]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to add arrear entry',
+                ], 500);
+            }
+        }
+    } catch (\Exception $e) {
+        \Log::error('Exception in add_arrear_api: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Server error: ' . $e->getMessage(),
+        ], 500);
     }
 }
 

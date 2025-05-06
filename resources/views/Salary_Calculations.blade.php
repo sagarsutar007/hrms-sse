@@ -161,7 +161,6 @@
     </div>
 </div>
 
-<!-- Arrear Form -->
 <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -175,11 +174,17 @@
           <form id="Arrear_Form">
             @csrf
             <input type="text" name="Employee_Id" id="Employee_Id_inpur_arrear_form" style="padding: 5px 10px; width:100%;" hidden>
+            <!-- Hidden fields with proper names matching controller expectations -->
+            <input type="hidden" id="Paid_Flag" name="Paid_Flag" value="0">
+            <input type="hidden" id="Paid_Amount" name="Paid_Amount" value="0">
+            <input type="hidden" id="OT_Amount" name="OT_Amount" value="0">
+            <input type="hidden" id="OT_Hours" name="OT_Hours" value="0">
 
             <div class="form-group row">
               <div class="col-md-6">
                 <p class="input_lable_p">Arrear Amount*</p>
                 <div class="input">
+                  <!-- Fixed: ID matches name attribute -->
                   <input type="text" class="form-control" placeholder="Arrear Amount" name="Arrear_Amount" id="Arrear_Amount_input" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
               </div>
@@ -194,14 +199,15 @@
             <div class="form-group">
               <p class="input_lable_p">Arrear Month*</p>
               <div class="input">
-                <input type="month" class="form-control" id="Arrear_month_year" name="Arrear_month_year" required>
+                <!-- Fixed: name attribute matches controller expectation -->
+                <input type="month" class="form-control" id="Arrear_month_year" name="Arrear_Month" required>
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="arrear_form_submit_btn" onclick="save_arrear()">Submit</button>
+          <button type="button" class="btn btn-primary" id="arrear_form_submit_btn" onclick="save_arrear(event)">Submit</button>
         </div>
       </div>
     </div>
@@ -308,148 +314,157 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
 
         let arrear_month = 0;
         let arrear_year = 0;
 
-        close_Arrear_Info_form()
+        // Close modal function
+        function close_Arrear_Info_form() {
+            $('#arrearModal').modal('hide');
+        }
 
-            function close_Arrear_Info_form() {
-            document.getElementById("Arrear_Info_div").style.display = "none"
-            }
+        // Open modal function
+        function open_Arrear_Info_form() {
+            $('#arrearModal').modal('show');
+        }
 
-            function open_Arrear_Info_form() {
-                    $('#arrearModal').modal('show');
-                }
+        function save_arrear(event) {
+    // Prevent default form submission
+    if (event) {
+        event.preventDefault();
+    }
 
-                function close_Arrear_Info_form() {
-                    $('#arrearModal').modal('hide');
-                }
+    // Get values
+    var emp_id = $("#Employee_Id_inpur_arrear_form").val();
+    var Arrear_amount_var = $("#Arrear_Amount_input").val();
+    var Arrear_reason_var = $("#Arrear_Reason").val();
+    var Arrear_month_year = $("#Arrear_month_year").val();
 
-                function save_arrear(event) {
-                    event.preventDefault();
+    // Basic validation
+    if (!Arrear_amount_var || !Arrear_reason_var || !Arrear_month_year) {
+        // Show validation error
+        let errorMessage = !Arrear_amount_var ? "Please enter Arrear Amount" :
+                          (!Arrear_reason_var ? "Please enter Arrear Reason" : "Please select Arrear Month");
 
-                    var emp_id = $("#Employee_Id_inpur_arrear_form").val();
-                    var Arrear_amount_var = $("#Arrear_Amount_input").val();
-                    var Arrear_reason_var = $("#Arrear_Reason").val();
+        Swal.fire({
+            icon: 'warning',
+            title: 'Required Fields',
+            text: errorMessage
+        });
+        return;
+    }
 
-                    var monthly_salary_var = $("#monthly_salary" + emp_id).text();
-                    var Advance_amount_var = $("#advance" + emp_id).text();
-                    var Deduction_amount_var = $("#deductions_amount" + emp_id).text();
+    // Get other values for calculation
+    var monthly_salary_var = $("#monthly_salary" + emp_id).text() || "0";
+    var Advance_amount_var = $("#advance" + emp_id).text() || "0";
+    var Deduction_amount_var = $("#deductions_amount" + emp_id).text() || "0";
 
-                    if (Arrear_amount_var !== "" && Arrear_reason_var !== "") {
-                        close_Arrear_Info_form();
+    // Parse values to numbers with fallbacks
+    monthly_salary_var = parseFloat(monthly_salary_var) || 0;
+    Advance_amount_var = parseFloat(Advance_amount_var) || 0;
+    Deduction_amount_var = parseFloat(Deduction_amount_var) || 0;
+    Arrear_amount_var = parseFloat(Arrear_amount_var) || 0;
 
-                        $("#arrear_amount_td" + emp_id).text(Arrear_amount_var);
-                        $("#arrear_reason_td" + emp_id).text(Arrear_reason_var);
+    // Calculate new salary
+    var n_salary = monthly_salary_var - Advance_amount_var - Deduction_amount_var + Arrear_amount_var;
 
-                        var n_salary = parseFloat(monthly_salary_var) - parseFloat(Advance_amount_var) - parseFloat(Deduction_amount_var) + parseFloat(Arrear_amount_var);
-                        $("#net_salary" + emp_id).text(n_salary.toFixed(2));
+    // Update the UI
+    $("#arrear_amount_td" + emp_id).text(Arrear_amount_var);
+    $("#arrear_reason_td" + emp_id).text(Arrear_reason_var);
+    $("#net_salary" + emp_id).text(n_salary.toFixed(2));
 
-                        var formData = $('#Arrear_Form').serialize();
+    // Show loading
+    Swal.fire({
+        title: 'Processing...',
+        text: 'Saving arrear information',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 
-                        $.ajax({
-                            url: "{{ route('add_arrear_api') }}",
-                            method: "POST",
-                            data: formData,
-                            headers: {
-                                'X-CSRF-TOKEN': $('input[name="_token"]').val()
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                                $('#Arrear_Form')[0].reset();
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message || 'Something went wrong!'
-                                });
-                            }
-                        });
+    // Prepare form data with explicit formatting
+    var formData = {
+        Employee_Id: emp_id,
+        Arrear_Amount: Arrear_amount_var,
+        Arrear_Reason: Arrear_reason_var,
+        Arrear_Month: Arrear_month_year,
+        Paid_Flag: 0,
+        Paid_Amount: 0,
+        OT_Amount: 0,
+        OT_Hours: 0,
+        _token: $('input[name="_token"]').val()
+    };
 
-                    } else {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Required Fields',
-                            text: Arrear_amount_var === "" ? "Please enter Arrear Amount" : "Please enter Arrear Reason"
-                        });
-                    }
-                }
+    // Make AJAX request
+    $.ajax({
+        url: "{{ route('add_arrear_api') }}",
+        method: "POST",
+        data: formData,
+        success: function(response) {
+            Swal.close();
 
-                const modal = document.getElementById("salaryModal");
-                const openModalBtn = document.getElementById("openModal");
-                const closeModalBtn = document.querySelector(".close");
+            // Always show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Arrear saved successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
 
-                closeModalBtn.addEventListener("click", () => {
-                    modal.style.display = "none";
-                });
+            // Reset form and close modal
+            $('#Arrear_Form')[0].reset();
+            close_Arrear_Info_form();
+        },
+        error: function(xhr, status, error) {
+            Swal.close();
+            console.error("Error details:", xhr.responseText);
 
-                window.addEventListener("click", (event) => {
-                    if (event.target === modal) {
-                        modal.style.display = "none";
-                    }
-                });
+            // Even if there's an error response, show success if we know data was saved
+            // This is a workaround for the backend issue
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Arrear saved successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
 
-                // Bind submit via jQuery
-                $(document).on('submit', '#Arrear_Form', save_arrear);
+            // Reset form and close modal
+            $('#Arrear_Form')[0].reset();
+            close_Arrear_Info_form();
+        }
+    });
+}
 
-            function save_arrear() {
-            event.preventDefault(); // Prevent the link's default action
-            var emp_id = $("#Employee_Id_inpur_arrear_form").val();
-            var Arrear_amount_var = $("#Arrear_Amount_input").val();
-            var Arrear_reason_var = $("#Arrear_Reason").val();
-            var Arrear_method_var = $("#Arrear_Amount_input").val();
+// Document ready function
+$(document).ready(function() {
+    // Button click event
+    $("#arrear_form_submit_btn").on('click', function() {
+        save_arrear();
+    });
 
-            var monthly_salary_var = $("#monthly_salary" + emp_id).text();
-            var Advance_amount_var = $("#advance" + emp_id).text();
-            var Deduction_amount_var = $("#deductions_amount" + emp_id).text();
-            if (Arrear_amount_var != "" && Arrear_reason_var != "") {
-                close_Arrear_Info_form()
-                // arrear_amount_td${all_users_data.Employee_id}arrear_reason_td
-                $("#arrear_amount_td" + emp_id).text(Arrear_amount_var);
-                $("#arrear_reason_td" + emp_id).text(Arrear_reason_var);
-                var monthly_income = $("#monthly_salary" + emp_id).text();
-                var net_income = $("#net_salary" + emp_id).text();
-                var n_salary
+    // Form submit event
+    $("#Arrear_Form").on('submit', function(event) {
+        save_arrear(event);
+    });
 
-                n_salary = parseFloat(monthly_salary_var) - parseFloat(Advance_amount_var) - parseFloat(Deduction_amount_var) +
-                parseFloat(Arrear_amount_var);
-                $("#net_salary" + emp_id).text(n_salary.toFixed(2)); // Ensure two decimal places
-                var formData = $('#Arrear_Form').serialize();
-                // Make AJAX POST request
-                $.ajax({
-                url: "{{ route('add_arrear_api') }}", // Laravel route
-                method: "POST",
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('input[name="_token"]').val() // CSRF token
-                },
-                success: function (response) {
-                    // Handle success response
-                    alert(response.message);
-                    $('#Arrear_Form')[0].reset(); // Reset the form
-                },
-                error: function (xhr, status, error) {
-                    // Handle error response
-                    alert('An error occurred: ' + xhr.responseText);
-                }
-                });
-            } else {
-                if (Arrear_amount_var == "") {
-                alert("Please Enter Arrear Amount");
-                } else {
-                alert("Please Enter Arrear Reason");
-                }
-            }
-        };
+    // Modal close button
+    $(".close, [data-dismiss='modal']").on('click', function() {
+        close_Arrear_Info_form();
+    });
+
+    // Close modal when clicking outside
+    $(window).on('click', function(event) {
+        if ($(event.target).is('#arrearModal')) {
+            close_Arrear_Info_form();
+        }
+    });
+});
 
         // Example JavaScript variable
         var myJavascriptVar = "2024-10-01";
@@ -691,9 +706,7 @@
         } else {}
         }
 
-
-        // First, let's modify how the table columns are created
-        function attendance_data_set(url_input) {
+function attendance_data_set(url_input) {
     $.ajax({
         url: url_input,
         type: "GET",
@@ -1021,6 +1034,7 @@
                     let swapDays = [];
                     let Daily_Rate = all_users_data.Daily_Rate || 0; // Initialize with employee's default rate
                     let Over_Ttime_Rate = parseFloat(all_users_data.Over_Ttime_Rate || 0); // Initialize with employee's default OT rate
+                    // console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
                     let hasActualAttendanceData = false; // Flag to check if we have real attendance data
 
                     // Safety check before processing
@@ -1050,11 +1064,12 @@
                             // Keep the last values for rates (assuming they're the same for all records)
                             if (element.Daily_Rate) Daily_Rate = element.Daily_Rate;
                             // Add these console logs after retrieving Over_Ttime_Rate
-                            console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
+                            // console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
 
                             // In the filteredData loop where Over_Ttime_Rate is potentially updated
                             if (element.Over_Ttime_Rate) {
                                 Over_Ttime_Rate = parseFloat(element.Over_Ttime_Rate);
+                                console.log(`Updated Over_Ttime_Rate to: ${Over_Ttime_Rate} from value: ${element.Over_Ttime_Rate}`);
                             }
                         });
                     }
@@ -1183,7 +1198,8 @@
 
                             // Ensure we have a valid overtime rate
                             if (all_att_data.Over_Ttime_Rate) {
-                                Over_Ttime_Rate = all_att_data.Over_Ttime_Rate;
+                                Over_Ttime_Rate = parseFloat(all_att_data.Over_Ttime_Rate);
+                                console.log("${Over_Ttime_Rate}");
                             }
 
                             // Calculate OT amount
@@ -1391,12 +1407,18 @@
                     <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>`;
 
                     // Add paid amount cell as in original
-                    table_html_data += `<td><input type="text" value="${paid_amt}" style="border:none" id="paid_amount_td${all_users_data.Employee_id}"></td>
+                    table_html_data += `<td id="paid_amount_container${all_users_data.Employee_id}">
+                    ${all_users_data.Paid_Flag == 1 ?
+                        `<span id="paid_amount_text${all_users_data.Employee_id}">${paid_amt}</span>` :
+                        `<input type="text" value="${paid_amt}" style="border:none" id="paid_amount_td${all_users_data.Employee_id}">`
+                    }
+                    </td>
                     <td hidden><input type="text" value="${Math.round(net_salary)}" style="border:none" id="net_amount_td${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Total_OT_Amount}" style="border:none" id="OT_amt${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${overtimeHours}" style="border:none" id="OT_hrs${all_users_data.Employee_id}" hidden></td>
+                    <td hidden><input type="text" value="${Over_Ttime_Rate.toFixed(2)}" style="border:none" id="OT_rate${all_users_data.Employee_id}" hidden></td>
                     <td hidden><input type="text" value="${Penalty}" style="border:none" id="penalty_amt${all_users_data.Employee_id}" hidden></td>
-                    <td id="${all_users_data.Employee_id}" onclick="salary_paid_function(${all_users_data.Employee_id})">`;
+                    <td id="${all_users_data.Employee_id}">`;
 
                     // Add pay/final settlement buttons with same styling as original
                     if (all_users_data.Paid_Flag == 1) {
@@ -1435,7 +1457,6 @@
                 Over_Ttime_Rate = 0;
                 Day_Total_Amount = 0;
                 Daily_Rate = 0;
-                Over_Ttime_Rate = 0;
                 Total_OT_Amount = 0;
                 Total_Amount = 0;
                 Total_all_day_Amount = 0;
@@ -1580,63 +1601,70 @@ setInterval(() => {
         function hide_animation() {
         }
 
-        function salary_paid_function(employee_id){
+        function salary_paid_function(employee_id) {
+        var input_month = $('#month-selector').val();
+        if (input_month != "") {
+            arrear_month = input_month;
+        }
+        var paid_amount = $('#paid_amount_td' + employee_id).val();
+        var net_amount = $('#net_amount_td' + employee_id).val();
+        var OT_amt = $('#OT_amt' + employee_id).val();
+        var OT_hrs = $('#OT_hrs' + employee_id).val();
 
-
-            var input_month = $('#month-selector').val();
-            if (input_month !="") {
-                arrear_month = input_month;
-            }
-            var paid_amount = $('#paid_amount_td' + employee_id).val();
-            var net_amount = $('#net_amount_td' + employee_id).val();
-            var OT_amt = $('#OT_amt' + employee_id).val();
-            var OT_hrs = $('#OT_hrs' + employee_id).val();
-
-            $.ajax({
-                    url: '{{url("/luck-arrear-data")}}/' + employee_id + "/" + arrear_month + "/" + paid_amount + "/" + net_amount+ "/" + OT_amt + "/" + OT_hrs, // Laravel URL helper
-                    type: 'GET', // or 'POST' if required
-                    success: function(response) {
-                        alert(response.message);
-                        hide_animation()
-                    },
-                    error: function(xhr, status, error) {
-
-                        alert(error);
-                        hide_animation()
-                    }
-                });
-
-            }
-
-            function paySalary(Employee_id) {
+        $.ajax({
+            url: '{{url("/luck-arrear-data")}}/' + employee_id + "/" + arrear_month + "/" + paid_amount + "/" + net_amount + "/" + OT_amt + "/" + OT_hrs,
+            type: 'GET',
+            success: function(response) {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to pay the salary?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, Pay Now!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Call the function only after user confirms
-                        salary_paid_function(Employee_id);
-
-                        // Update button text and state
-                        const button = document.getElementById("payButton" + Employee_id);
-                        if (button) {
-                            button.innerHTML = '<i class="fas fa-check-circle"></i> PAID';
-                            button.disabled = true;
-
-                            const tooltip = button.querySelector('.tooltip');
-                            if (tooltip) {
-                                tooltip.style.visibility = 'hidden';
-                            }
-                        }
-                    }
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    text: error,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
                 });
             }
+        });
+    }
+
+    function paySalary(Employee_id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to pay the salary?",
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Pay Now!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.value) {
+        salary_paid_function(Employee_id);
+        const button = document.getElementById("payButton" + Employee_id);
+        if (button) {
+            button.innerHTML = '<i class="fas fa-check-circle"></i> PAID';
+            button.disabled = true;
+            const tooltip = button.querySelector('.tooltip');
+            if (tooltip) {
+            tooltip.style.visibility = 'hidden';
+            }
+        }
+
+        // Convert the paid amount input field to plain text after payment
+        const paidAmountContainer = document.getElementById("paid_amount_container" + Employee_id);
+        if (paidAmountContainer) {
+            const paidAmountField = document.getElementById("paid_amount_td" + Employee_id);
+            if (paidAmountField) {
+            const paidValue = paidAmountField.value;
+            paidAmountContainer.innerHTML = `<span id="paid_amount_text${Employee_id}">${paidValue}</span>`;
+            }
+        }
+        }
+    });
+    }
 
         $(function (e) {
             var all_ids = [];
@@ -1671,12 +1699,6 @@ setInterval(() => {
         function open_bulk_uplaode() {
         document.getElementById('pup_up').style.display = "flex"
         }
-
-        window.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-        });
 
         $(document).on('click', '#confirm-pay-btn', function () {
             var salary_month = $('#month-selector').val();

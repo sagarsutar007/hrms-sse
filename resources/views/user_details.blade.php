@@ -1095,7 +1095,25 @@
                                                         </div>
                                                       </div>
 
-
+                                                      <div class="modal fade" id="confirmDeleteDeductionModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    Are you sure you want to delete this deduction.
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                                    <a id="confirmDeleteButton" class="btn btn-danger" href="#">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
 
                                                     <!-- Advances Tab -->
@@ -1223,22 +1241,21 @@
                                                     </div>
 
 
-                                                    <!-- Delete Confirmation Modal -->
-                                                    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered">
-                                                            <div class="modal-content bg-danger text-white">
+                                                    <div class="modal fade" id="confirmDeleteLoanModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="confirmDeleteLabel">Confirm Delete</h5>
-                                                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    Are you sure you want to delete this advance record?
+                                                                    Are you sure you want to delete this loan? This action cannot be undone.
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancel</button>
-                                                                    <a href="#" class="btn btn-light" id="confirmDeleteBtn">Delete</a>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                                    <button type="button" class="btn btn-danger" id="confirmDeleteLoan">Delete</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2088,6 +2105,30 @@
 
         // Set the href on the delete button inside modal
         $(this).find('#confirmDeleteBtn').attr('href', href);
+
+
+    });
+
+    $('#confirmDeleteBtn').on('click', function(e) {
+        e.preventDefault();
+
+        var href = $(this).data('href');
+        var id = $(this).data('id');
+
+        $.ajax({
+            url: href,
+            type: 'GET',
+            data: {
+                id: id,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                window.location.reload();
+            },
+            error: function(xhr) {
+                toastr.error('Error deleting item');
+            }
+        });
     });
 
 
@@ -2660,7 +2701,7 @@ function fetchDeductions(url_input) {
                         <button type="button"
                                 class="btn btn-sm btn-danger"
                                 data-toggle="modal"
-                                data-target="#confirmDeleteModal"
+                                data-target="#confirmDeleteDeductionModal"
                                 data-href="/delete/${$deduction.id}/deductions">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>`;
@@ -2751,6 +2792,41 @@ function fetchDeductions(url_input) {
             }
         });
     }
+
+    $(document).ready(function() {
+        // When the modal is about to be shown, update the delete link
+        $('#confirmDeleteDeductionModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var deleteUrl = button.data('href'); // Extract href from data-href attribute
+            var modal = $(this);
+
+            // Update the delete button's href
+            modal.find('#confirmDeleteButton').attr('href', deleteUrl);
+        });
+
+        // Optional: Handle the delete via AJAX if you prefer
+        $('#confirmDeleteButton').click(function(e) {
+            e.preventDefault();
+            var deleteUrl = $(this).attr('href');
+
+            // Perform AJAX delete request
+            $.ajax({
+                url: deleteUrl,
+                type: 'GET', // or 'POST' depending on your backend
+                success: function(result) {
+                    // Close the modal
+                    $('#confirmDeleteDeductionModal').modal('hide');
+
+                    // Optionally refresh the page or update the UI
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    alert('Error deleting deduction: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+
 
 
 
@@ -2880,7 +2956,13 @@ function fetchDeductions(url_input) {
                                 <button type="button" class="btn btn-sm btn-info" onclick="open_loan_modal('${loan.id}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <a href="{{ url('/delete') }}/${loan.id}/loan" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                                <a href="{{ url('/delete') }}/${loan.id}/loan"
+                                class="btn btn-sm btn-danger"
+                                data-toggle="modal"
+                                data-target="#confirmDeleteLoanModal"
+                                data-loan-id="${loan.id}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </td>
                         </tr>`;
                 });
@@ -3413,6 +3495,45 @@ function fetchDeductions(url_input) {
         });
     }
 
+    $(document).ready(function() {
+    let deleteUrl = null;
+
+    // When modal opens, get the delete URL
+    $('#confirmDeleteLoanModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        deleteUrl = button.attr('href');
+    });
+
+    // Handle delete confirmation
+    $('#confirmDeleteLoan').click(function() {
+        if (!deleteUrl) return;
+
+        const deleteBtn = $(this);
+        deleteBtn.prop('disabled', true);
+        deleteBtn.text('Deleting...');
+
+        $.ajax({
+            url: deleteUrl,
+            type: 'GET', // or 'POST'/'DELETE' based on your backend
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function() {
+                $('#confirmDeleteLoanModal').modal('hide');
+                window.location.reload(); // Simple page refresh
+            },
+            error: function(xhr) {
+                alert('Error: ' + (xhr.responseJSON?.message || 'Failed to delete'));
+                deleteBtn.prop('disabled', false).text('Delete');
+            }
+        });
+    });
+
+    // Reset button state when modal closes
+    $('#confirmDeleteLoanModal').on('hidden.bs.modal', function() {
+        $('#confirmDeleteLoan').prop('disabled', false).text('Delete');
+    });
+});
 
     $(document).ready(function() {
         $("#penalties_table").DataTable({

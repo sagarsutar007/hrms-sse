@@ -13,11 +13,28 @@
         transition: all 0.3s;
         cursor: pointer;
         height: 100%;
+        /* Reduced padding for more compact cards */
+        padding: 10px;
+    }
+
+    .card-admin .card-body {
+        padding: 0.75rem;
     }
 
     .card-admin:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,.12), 0 3px 6px rgba(0,0,0,.06);
+    }
+
+    .card-admin .fa-3x {
+        /* Reducing icon size */
+        font-size: 2em !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .card-admin .card-title {
+        font-size: 0.95rem;
+        margin-bottom: 0;
     }
 
     .nav-tabs .nav-link.active {
@@ -40,12 +57,13 @@
             @if ($roler_permis->role_name == 'Admin')
                 <!-- Admin Permission Cards -->
                 <div class="row">
+                    <!-- Increased number of columns for smaller cards -->
                     <!-- Add Admin Card -->
                     @if ($roler_permis->Add_Admin == 1)
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('add-admin')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-shield fa-3x mb-3 text-primary"></i>
+                                <i class="fas fa-user-shield fa-3x mb-2 text-primary"></i>
                                 <h5 class="card-title">Add Admin</h5>
                             </div>
                         </div>
@@ -54,10 +72,10 @@
 
                     <!-- Add HR Card -->
                     @if ($roler_permis->Add_HR == 1)
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('add-HR')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-tie fa-3x mb-3 text-info"></i>
+                                <i class="fas fa-user-tie fa-3x mb-2 text-info"></i>
                                 <h5 class="card-title">Add HR</h5>
                             </div>
                         </div>
@@ -66,10 +84,10 @@
 
                     <!-- Add Employee Card -->
                     @if ($roler_permis->Add_Employee == 1)
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('registration')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-plus fa-3x mb-3 text-success"></i>
+                                <i class="fas fa-user-plus fa-3x mb-2 text-success"></i>
                                 <h5 class="card-title">Add Employee</h5>
                             </div>
                         </div>
@@ -78,10 +96,10 @@
 
                     <!-- Add Guard Card -->
                     @if ($roler_permis->Add_Guard == 1)
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('add-guard')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-secret fa-3x mb-3 text-warning"></i>
+                                <i class="fas fa-user-secret fa-3x mb-2 text-warning"></i>
                                 <h5 class="card-title">Add Guard</h5>
                             </div>
                         </div>
@@ -91,10 +109,10 @@
                     <!-- Role Settings Cards -->
                     @foreach ($roler_permissions as $rol_permiss)
                         @if ($rol_permiss->role_name != "Super admin")
-                        <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                             <div class="card card-admin" onclick="location.href='{{url('admin-settings')}}/{{$rol_permiss->role_name}}'">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-users-cog fa-3x mb-3 text-secondary"></i>
+                                    <i class="fas fa-users-cog fa-3x mb-2 text-secondary"></i>
                                     <h5 class="card-title">{{$rol_permiss->role_name}} Settings</h5>
                                 </div>
                             </div>
@@ -103,70 +121,70 @@
                     @endforeach
 
                     <!-- All Users Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('all-admins')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-users fa-3x mb-3 text-dark"></i>
+                                <i class="fas fa-users fa-3x mb-2 text-dark"></i>
                                 <h5 class="card-title">All Users</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- All HRs Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" onclick="location.href='{{url('all-attendance')}}'">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-tie fa-3x mb-3 text-info"></i>
+                                <i class="fas fa-user-tie fa-3x mb-2 text-info"></i>
                                 <h5 class="card-title">All HRs</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- All Employees Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin">
                             <div class="card-body text-center">
-                                <i class="fas fa-id-card fa-3x mb-3 text-success"></i>
+                                <i class="fas fa-id-card fa-3x mb-2 text-success"></i>
                                 <h5 class="card-title">All Employees</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- Add Role Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" data-toggle="modal" data-target="#addRoleModal">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-tag fa-3x mb-3 text-danger"></i>
+                                <i class="fas fa-user-tag fa-3x mb-2 text-danger"></i>
                                 <h5 class="card-title">Add Role</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- Add Shift Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" data-toggle="modal" data-target="#addShiftModal">
                             <div class="card-body text-center">
-                                <i class="fas fa-clock fa-3x mb-3 text-purple"></i>
+                                <i class="fas fa-clock fa-3x mb-2 text-purple"></i>
                                 <h5 class="card-title">Add Shift</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- Add Employee Type Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" data-toggle="modal" data-target="#addEmployeeTypeModal">
                             <div class="card-body text-center">
-                                <i class="fas fa-user-edit fa-3x mb-3 text-info"></i>
+                                <i class="fas fa-user-edit fa-3x mb-2 text-info"></i>
                                 <h5 class="card-title">Add Employee Type</h5>
                             </div>
                         </div>
                     </div>
 
                     <!-- Change Password Card -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                         <div class="card card-admin" data-toggle="modal" data-target="#changePasswordModal">
                             <div class="card-body text-center">
-                                <i class="fas fa-key fa-3x mb-3 text-warning"></i>
+                                <i class="fas fa-key fa-3x mb-2 text-warning"></i>
                                 <h5 class="card-title">Change Password</h5>
                             </div>
                         </div>
