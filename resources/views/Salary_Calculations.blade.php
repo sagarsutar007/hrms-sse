@@ -1001,17 +1001,15 @@ function attendance_data_set(url_input) {
                         }
                     });
 
-                    let cellBackgroundColor = ''; // Default is no background color
+                    let cellBackgroundColor = '';
                     let currentDateFormatted = formatDateToYYYYMMDD(date);
 
-                    // Helper function to normalize date formats for reliable comparison
                     function normalizeDate(dateValue) {
                         if (!dateValue) return null;
 
                         try {
                             // Handle different date formats
                             if (typeof dateValue === 'string') {
-                                // If it's already in YYYY-MM-DD format, return it
                                 if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
                                     return dateValue;
                                 }
@@ -1032,20 +1030,15 @@ function attendance_data_set(url_input) {
                     let holidayDates = [];
                     let weeklyOffs = [];
                     let swapDays = [];
-                    let Daily_Rate = all_users_data.Daily_Rate || 0; // Initialize with employee's default rate
-                    let Over_Ttime_Rate = parseFloat(all_users_data.Over_Ttime_Rate || 0); // Initialize with employee's default OT rate
-                    // console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
-                    let hasActualAttendanceData = false; // Flag to check if we have real attendance data
+                    let Daily_Rate = all_users_data.Daily_Rate || 0;
+                    let Over_Ttime_Rate = parseFloat(all_users_data.Over_Ttime_Rate || 0);
+                    let hasActualAttendanceData = false;
 
-                    // Safety check before processing
                     if (filteredData && Array.isArray(filteredData)) {
                         filteredData.forEach(element => {
-                            // Check if this is actual attendance data or just a swap date reference
                             if (element.attandence_Date === currentDateFormatted) {
                                 hasActualAttendanceData = true;
                             }
-
-                            // Process swap dates
                             if (element.Swap_Date) {
                                 const normalizedDate = normalizeDate(element.Swap_Date);
                                 if (normalizedDate) swapDates.push(normalizedDate);
@@ -1060,13 +1053,7 @@ function attendance_data_set(url_input) {
                             // Process other data
                             if (element.Swap_Day == 1) swapDays.push(element);
                             if (element.WeeklyOff == 1) weeklyOffs.push(element);
-
-                            // Keep the last values for rates (assuming they're the same for all records)
                             if (element.Daily_Rate) Daily_Rate = element.Daily_Rate;
-                            // Add these console logs after retrieving Over_Ttime_Rate
-                            // console.log(`Employee ID: ${all_users_data.Employee_id}, Initial Over_Ttime_Rate: ${Over_Ttime_Rate}`);
-
-                            // In the filteredData loop where Over_Ttime_Rate is potentially updated
                             if (element.Over_Ttime_Rate) {
                                 Over_Ttime_Rate = parseFloat(element.Over_Ttime_Rate);
                                 console.log(`Updated Over_Ttime_Rate to: ${Over_Ttime_Rate} from value: ${element.Over_Ttime_Rate}`);
@@ -1220,7 +1207,7 @@ function attendance_data_set(url_input) {
                             `;
 
                             // Update cumulative amount with daily amount for this date
-                            dailyAmountForThisDate = Daily_Amt;
+                            dailyAmountForThisDate = Daily_Amt + OT_Amt;
                             cumulative_amount += dailyAmountForThisDate;
 
                             // Add to monthly in/out report
