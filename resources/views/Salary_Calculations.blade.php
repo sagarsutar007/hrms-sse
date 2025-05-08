@@ -908,7 +908,21 @@ $(document).ready(function() {
                             <td>${all_users_data.Shift_hours}</td>
                         `;
 
-                        var Employee_Daily_Rate = all_users_data.salary / Working_Day;
+                        var Employee_Daily_Rate = parseFloat(all_users_data.Daily_Rate) || (all_users_data.salary / Working_Day);
+                        // Initialize the Over Time Rate from employee data
+                        var Employee_OT_Rate = parseFloat(all_users_data.Over_Ttime_Rate) || 0;
+
+                        if (Employee_Daily_Rate <= 0) {
+                            Employee_Daily_Rate = all_users_data.salary / Working_Day;
+                        }
+
+                        if (Employee_OT_Rate <= 0) {
+                            // Default overtime rate if not specified
+                            Employee_OT_Rate = Employee_Daily_Rate / 8 * 2; // Common formula: double hourly rate
+                        }
+
+                        console.log(`Employee ${all_users_data.Employee_id} - Daily Rate: ${Employee_Daily_Rate}, OT Rate: ${Employee_OT_Rate}`);
+
                         data_count++;
                         var pop_up_total_hr = 0;
                         var pop_up_total_min = 0;
@@ -1030,8 +1044,8 @@ $(document).ready(function() {
                             let holidayDates = [];
                             let weeklyOffs = [];
                             let swapDays = [];
-                            let Daily_Rate = all_users_data.Daily_Rate || all_users_data.salary / Working_Day || 0;
-                            let Over_Ttime_Rate = parseFloat(all_users_data.Over_Ttime_Rate || 0);
+                            var Daily_Rate = Employee_Daily_Rate; // Default to employee rate
+                            var Over_Ttime_Rate = Employee_OT_Rate;
                             let hasActualAttendanceData = false;
 
                             if (filteredData && Array.isArray(filteredData)) {
@@ -1053,11 +1067,24 @@ $(document).ready(function() {
                                     // Process other data
                                     if (element.Swap_Day == 1) swapDays.push(element);
                                     if (element.WeeklyOff == 1) weeklyOffs.push(element);
-                                    if (element.Daily_Rate) Daily_Rate = element.Daily_Rate;
-                                    if (element.Over_Ttime_Rate) {
-                                        Over_Ttime_Rate = parseFloat(element.Over_Ttime_Rate);
-                                        console.log(`Updated Over_Ttime_Rate to: ${Over_Ttime_Rate} from value: ${element.Over_Ttime_Rate}`);
+                                    if (element.Daily_Rate && parseFloat(element.Daily_Rate) > 0) {
+                                        Daily_Rate = parseFloat(element.Daily_Rate);
                                     }
+
+                                    if (element.Over_Ttime_Rate && parseFloat(element.Over_Ttime_Rate) > 0) {
+                                        Over_Ttime_Rate = parseFloat(element.Over_Ttime_Rate);
+                                    }
+
+                                    // Make sure we have valid rates
+                                    if (!Daily_Rate || Daily_Rate <= 0) {
+                                        Daily_Rate = Employee_Daily_Rate;
+                                    }
+
+                                    if (!Over_Ttime_Rate || Over_Ttime_Rate <= 0) {
+                                        Over_Ttime_Rate = Employee_OT_Rate;
+                                    }
+
+                                    console.log(`Date ${formatDateToYYYYMMDD(date)}, Daily Rate: ${Daily_Rate}, OT Rate: ${Over_Ttime_Rate}`);
                                 });
                             }
 
@@ -1317,8 +1344,24 @@ $(document).ready(function() {
                             table_html_data += `<td id="penalty_amount${all_users_data.Employee_id}">`;
                             if (penalty_data != null) {
                                 penalty_data.forEach(penalty => {
-                                    if (penalty.EmpID === all_users_data.Employee_id) {
-                                        Penalty += parseInt(penalty.Final_Amount);
+                                    // Find the correct date property
+                                    let penaltyDateStr = penalty.Date_of_Penalty;
+
+                                    if (penaltyDateStr) {
+                                        const penaltyDate = new Date(penaltyDateStr);
+                                        const penaltyMonth = penaltyDate.getMonth();
+                                        const penaltyYear = penaltyDate.getFullYear();
+
+                                        // Convert both IDs to strings and trim whitespace for comparison
+                                        const empID = String(penalty.EmpID).trim();
+                                        const userID = String(all_users_data.Employee_id).trim();
+
+                                        // Compare IDs as strings and check month/year
+                                        if (empID === userID &&
+                                            penaltyMonth === selectedDate.getMonth() &&
+                                            penaltyYear === selectedDate.getFullYear()) {
+                                            Penalty += parseInt(penalty.Final_Amount);
+                                        }
                                     }
                                 });
                             }
@@ -1374,7 +1417,7 @@ $(document).ready(function() {
                             <td>Days Absent</td><td>${Absent_count}</td>
                             <td colspan='2'></td>
                             <td>Arrear</td><td>${all_users_data.Arrear_Amount ?? 0}</td>
-                            <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'></td>
+                            <td>Paid Amount</td><td id='paid_amoutn_for_pup_up_span'>${all_users_data.Paid_Flag == 1 ? Math.round(net_salary) : 0}</td>
                             </tr>
                             <tr>
                             <td colspan='2'></td>
@@ -1383,8 +1426,8 @@ $(document).ready(function() {
                             </tr>
                             ${terminationInfo}`;
 
-                            // Set paid amount as in original
-                            var paid_amt = Math.round(net_salary);
+                            // Set paid amount based on payment status
+                            var paid_amt = all_users_data.Paid_Flag == 1 ? Math.round(net_salary) : 0;
 
                             // Complete the net salary cell with hidden inputs as in original
                             table_html_data += `${Math.round(net_salary)}
