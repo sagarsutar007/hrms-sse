@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class downloade_id_cards_controller extends Controller
 {
-    public function downloade_Id_cards($id) {
+
+
+    public function downloade_Id_cards($id = null) {
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
 
@@ -17,8 +19,8 @@ class downloade_id_cards_controller extends Controller
                 ->select('all_users.*', 'role_masrer.roles')
                 ->where('all_users.role', '>', 1);
 
-            // Filter by selected IDs
-            if($id != 'all') {
+            // Apply filter only if $id is provided
+            if ($id !== null && $id !== 'all') {
                 $selectedIds = explode(',', $id);
                 $user_data = $user_data->whereIn('all_users.id', $selectedIds);
             }
@@ -28,11 +30,12 @@ class downloade_id_cards_controller extends Controller
             return view("downloade_Id_cards")
                 ->with('user_data', $user_data)
                 ->with('role', $role)
-                ->with('selectedIds', $id != 'all' ? explode(',', $id) : []);
+                ->with('selectedIds', $id !== null && $id !== 'all' ? explode(',', $id) : []);
         } else {
             return redirect()->route('login');
         }
     }
+
 
     // Updated method to handle both single and multiple IDs
     public function dounloade_user_id_catd($id) {
