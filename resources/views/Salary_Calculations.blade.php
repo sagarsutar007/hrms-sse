@@ -1344,24 +1344,8 @@ $(document).ready(function() {
                             table_html_data += `<td id="penalty_amount${all_users_data.Employee_id}">`;
                             if (penalty_data != null) {
                                 penalty_data.forEach(penalty => {
-                                    // Find the correct date property
-                                    let penaltyDateStr = penalty.Date_of_Penalty;
-
-                                    if (penaltyDateStr) {
-                                        const penaltyDate = new Date(penaltyDateStr);
-                                        const penaltyMonth = penaltyDate.getMonth();
-                                        const penaltyYear = penaltyDate.getFullYear();
-
-                                        // Convert both IDs to strings and trim whitespace for comparison
-                                        const empID = String(penalty.EmpID).trim();
-                                        const userID = String(all_users_data.Employee_id).trim();
-
-                                        // Compare IDs as strings and check month/year
-                                        if (empID === userID &&
-                                            penaltyMonth === selectedDate.getMonth() &&
-                                            penaltyYear === selectedDate.getFullYear()) {
-                                            Penalty += parseInt(penalty.Final_Amount);
-                                        }
+                                    if (penalty.EmpID === all_users_data.Employee_id) {
+                                        Penalty += parseInt(penalty.Final_Amount);
                                     }
                                 });
                             }
