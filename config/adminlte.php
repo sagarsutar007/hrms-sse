@@ -428,19 +428,20 @@ return [
                 'text' => 'Super Admin Settings',
                 'url'  => 'super-admin-settings',
                 'icon' => 'fas fa-user-shield',
-                // 'can'  => 'isSuperAdmin',
+                // Using a direct role check instead of Gate
+                'role' => 'superadmin',
             ],
             [
                 'text' => 'Admin Settings',
                 'url'  => 'admin',
                 'icon' => 'fas fa-user-cog',
-                // 'can'  => 'isAdmin',
+                'role' => 'admin',
             ],
             [
                 'text' => 'HR Settings',
                 'url'  => 'HR-page',
                 'icon' => 'fas fa-user-tie',
-                // 'can'  => 'isHR',
+                'role' => 'hr',
             ],
         ],
     ],

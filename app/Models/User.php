@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // Add role to fillable attributes
     ];
 
     /**
@@ -44,5 +45,35 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if the user is a super admin
+     *
+     * @return bool
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    /**
+     * Check if the user is an admin
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user is an HR
+     *
+     * @return bool
+     */
+    public function isHR(): bool
+    {
+        return $this->role === 'hr';
     }
 }
