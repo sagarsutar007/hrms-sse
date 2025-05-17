@@ -428,7 +428,6 @@ return [
                 'text' => 'Super Admin Settings',
                 'url'  => 'super-admin-settings',
                 'icon' => 'fas fa-user-shield',
-                // Using a direct role check instead of Gate
                 'role' => 'superadmin',
             ],
             [
