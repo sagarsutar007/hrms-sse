@@ -27,11 +27,6 @@
                 </div>
             </div>
             <div class="col-4"></div>
-            {{-- <div class="col-md-2">
-                <button type="button" class="btn btn-success btn-block pay-salary-btn" id="saveTableData">
-                    <i class="fas fa-money-bill-wave"></i> Pay All Employee Salary
-                </button>
-            </div> --}}
             <div class="col-md-2">
                 <div class="input-group">
                     <input type="month" class="form-control" id="month-selector" value="{{ date('Y-m') }}">
@@ -47,9 +42,7 @@
 
 
     <div class="card-body" style="max-height: 1000px; overflow-y: auto; overflow-x: auto;">
-        <!-- Flex row with space between -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-            <!-- Color Legends -->
             <div class="mb-2">
                 <span style="display:inline-block; width:15px; height:15px; background-color:#00FFFF; margin-right:5px;"></span> Weekly Off
                 <span style="display:inline-block; width:15px; height:15px; background-color:#FFFF00; margin-right:5px;"></span> Holiday
@@ -59,12 +52,10 @@
                 <span style="display:inline-block; width:15px; height:15px; background-color:#ff8a8a ; margin-right:5px;"></span> Terminated
             </div>
 
-            <!-- Search Bar -->
             <form action="{{ route('search_employee') }}" method="post" class="d-flex" style="gap: 5px;">
                 @csrf
                 <input type="search" name="search_val" id="search_input" class="form-control"
                     placeholder="Search Employee by Name Number etc" required onkeyup="serch_on_key_presh()">
-                {{-- <button type="submit" id="search_btn" class="btn btn-outline-secondary">Search</button> --}}
             </form>
         </div>
 
@@ -81,9 +72,6 @@
 
 </div>
 
-
-
-<!-- Employee Details Modal -->
 <div class="modal fade" id="employeeDetailsModal" tabindex="-1" role="dialog" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -1351,34 +1339,26 @@ $(document).ready(function() {
                             }
                             table_html_data += `${Penalty}</td>`;
 
-                            // Add arrear columns exactly as in original
                             table_html_data += `<td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
                                             <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>`;
 
-                            // Add daily rate and monthly salary exactly as in original
                             table_html_data += `<td>${Daily_Rate.toFixed(2)}</td>
                                             <td id="monthly_salary${all_users_data.Employee_id}">`;
-                            // Same monthly salary calculation as original
                             monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
                             table_html_data += `${Math.round(monthaly_salary)}</td>`;
 
-                            // Add net salary cell start
                             var arrer_amo = all_users_data.Arrear_Amount ?? 0;
                             table_html_data += `<td id="net_salary${all_users_data.Employee_id}">`;
 
-                            // Same net salary calculation as original, with parseInt for safety
                             net_salary = monthaly_salary - Penalty - deductions_amount + parseInt(arrer_amo || 0);
 
-                            // Create termination info only if needed (new in second snippet)
                             let terminationInfo = '';
                             if (hasTerminationDate) {
                                 terminationInfo = `<tr><td colspan="2" style="color:red">Terminated on: ${all_users_data.termination_date}</td><td colspan="8"></td></tr>`;
                             }
 
-                            // Calculate overtime hours with 2 decimal places
                             const overtimeHours = (Over_Time / 60).toFixed(2);
 
-                            // Create top table content - matches format of original but with termination info
                             top_table_content = `<tr>
                                 <th colspan='2'>Employee Information</th>
                                 <th colspan='2'>Attendance Details</th>
@@ -1410,17 +1390,14 @@ $(document).ready(function() {
                             </tr>
                             ${terminationInfo}`;
 
-                            // Set paid amount based on payment status
                             var paid_amt = all_users_data.Paid_Flag == 1 ? Math.round(net_salary) : 0;
 
-                            // Complete the net salary cell with hidden inputs as in original
                             table_html_data += `${Math.round(net_salary)}
                             <input hidden id="header_cont_${all_users_data.Employee_id}" type="text" value="${top_table_content.replace(/"/g, '&quot;')}">
                             <input hidden value='${one_user_monthly_total_amount}' id='one_user_monthly_total_amount${all_users_data.Employee_id}'>
                             <input hidden value='${one_user_monthly_in_out}' id='one_user_monthly_in_out${all_users_data.Employee_id}'>
                             <p id='heading${all_users_data.Employee_id}' hidden>Salary of ${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name} for ${month_and_year_var}</p></td>`;
 
-                            // Add paid amount cell as in original
                             table_html_data += `<td id="paid_amount_container${all_users_data.Employee_id}">
                             ${all_users_data.Paid_Flag == 1 ?
                                 `<span id="paid_amount_text${all_users_data.Employee_id}">${paid_amt}</span>` :
@@ -1434,7 +1411,6 @@ $(document).ready(function() {
                             <td hidden><input type="text" value="${Penalty}" style="border:none" id="penalty_amt${all_users_data.Employee_id}" hidden></td>
                             <td id="${all_users_data.Employee_id}">`;
 
-                            // Add pay/final settlement buttons with same styling as original
                             if (all_users_data.Paid_Flag == 1) {
                                 table_html_data += `<button class="pay-salary-btn" disabled id='payButton${all_users_data.Employee_id}'>
                                     <i class="fas fa-check-circle"></i> PAID
@@ -1455,7 +1431,6 @@ $(document).ready(function() {
 
                             table_html_data += `</td>`;
 
-                        // Reset variables for next user
                         leave_holiday_weakly_off_count = 0;
                         one_user_monthly_in_out = '';
                         top_table_content = '';
@@ -1476,7 +1451,6 @@ $(document).ready(function() {
                         Total_all_day_Amount = 0;
                     });
 
-                    // Close the table
                     table_html_data += `
                         </tbody>
                     </table>
@@ -1484,7 +1458,6 @@ $(document).ready(function() {
                 </div>
                     `;
 
-                    // Display the table
                     $("#result").html(table_html_data);
 
                     $('#salary_table').DataTable({
@@ -1553,14 +1526,11 @@ $(document).ready(function() {
                 return;
             }
 
-            // Open the arrear info form modal or section
             open_Arrear_Info_form(employee_id);
 
-            // Get arrear amount and reason from the table cells
             const arrear_amount_td = $("#arrear_amount_td" + employee_id).text();
             const arrear_reason_td = $("#arrear_reason_td" + employee_id).text();
 
-            // Get year and month from the input (format: YYYY-MM)
             const inputMonth = document.getElementById("month-selector").value;
 
             if (!inputMonth) {
@@ -1571,14 +1541,11 @@ $(document).ready(function() {
             const [arrear_year, raw_month] = inputMonth.split("-");
             const arrear_month = raw_month.padStart(2, "0"); // ensure 2-digit month
 
-            // Populate the modal fields
             $("#Employee_Id_inpur_arrear_form").val(employee_id);
             $("#Arrear_Amount_input").val(arrear_amount_td);
             $("#Arrear_Reason").val(arrear_reason_td);
             $("#Arrear_month_year").val(`${arrear_year}-${arrear_month}`);
         }
-
-
 
 
         $(document).on('click', '#saveTableData', function () {
@@ -1588,10 +1555,9 @@ $(document).ready(function() {
             arrear_month = input_month;
         }
 
-
         $.ajax({
                 url: '{{url("/luck-one-clic-arrear-data")}}/' + arrear_month, // Laravel URL helper
-                type: 'GET', // or 'POST' if required
+                type: 'GET',
                 success: function(response) {
                     alert(response.message);
                     set_month_for_data();
@@ -1663,7 +1629,6 @@ $(document).ready(function() {
             }
         }
 
-        // Convert the paid amount input field to plain text after payment
         const paidAmountContainer = document.getElementById("paid_amount_container" + Employee_id);
         if (paidAmountContainer) {
             const paidAmountField = document.getElementById("paid_amount_td" + Employee_id);
@@ -1746,7 +1711,6 @@ $(document).ready(function() {
             $("#table_heading_h2").html(table_heading);
             $("#paid_amoutn_for_pup_up_span").text(paid_amoutn_for_pup_up);
 
-            // Store employee ID in a hidden field for PDF generation
             if ($('#modal_employee_id').length === 0) {
                 $('body').append(`<input type="hidden" id="modal_employee_id" value="${emp_id}">`);
             } else {
@@ -1755,7 +1719,6 @@ $(document).ready(function() {
 
             $('#salaryModal').modal('show');
 
-            // Add Print and PDF buttons to modal footer
             if ($('#printButton').length === 0 && $('#pdfDownloadButton').length === 0) {
                 $('.modal-footer').append(`
                     <button id="printButton" class="btn btn-primary me-2" onclick="printSalaryDetails('${emp_id}')">
@@ -1763,24 +1726,20 @@ $(document).ready(function() {
                     </button>
                 `);
             } else {
-                // Update existing buttons with new employee ID
                 $('#printButton').attr('onclick', `printSalaryDetails('${emp_id}')`);
                 $('#pdfDownloadButton').attr('onclick', `downloadPDF('${emp_id}')`);
             }
         }
 
         function printSalaryDetails(emp_id) {
-            // Get modal content
             var paid_amoutn_for_pup_up = $('#paid_amount_td' + emp_id).val();
 
             var hed_tr_data = $("#header_cont_" + emp_id).val();
             var one_user_monthly_in_out_data_var = $("#one_user_monthly_in_out" + emp_id).val();
             var table_heading = $("#heading" + emp_id).html();
 
-            // Create a new window for printing
             const printWindow = window.open('', '_blank');
 
-            // Add necessary CSS for printing
             printWindow.document.write(`
                 <html>
                 <head>
@@ -1842,20 +1801,16 @@ $(document).ready(function() {
         function toggleMonths() {
         var table = document.getElementById("salary_table");
 
-        // Skip if table doesn't exist
         if (!table) return;
 
-        // First, determine how many date columns we have
         var headerRow = table.rows[0];
         var subHeaderRow = table.rows[1];
 
-        // Toggle the empty space above the first four columns
         if (headerRow.cells[0].colSpan === 4) {
             headerRow.cells[0].style.display =
                 (headerRow.cells[0].style.display === "none" ? "" : "none");
         }
 
-        // Get number of date columns from the header row
         var dateColumns = 0;
         var firstDateColIndex = 4; // After Sr No, Name, Employee Id, Shift hrs
 
@@ -1865,14 +1820,11 @@ $(document).ready(function() {
             }
         }
 
-        // Now toggle each date's columns
         for (var rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
             var row = table.rows[rowIndex];
 
             if (rowIndex <= 1) {
-                // For header rows, toggle the date header cells
                 if (rowIndex === 0) {
-                    // For the main header row, toggle the date headers
                     for (var i = 1; i < headerRow.cells.length; i++) {
                         if (headerRow.cells[i].colSpan === 7) {
                             headerRow.cells[i].style.display =
@@ -1880,7 +1832,6 @@ $(document).ready(function() {
                         }
                     }
                 } else {
-                    // For the subheader row, toggle all date-related column headers
                     for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
                         var startColIndex = firstDateColIndex + (dateIndex * 7);
                         for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
@@ -1893,7 +1844,6 @@ $(document).ready(function() {
                     }
                 }
             } else {
-                // For data rows, toggle each date's cells
                 for (var dateIndex = 0; dateIndex < dateColumns; dateIndex++) {
                     var startColIndex = firstDateColIndex + (dateIndex * 7);
                     for (var subColIndex = 0; subColIndex < 7; subColIndex++) {
