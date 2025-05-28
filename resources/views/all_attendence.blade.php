@@ -293,165 +293,220 @@
 
 
         // Generate Attendance button
-        $("#generate-attendance-btn").on("click", function() {
-            $("#generate-attendance-modal").modal("show");
+$("#generate-attendance-btn").on("click", function() {
+    $("#generate-attendance-modal").modal("show");
+});
+
+$(document).ready(function () {
+    $("#generate-btn").on("click", function (event) {
+        event.preventDefault(); // Prevent default action
+
+        var from_date = $("#from-date").val();
+        var to_date = $("#to-date").val();
+
+        if (!from_date || !to_date) {
+            Swal.fire("Error", "Please provide both 'From Date' and 'To Date'.", "error");
+            return;
+        }
+
+        var startDate = new Date(from_date);
+        var endDate = new Date(to_date);
+
+        if (startDate > endDate) {
+            Swal.fire("Error", "'From Date' cannot be later than 'To Date'.", "error");
+            return;
+        }
+
+        // Show loading while fetching employees
+        Swal.fire({
+            title: "Fetching Employees",
+            text: "Please wait while we fetch employee data...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
-        $(document).ready(function () {
-            $("#generate-btn").on("click", function (event) {
-                event.preventDefault(); // Prevent default action
-
-                const employeeIDs = [1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20];
-                var from_date = $("#from-date").val();
-                var to_date = $("#to-date").val();
-
-                if (!from_date || !to_date) {
-                    Swal.fire("Error", "Please provide both 'From Date' and 'To Date'.", "error");
+        // Fetch employees dynamically from backend
+        $.ajax({
+            url: "{{url('get-active-employees')}}", // Create this endpoint in your backend
+            type: "GET",
+            data: {
+                _token: '{{csrf_token()}}'
+            },
+            success: function(response) {
+                if (!response.employees || response.employees.length === 0) {
+                    Swal.fire("Error", "No active employees found.", "error");
                     return;
                 }
 
-                var startDate = new Date(from_date);
-                var endDate = new Date(to_date);
+                const employeeIDs = response.employees.map(emp => emp.id);
+                processAttendance(employeeIDs, startDate, endDate, from_date, to_date);
+            },
+            error: function(xhr, status, error) {
+                Swal.fire("Error", "Failed to fetch employees: " + error, "error");
+            }
+        });
+    });
 
-                if (startDate > endDate) {
-                    Swal.fire("Error", "'From Date' cannot be later than 'To Date'.", "error");
+    function processAttendance(employeeIDs, startDate, endDate, from_date, to_date) {
+        $("#generate-attendance-modal").modal("hide");
+
+        // Calculate total number of operations
+        const millisecondsPerDay = 24 * 60 * 60 * 1000;
+        const dateDifference = Math.round((endDate - startDate) / millisecondsPerDay) + 1;
+        const totalOperations = dateDifference * employeeIDs.length;
+        let completedOperations = 0;
+
+        Swal.fire({
+            title: "Generating Attendance",
+            html: `
+                <div class="progress" style="height: 20px;">
+                    <div id="attendance-progress-bar" class="progress-bar" role="progressbar"
+                        style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div id="progress-status" class="mt-2">Processing 0/${totalOperations} records...</div>
+            `,
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+
+        let attendanceData = []; // Store attendance results
+
+        function updateProgressBar() {
+            completedOperations++;
+            const progressPercentage = Math.round((completedOperations / totalOperations) * 100);
+
+            $("#attendance-progress-bar").css("width", progressPercentage + "%");
+            $("#attendance-progress-bar").attr("aria-valuenow", progressPercentage);
+            $("#attendance-progress-bar").text(progressPercentage + "%");
+            $("#progress-status").text(`Processing ${completedOperations}/${totalOperations} records...`);
+        }
+
+        function sendAjaxForDateAndEmployee(currentDate, employeeIndex) {
+            if (currentDate > endDate) {
+                if (employeeIndex >= employeeIDs.length - 1) {
+                    Swal.close(); // Close loading message
+                    showAttendancePreview(attendanceData); // Show the modal
                     return;
                 }
 
-                $("#generate-attendance-modal").modal("hide");
-
-                Swal.fire({
-                    title: "Generating Attendance",
-                    text: "Please wait while the attendance data is being generated...",
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                let attendanceData = []; // Store attendance results
-
-                function sendAjaxForDateAndEmployee(currentDate, employeeIndex) {
-                    if (currentDate > endDate) {
-                        if (employeeIndex >= employeeIDs.length - 1) {
-                            Swal.close(); // Close loading message
-                            showAttendancePreview(attendanceData); // Show the modal
-                            return;
-                        }
-
-                        currentDate = new Date(from_date);
-                        employeeIndex++;
-                    }
-
-                    var formattedDate = currentDate.toISOString().split('T')[0];
-                    var employeeID = employeeIDs[employeeIndex];
-
-                    $.ajax({
-                        url: `{{url('genrate-attandance')}}/${formattedDate}/${formattedDate}/${employeeID}`,
-                        type: "GET",
-                        data: {
-                            employeeID: employeeID,
-                            _token: '{{csrf_token()}}'
-                        },
-                        success: function (response) {
-                            attendanceData.push({
-                                date: formattedDate,
-                                employee_id: employeeID,
-                                employee_name: "Employee " + employeeID,
-                                status: response.status ? "Present" : "Absent"
-                            });
-
-                            currentDate.setDate(currentDate.getDate() + 1);
-                            sendAjaxForDateAndEmployee(currentDate, employeeIndex);
-                        },
-                        error: function (xhr, status, error) {
-                            attendanceData.push({
-                                date: formattedDate,
-                                employee_id: employeeID,
-                                employee_name: "Employee " + employeeID,
-                                status: "Error"
-                            });
-
-                            currentDate.setDate(currentDate.getDate() + 1);
-                            sendAjaxForDateAndEmployee(currentDate, employeeIndex);
-                        }
-                    });
-                }
-
-                sendAjaxForDateAndEmployee(startDate, 0);
-            });
-
-
-            function showAttendancePreview(data) {
-                let tbody = $("#attendancePreviewBody");
-                tbody.empty(); // Clear previous data
-
-                if (data.length === 0) {
-                    tbody.append('<tr><td colspan="4">No attendance data available.</td></tr>');
-                } else {
-                    data.forEach(item => {
-                        let row = `
-                            <tr>
-                                <td>${item.date}</td>
-                                <td>${item.employee_id}</td>
-                                <td>${item.employee_name}</td>
-                                <td>${item.status}</td>
-                            </tr>
-                        `;
-                        tbody.append(row);
-                    });
-                }
-
-                $("#attendancePreviewModal").modal("show"); // Show modal
+                currentDate = new Date(from_date);
+                employeeIndex++;
             }
 
+            var formattedDate = currentDate.toISOString().split('T')[0];
+            var employeeID = employeeIDs[employeeIndex];
 
-            // Function to download the attendance data as a PDF
-            $("#downloadAttendancePDF").on("click", function () {
-                let fromDate = $("#from-date").val();
-                let toDate = $("#to-date").val();
+            $.ajax({
+                url: `{{url('genrate-attandance')}}/${formattedDate}/${formattedDate}/${employeeID}`,
+                type: "GET",
+                data: {
+                    employeeID: employeeID,
+                    _token: '{{csrf_token()}}'
+                },
+                success: function (response) {
+                    // Store employee name from response if available
+                    const employeeName = response.employee_name || "Employee " + employeeID;
 
-                if (!fromDate || !toDate) {
-                    Swal.fire("Error", "Missing date range. Please regenerate attendance.", "error");
-                    return;
-                }
-
-                let pdfFileName = `Attendance_${fromDate}_to_${toDate}.pdf`;
-
-                let doc = new jsPDF('p', 'mm', 'a4');
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(16);
-                doc.text("Attendance Report", 105, 15, null, null, "center");
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(12);
-                doc.text(`From: ${fromDate}  To: ${toDate}`, 105, 25, null, null, "center");
-
-                let tableData = [];
-                $("#attendancePreviewBody tr").each(function () {
-                    let row = [];
-                    $(this).find("td").each(function () {
-                        row.push($(this).text().trim());
+                    attendanceData.push({
+                        date: formattedDate,
+                        employee_id: employeeID,
+                        employee_name: employeeName,
+                        status: response.status ? "Present" : "Absent"
                     });
-                    tableData.push(row);
-                });
 
-                doc.autoTable({
-                    head: [["Date", "Employee ID", "Employee Name", "Status"]],
-                    body: tableData,
-                    startY: 30,
-                    theme: "grid",
-                    styles: { fontSize: 10 },
-                    headStyles: { fillColor: [40, 40, 40] },
-                    margin: { top: 30 },
-                });
+                    updateProgressBar();
 
-                doc.save(pdfFileName);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    sendAjaxForDateAndEmployee(currentDate, employeeIndex);
+                },
+                error: function (xhr, status, error) {
+                    attendanceData.push({
+                        date: formattedDate,
+                        employee_id: employeeID,
+                        employee_name: "Employee " + employeeID,
+                        status: "Error"
+                    });
+
+                    updateProgressBar();
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    sendAjaxForDateAndEmployee(currentDate, employeeIndex);
+                }
             });
+        }
 
+        sendAjaxForDateAndEmployee(startDate, 0);
+    }
 
+    function showAttendancePreview(data) {
+        let tbody = $("#attendancePreviewBody");
+        tbody.empty(); // Clear previous data
 
+        if (data.length === 0) {
+            tbody.append('<tr><td colspan="4">No attendance data available.</td></tr>');
+        } else {
+            data.forEach(item => {
+                let row = `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.employee_id}</td>
+                        <td>${item.employee_name}</td>
+                        <td>${item.status}</td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        $("#attendancePreviewModal").modal("show"); // Show modal
+    }
+
+    // Function to download the attendance data as a PDF
+    $("#downloadAttendancePDF").on("click", function () {
+        let fromDate = $("#from-date").val();
+        let toDate = $("#to-date").val();
+
+        if (!fromDate || !toDate) {
+            Swal.fire("Error", "Missing date range. Please regenerate attendance.", "error");
+            return;
+        }
+
+        let pdfFileName = `Attendance_${fromDate}_to_${toDate}.pdf`;
+
+        let doc = new jsPDF('p', 'mm', 'a4');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text("Attendance Report", 105, 15, null, null, "center");
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        doc.text(`From: ${fromDate}  To: ${toDate}`, 105, 25, null, null, "center");
+
+        let tableData = [];
+        $("#attendancePreviewBody tr").each(function () {
+            let row = [];
+            $(this).find("td").each(function () {
+                row.push($(this).text().trim());
+            });
+            tableData.push(row);
         });
+
+        doc.autoTable({
+            head: [["Date", "Employee ID", "Employee Name", "Status"]],
+            body: tableData,
+            startY: 30,
+            theme: "grid",
+            styles: { fontSize: 10 },
+            headStyles: { fillColor: [40, 40, 40] },
+            margin: { top: 30 },
+        });
+
+        doc.save(pdfFileName);
+    });
+});
 
 
         // Bulk Delete button

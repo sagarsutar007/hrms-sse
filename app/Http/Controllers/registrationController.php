@@ -13,20 +13,20 @@ class registrationController extends Controller
         $role = session()->get('role');
         if (isset($EmployeesID)) {
 
-//shift_master
-$shift_master = DB::table('shift_master')
-->get();
-// depart master
+            //shift_master
+            $shift_master = DB::table('shift_master')
+            ->get();
+            // depart master
+            $department_master = DB::table('department_master')
+            ->get();
+            //employee_type_master
+            $employee_type_master = DB::table('shift__employee_type_master')
+            ->get();
+            //role_masrer
+            $role_masrer = DB::table('role_masrer')
+            ->get();
 
-$department_master = DB::table('department_master')
-->get();
 
-//employee_type_master
-$employee_type_master = DB::table('shift__employee_type_master')
-->get();
-//role_masrer
-$role_masrer = DB::table('role_masrer')
-->get();
             return view("add_user")
                 ->with('reg_id', "0")
                 ->with('reg_email', "0")

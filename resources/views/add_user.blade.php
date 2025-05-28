@@ -117,9 +117,9 @@
                     </div>
                     <div class="col-md-6" style="display: none;">
                         <x-adminlte-select name="role" label="Employee Role" icon="fas fa-user-tag" disabled>
-                            <option value="3" selected>Employee</option>
+                            <option value="5" selected>Employee</option>
                         </x-adminlte-select>
-                        <input type="hidden" name="role" value="3">
+                        <input type="hidden" name="role" value="5">
                     </div>
                     <div class="col-md-6">
                         <x-adminlte-input name="DOJ" label="Date Of Joining" type="date" value="{{ \Carbon\Carbon::now()->toDateString() }}" icon="fas fa-calendar-check" />

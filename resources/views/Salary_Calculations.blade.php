@@ -695,6 +695,8 @@ $(document).ready(function() {
         }
 
         function attendance_data_set(url_input) {
+            console.log("Loading attendance data from URL:", url_input);
+            console.log("Employee ID:", {{ $_GET['employee_id'] ?? 'null' }});
             $.ajax({
                 url: url_input,
                 type: "GET",
@@ -958,6 +960,21 @@ $(document).ready(function() {
                                 month: "2-digit",
                                 year: "numeric"
                             });
+
+                            function formatDateToYYYYMMDD(date) {
+                                if (!date) return null;
+
+                                try {
+                                    const d = new Date(date);
+                                    const year = d.getFullYear();
+                                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                                    const day = String(d.getDate()).padStart(2, '0');
+                                    return `${year}-${month}-${day}`;
+                                } catch (e) {
+                                    console.error("Date formatting error:", e);
+                                    return null;
+                                }
+                            }
 
                             // Filter data for this user and date
                             const filteredData = all_attandance_data.filter(all_att_data =>
