@@ -1320,7 +1320,7 @@ $(document).ready(function() {
                                             <td>${Work}</td>
                                             <td>${Absent_count}</td>
                                             <td>${Over_Time}</td>
-                                            <td>${Over_Ttime_Rate.toFixed(2)}</td>
+                                            <td>${Employee_OT_Rate.toFixed(2)}</td>
                                             <td>${Math.round(Total_OT_Amount)}</td>`;
 
                             // Add advance column exactly as in original
@@ -1359,7 +1359,7 @@ $(document).ready(function() {
                             table_html_data += `<td id="arrear_amount_td${all_users_data.Employee_id}">${all_users_data.Arrear_Amount ?? 0}</td>
                                             <td id="arrear_reason_td${all_users_data.Employee_id}">${all_users_data.Arrear_Reasons ?? " "}</td>`;
 
-                            table_html_data += `<td>${Daily_Rate.toFixed(2)}</td>
+                            table_html_data += `<td>${Employee_Daily_Rate.toFixed(2)}</td>
                                             <td id="monthly_salary${all_users_data.Employee_id}">`;
                             monthaly_salary = Total_Amount + (leave_holiday_weakly_off_count * all_users_data.salary / 30);
                             table_html_data += `${Math.round(monthaly_salary)}</td>`;
@@ -1384,9 +1384,9 @@ $(document).ready(function() {
                                 <th colspan='2'>Salary Details</th></tr>
                             <tr><td>Name</td> <td>${all_users_data.f_name} ${all_users_data.m_name} ${all_users_data.l_name}</td>
                             <td>Total Days</td><td>${calculationWorkingDays}</td> <td>Overtime (Hours)</td><td>${overtimeHours}</td><td>Loan/Advance (INR)</td><td>${advance}</td>
-                            <td>Daily Rate (INR)</td><td>${Daily_Rate.toFixed(2)}</td></tr>
+                            <td>Daily Rate (INR)</td><td>${Employee_Daily_Rate.toFixed(2)}</td></tr>
                             <tr> <td>Employee ID</td> <td>${all_users_data.Employee_id}</td>
-                            <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td> <td>Overtime Rate</td><td>${Over_Ttime_Rate.toFixed(2)}</td>
+                            <td>Working Days</td><td>${calculationWorkingDays - holidayCount}</td> <td>Overtime Rate</td><td>${Employee_OT_Rate.toFixed(2)}</td>
                             <td>Deductions</td><td>${deductions_amount}</td>
                             <td>Gross Salary (INR)</td><td>${monthaly_salary.toFixed(2)}</td></tr>
                             <tr> <td>Shift Hours</td> <td>${all_users_data.Shift_hours}</td>

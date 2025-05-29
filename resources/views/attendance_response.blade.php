@@ -12,11 +12,17 @@
                     <h5 class="mb-0">Punch Card</h5>
                 </div>
                 <div class="card-body text-center">
-                    <img class="profile-pic" src="{{ asset('/storage/' . $user->photo_name) }}" alt="Profile Picture">
+                    <img class="profile-pic"
+                        src="{{ $user->photo_name && Storage::exists('public/' . $user->photo_name)
+                                ? asset('storage/' . $user->photo_name)
+                                : 'https://placehold.co/80x80' }}"
+                        alt="Profile Picture">
+
                     <h4 class="mt-2">{{ $user->f_name }} {{ $user->m_name }} {{ $user->l_name }}</h4>
                     <span class="role-badge">{{ $user->roles }}</span>
                     <div id="qrcode{{ $index }}"></div>
                 </div>
+
                 <div class="card-footer text-center">
                     <h6 style="color: {{ $color_name }};">{{ $response_message }}</h6>
                 </div>
@@ -42,7 +48,6 @@
     .profile-pic {
         width: 80px;
         height: 80px;
-        border-radius: 50%;
         object-fit: cover;
         border: 2px solid #ccc;
     }
@@ -67,10 +72,9 @@
 
 @section('js')
 <script>
-    const myTimeout = setTimeout(myGreeting, 5000);
-
-    function myGreeting() {
-        window.close();
-    }
+    setTimeout(function () {
+        window.location.href = "{{ route('all_attendance') }}";
+    }, 5000);
 </script>
 @stop
+
