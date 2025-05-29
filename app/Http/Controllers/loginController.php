@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class loginController extends Controller
 {
@@ -93,23 +96,38 @@ class loginController extends Controller
 
     }
     public function login_req(Request $login_req) {
-        $email = $login_req->email;
-        $Password = $login_req->Password;
+    $email = $login_req->email;
+    $password = $login_req->Password;
 
-        if (isset($email) && isset($Password)) {
-            $guserData = DB::table('users')
+    if (isset($email) && isset($password)) {
+        $guserData = DB::table('users')
             ->join('role_masrer', 'users.role', '=', 'role_masrer.id')
             ->select('users.*', 'role_masrer.roles')
             ->where('users.email', '=', $email)
             ->first();
 
-            if($guserData){
-                if($guserData->password == $Password){
-                    // Login success: Set session data
-                 $name = $guserData->f_name . " " . $guserData->m_name . " " . $guserData->l_name;
-                 $EmployeesID = $guserData->Employee_id;
-               $role = $guserData->roles;
-               $role_number = $guserData->role;
+        if($guserData){
+            // Note: You should use Hash::check() for password verification in production
+            if($guserData->password == $password){
+                // Create User model instance with correct primary key
+                $userModel = new User();
+                $userModel->Employee_id = $guserData->Employee_id;
+                $userModel->name = $guserData->name;
+                $userModel->f_name = $guserData->f_name;
+                $userModel->m_name = $guserData->m_name;
+                $userModel->l_name = $guserData->l_name;
+                $userModel->email = $guserData->email;
+                $userModel->role = $guserData->role;
+                $userModel->exists = true; // Important: tell Laravel this record exists
+
+                // Login the user
+                Auth::login($userModel);
+
+                // Set session data
+                $name = $guserData->f_name . " " . $guserData->m_name . " " . $guserData->l_name;
+                $EmployeesID = $guserData->Employee_id;
+                $role = $guserData->roles;
+                $role_number = $guserData->role;
 
                 $login_req->session()->put('EmployeeID', $EmployeesID);
                 $login_req->session()->put('name', $name);
@@ -122,36 +140,17 @@ class loginController extends Controller
                     return redirect()->route('dashboard');
                 }
 
-
-
-
-                }else{
-                    echo "<script>
-                    alert('Wrong Password');
-                    history.back();
-                </script>";
-                }
-
-
-
             }else{
-                echo "<script>
-            alert('User Not Found');
-            history.back();
-        </script>";
+                return back()->with('error', 'Wrong Password');
             }
+
         }else{
-            echo "<script>
-            alert('Please Fill Fields');
-            history.back();
-        </script>";
+            return back()->with('error', 'User Not Found');
         }
-
-
-
-
-
+    }else{
+        return back()->with('error', 'Please Fill All Fields');
     }
+}
 
     public function login_reqwww(Request $login_req) {
 

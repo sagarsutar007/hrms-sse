@@ -481,3 +481,17 @@ Route::get('/leaves', function () {
 Route::get('/guard', function () {
     return view('guard_view');
 });
+
+Route::get('/test-role', function () {
+    $user = auth()->user();
+    if (!$user) {
+        return 'Not logged in';
+    }
+
+    return [
+        'user_id' => $user->id,
+        'role' => $user->role,
+        'isSuperAdmin' => Gate::allows('isSuperAdmin'),
+    ];
+});
+
