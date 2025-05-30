@@ -90,41 +90,10 @@ class User extends Authenticatable
         return $this->role === 3;
     }
 
-    /**
-     * AdminLTE profile URL method
-     * This method is required by AdminLTE package
-     *
-     * @return string
-     */
-    public function adminlte_profile_url(): string
+    public function adminlte_image()
     {
-        // Return the URL to the user's profile page
-        // Adjust this route name based on your application's routing
-        return route('dashboard', ['id' => $this->Employee_id]);
+        return 'images/default-user.png';  // or any default image path
     }
 
-    /**
-     * AdminLTE profile image URL method (optional)
-     *
-     * @return string
-     */
-    public function adminlte_image(): string
-    {
-        // Return a default avatar or user's profile image URL
-        // You can customize this based on your needs
-        return 'https://via.placeholder.com/160x160/667ba8/ffffff?text=' . strtoupper(substr($this->name ?? 'U', 0, 1));
-    }
 
-    /**
-     * AdminLTE description method (optional)
-     *
-     * @return string
-     */
-    public function adminlte_desc(): string
-    {
-        // Return user description or role
-        return $this->role == 1 ? 'Super Admin' :
-               ($this->role == 2 ? 'Admin' :
-               ($this->role == 3 ? 'HR' : 'User'));
-    }
 }

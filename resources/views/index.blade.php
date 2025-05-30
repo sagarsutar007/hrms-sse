@@ -162,34 +162,6 @@
     </div>
 </div>
 
-<!-- ID Card Modal -->
-<div class="modal fade" id="idCardModal" tabindex="-1" role="dialog" aria-labelledby="idCardModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="idCardModalLabel">Employee ID Card</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="id-card-container text-center">
-                    <div class="company-header">
-                        <h2>Shri Sai Electricals</h2>
-                    </div>
-                    <div class="employee-photo">
-                        <img src="{{asset('/storage')}}/{{$login_u_data['photo_name']}}" alt="Employee Photo" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
-                    </div>
-                    <div class="employee-details mt-3">
-                        <h3>{{$login_u_data['Name']}}</h3>
-                        <h5>Branch Manager</h5>
-                    </div>
-                    <div class="mt-3" id="qrcode"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @stop
 
 @section('css')
@@ -752,8 +724,6 @@
             OTDataFunction('{{url("/Daily-Ot-Hrs-api/")}}');
             renderEmployeeTypeWisePieCharts('{{url("/Get-Employee-Type-Wise-Current-Date-Data-api/")}}');
 
-            // Add user icon to navbar for ID card
-            $('.navbar-nav.ml-auto').append('<li class="nav-item"><a class="nav-link" href="#" onclick="showIdCard()"><i class="fas fa-id-card"></i></a></li>');
         });
     </script>
 @stop
