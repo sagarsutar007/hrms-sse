@@ -92,7 +92,7 @@ class User extends Authenticatable
 
     public function adminlte_image()
     {
-        return 'images/default-user.png';  // or any default image path
+        return 'https://avatar.iran.liara.run/username?username=User';  // or any default image path
     }
 
 
