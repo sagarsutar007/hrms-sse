@@ -27,7 +27,7 @@ alert("Not Permission")
 <?php
 
 }
-         
+
         }else{
           return redirect()->route('login');
         }
@@ -41,14 +41,14 @@ alert("Not Permission")
         if(isset( $EmployeesID)){
 
 if ($req->Department_input_id != "") {
-  
+
 
     $update_Department=DB::table('department_master')
-    ->where('id',  $req->Department_input_id) 
-     ->update( [ 
-        'Department_name'=>$req->Department, 
+    ->where('id',  $req->Department_input_id)
+     ->update( [
+        'Department_name'=>$req->Department,
 
-    ]); 
+    ]);
 
     if( $update_Department){
         return response()->json([
@@ -65,10 +65,10 @@ if ($req->Department_input_id != "") {
 
             $add_Department=DB::table('department_master')
             ->insertOrIgnore([
-                'Department_name'=>$req->Department, 
+                'Department_name'=>$req->Department,
                 'created_at'=>now(),
                 'updated_at'=>now()
-         
+
             ]);
 
             if($add_Department){
@@ -89,7 +89,7 @@ if ($req->Department_input_id != "") {
         }
     }
 
-    
+
      // add_Leave_Master_Form
      public function add_Leave_Master_Form(Request $req){
 
@@ -107,7 +107,7 @@ if(isset($leave_id)){
         'Short_Name'=>$req->Short_Name,
         'Color'=>$req->Color,
     ]);
-    
+
     if($add_Department){
         return response()->json([
             'status' => 'success',
@@ -120,16 +120,16 @@ if(isset($leave_id)){
         ]);
     }
 }else {
-    
+
             $add_Department=DB::table('leave_type_master')
             ->insertOrIgnore([
-               
+
                 'Name'=>$req->Leave_Type,
         'Payment_Status'=>$req->Payment_Status,
         'Short_Name'=>$req->Short_Name,
         'Color'=>$req->Color,
-                
-         
+
+
             ]);
 
             if($add_Department){
@@ -231,9 +231,9 @@ history.back();
 
   //roler_permissions
   $roler_permissions_qr = DB::table('roler_permissions')
-                    
+
   ->where('role_name', $role_sec)
-  ->get();  
+  ->get();
   $add_shift = 0;
   foreach($roler_permissions_qr as $roler_p){
       $add_shift = $roler_p->Add_Role ;
@@ -249,14 +249,14 @@ if($add_shift == 1){
             'created_by'=>$EmployeesID,
             'created_at'=>now(),
             'updated_at'=>now()
-     
+
         ]);
-    
-        
+
+
         $role_permissions_Quri=DB::table('roler_permissions')
         ->insertOrIgnore([
-            
-         
+
+
             'created_at'=>now(),
             'updated_at'=>now(),
             'role_name' =>$role,
@@ -268,29 +268,29 @@ if($add_shift == 1){
              'Delete_HR'=> 0,
              'Update_Admin'=> 0,
              'Delete_Admin'=> 0,
-              'Add_Guard'=> 0, 
-                'Update_Guard'=> 0, 
-                'Delete_Guard'=> 0, 
-                'Add_Admin'=> 0, 
-                'view_General_Informations'=> 0, 
-                'view_Profile'=> 0, 
-                'view_Set_Salary'=> 0, 
-                'view_Leave'=> 0, 
-                'view_Attendance'=> 0, 
-                'view_Core_HR'=> 0, 
-                'view_Project_Task'=> 0, 
-                'Add_Shift'=> 0, 
-                'Edit_Shift'=> 0, 
-                'Delete_Shift'=> 0, 
-                'Add_Employee_Type'=> 0, 
-                'Edit_Employee_Type'=> 0, 
-                'Delete_Employee_Type'=> 0, 
-                'Add_Role'=> 0, 
-                'Edit_Role'=> 0, 
-                'Delete_Role'=> 0, 
-                'Change_Password'=> 0, 
+              'Add_Guard'=> 0,
+                'Update_Guard'=> 0,
+                'Delete_Guard'=> 0,
+                'Add_Admin'=> 0,
+                'view_General_Informations'=> 0,
+                'view_Profile'=> 0,
+                'view_Set_Salary'=> 0,
+                'view_Leave'=> 0,
+                'view_Attendance'=> 0,
+                'view_Core_HR'=> 0,
+                'view_Project_Task'=> 0,
+                'Add_Shift'=> 0,
+                'Edit_Shift'=> 0,
+                'Delete_Shift'=> 0,
+                'Add_Employee_Type'=> 0,
+                'Edit_Employee_Type'=> 0,
+                'Delete_Employee_Type'=> 0,
+                'Add_Role'=> 0,
+                'Edit_Role'=> 0,
+                'Delete_Role'=> 0,
+                'Change_Password'=> 0,
                 'view_Payslip'=> 0
-    
+
         ]);
     }else{
 
@@ -299,11 +299,11 @@ if($add_shift == 1){
 alert("Not Permission")
 </script>
 <?php
-        
-        }
-    
 
-        
+        }
+
+
+
         if($roleQuri){
 
             ?>
@@ -321,7 +321,7 @@ history.back();
 </script>
 <?php
 
-            dd($roleQuri); 
+            dd($roleQuri);
             echo "Error Data not inserted";
         }
     }
@@ -340,7 +340,7 @@ history.back();
         $role = session()->get('role');
         if(isset( $EmployeesID)){
 
-  
+
    if($req->Password ==""){
     ?>
 <script>
@@ -354,9 +354,9 @@ history.back();
     {
 if($req->Password == $req->CPassword){
  //roler_permissions
- $roler_permissions_qr = DB::table('roler_permissions')               
+ $roler_permissions_qr = DB::table('roler_permissions')
  ->where('role_name',$role)
- ->get();  
+ ->get();
  $add_shift = 0;
  foreach($roler_permissions_qr as $roler_p){
      $add_shift = $roler_p->Change_Password ;
@@ -364,12 +364,12 @@ if($req->Password == $req->CPassword){
 
 if($add_shift == 1){
 
-    $change_password = DB::table('all_users') 
-    ->where('Employee_id', $req->Employee_Id) 
-     ->update( [ 
-     'password' => $req->Password, 
-     'updated_at' => now(), 
-    ]); 
+    $change_password = DB::table('all_users')
+    ->where('Employee_id', $req->Employee_Id)
+     ->update( [
+     'password' => $req->Password,
+     'updated_at' => now(),
+    ]);
 
 }else{
     ?>
@@ -398,7 +398,7 @@ history.back();
           dd($roleQuri);
           echo "Error Data not inserted";
       }
-      
+
 }else{
     ?>
 <script>
@@ -414,17 +414,17 @@ history.back();
        dd($e->getMessage());
     }
    }
-      
+
         }else{
           return redirect()->route('login');
         }
     }
 
-    
-    
-    
-    
-   //add emploee type 
+
+
+
+
+   //add emploee type
     public function add_employee_type(Request $req) {
         $EmployeesID = session()->get('EmployeeID');
         $role = session()->get('role');
@@ -435,9 +435,9 @@ history.back();
    if(isset($emp_m)){
 
   //roler_permissions
-  $roler_permissions_qr = DB::table('roler_permissions')               
+  $roler_permissions_qr = DB::table('roler_permissions')
   ->where('role_name',$role)
-  ->get();  
+  ->get();
   $add_shift = 0;
   foreach($roler_permissions_qr as $roler_p){
       $add_shift = $roler_p->Add_Employee_Type ;
@@ -471,7 +471,7 @@ alert("data Inserted")
 history.back();
 </script>
 <?php
-  
+
     }else{
         ?>
 <script>
@@ -482,13 +482,13 @@ history.back();
     }
 
    }
-    
+
         }else{
           return redirect()->route('login');
         }
     }
 
-    
+
 
 
 

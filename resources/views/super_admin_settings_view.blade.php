@@ -237,17 +237,12 @@
                            <span class="ml-1">{{ $lm->Color }}</span>
                         </td>
                         <td>
-                           <a href="{{ url('/delete-Leave-Master-Form/' . $lm->id) }}"
-                              class="btn btn-sm btn-danger delete-btn"
-                              title="Delete">
-                           <i class="fas fa-trash"></i>
-                           </a>
-                           <a href="javascript:void(0);"
-                              onclick="open_leave_type_master_form({{ $lm->id }})"
-                              class="btn btn-sm btn-primary edit-btn ml-1"
-                              title="Edit">
-                           <i class="fas fa-edit"></i>
-                           </a>
+                            <a href="{{url('/delete-Leave-Master-Form')}}/{{$lm->id}}" class="btn btn-sm btn-danger" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                            <a href="javascript:void(0);" onclick="open_leave_type_master_form({{ $lm->id }})" class="btn btn-sm btn-primary" title="Edit">
+                                <i class="fa-solid fa-pencil"></i>
+                            </a>
                         </td>
                      </tr>
                      @endforeach
@@ -359,52 +354,53 @@
 </div>
 
 <!-- Add Leave Master Modal -->
-<div class="modal fade" id="leaveMasterModal" tabindex="-1" aria-labelledby="leaveMasterModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-    <form id="add_Leave_Master_Form">
-        @csrf
-        <input type="hidden" name="leav_master_id" id="leav_master_id">
-        <div class="modal-header">
-        <h5 class="modal-title" id="leaveMasterModalLabel">Add Leave Master</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+<div class="modal fade" id="leaveMasterModal" tabindex="-1" aria-labelledby="leaveMasterModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form id="add_Leave_Master_Form">
+                @csrf
+                <input type="hidden" name="leav_master_id" id="leav_master_id">
 
-        <div class="modal-body">
-        <div class="row mb-3">
-            <div class="col-md-6">
-            <label for="Leave_Type_name" class="form-label">Leave Type *</label>
-            <input type="text" class="form-control" name="Leave_Type" id="Leave_Type_name" placeholder="Leave Type" required>
-            </div>
-            <div class="col-md-6">
-            <label for="Leave_Short_Name" class="form-label">Short Name *</label>
-            <input type="text" class="form-control" name="Short_Name" id="Leave_Short_Name" placeholder="Short Name" required>
-            </div>
-        </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaveMasterModalLabel">Add Leave Master</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-            <label for="Leave_Payment_Status" class="form-label">Payment Status *</label>
-            <select class="form-select custom-select" name="Payment_Status" id="Leave_Payment_Status" required>
-                <option value="" disabled selected>Select Payment Status</option>
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-            </select>
-            </div>
-            <div class="col-md-6">
-            <label for="Leave_Color" class="form-label">Color *</label>
-            <input type="color" class="form-control form-control-color" name="Color" id="Leave_Color" value="#000000" title="Choose color" required>
-            </div>
-        </div>
-        </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Leave_Type_name" class="form-label">Leave Type *</label>
+                            <input type="text" class="form-control" name="Leave_Type" id="Leave_Type_name" placeholder="Leave Type" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Leave_Short_Name" class="form-label">Short Name *</label>
+                            <input type="text" class="form-control" name="Short_Name" id="Leave_Short_Name" placeholder="Short Name" required>
+                        </div>
+                    </div>
 
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" id="submit_Leave_Master_Btn" class="btn btn-primary">Submit</button>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="Leave_Payment_Status" class="form-label">Payment Status *</label>
+                            <select class="form-select custom-select" name="Payment_Status" id="Leave_Payment_Status" required>
+                                <option value="" disabled selected>Select Payment Status</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Unpaid">Unpaid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Leave_Color" class="form-label">Color *</label>
+                            <input type="color" class="form-control form-control-color" name="Color" id="Leave_Color" value="#000000" title="Choose color" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="submit_Leave_Master_Btn" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
         </div>
-    </form>
     </div>
-</div>
 </div>
 
 <!-- Add Department Modal -->
@@ -839,7 +835,6 @@
    // Delete button alert
    $('.delete-btn').click(function (e) {
        e.preventDefault();
-       alert("Delete action triggered!");
    });
 
    // Edit leave modal
@@ -1092,24 +1087,76 @@
      });
    });
 
-   $('#submit_Leave_Master_Btn').on('click', function () {
-      var formData = $('#add_Leave_Master_Form').serialize();
-      $.ajax({
+   function openAddLeaveModal() {
+    // Reset form and modal title for adding
+    document.getElementById('add_Leave_Master_Form').reset();
+    $("#leav_master_id").val('');
+    $("#leaveMasterModalLabel").text("Add Leave Master");
+    $("#submit_Leave_Master_Btn").text("Submit");
+    $('#leaveMasterModal').modal('show');
+}
+
+// Your existing edit function - works perfectly as is!
+function open_leave_type_master_form(id) {
+    $("#leaveMasterModalLabel").text("Leave Type Update");
+    $("#submit_Leave_Master_Btn").text("Update");
+
+    $.ajax({
+        type: "GET",
+        url: "{{url("/Leave-Master-view/")}}/"+id,
+        dataType: "json",
+        success: function(response) {
+            console.log(response);
+            var r_data = response.data;
+            $("#leav_master_id").val(r_data.id);
+            $("#Leave_Type_name").val(r_data.Name);
+            $("#Leave_Short_Name").val(r_data.Short_Name);
+            $("#Leave_Payment_Status").val(r_data.Payment_Status);
+            $("#Leave_Color").val(r_data.Color);
+
+            // Show the modal
+            $('#leaveMasterModal').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.log(xhr.responseText);
+            alert('Error loading data: ' + xhr.responseText);
+        }
+    });
+}
+
+// Your existing submit handler - using the same route for both add and edit
+$('#submit_Leave_Master_Btn').on('click', function () {
+    var formData = $('#add_Leave_Master_Form').serialize();
+
+    $.ajax({
         url: "{{ route('add_Leave_Master_Form') }}",
         method: "POST",
         data: formData,
         headers: {
-          'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
         },
         success: function (response) {
-          alert(response.message);
-          $('#leaveMasterModal').modal('hide');
-          $('#add_Leave_Master_Form')[0].reset();
+            alert(response.message);
+            $('#leaveMasterModal').modal('hide');
+            document.getElementById('add_Leave_Master_Form').reset();
+            setTimeout(function() {
+                location.reload();
+            }, 500);
         },
         error: function (xhr, status, error) {
-          alert('An error occurred: ' + xhr.responseText);
+            console.log('Error details:', xhr.responseText);
+            alert('An error occurred: ' + xhr.responseText);
         }
-      });
     });
+});
+
+// Reset form when modal is closed
+$('#leaveMasterModal').on('hidden.bs.modal', function () {
+    document.getElementById('add_Leave_Master_Form').reset();
+    $("#leav_master_id").val('');
+    $("#leaveMasterModalLabel").text("Add Leave Master");
+    $("#submit_Leave_Master_Btn").text("Submit");
+});
+
 </script>
 @stop
