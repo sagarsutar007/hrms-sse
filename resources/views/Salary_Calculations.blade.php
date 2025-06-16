@@ -908,7 +908,7 @@ $(document).ready(function() {
 
                         if (Employee_OT_Rate <= 0) {
                             // Default overtime rate if not specified
-                            Employee_OT_Rate = Employee_Daily_Rate / 8 * 2; // Common formula: double hourly rate
+                            Employee_OT_Rate = all_users_data.salary / Working_Day / all_users_data.Shift_hours;
                         }
 
                         console.log(`Employee ${all_users_data.Employee_id} - Daily Rate: ${Employee_Daily_Rate}, OT Rate: ${Employee_OT_Rate}`);
@@ -1103,6 +1103,7 @@ $(document).ready(function() {
                                 // Only add daily amount for swap dates if there's no actual attendance data
                                 if (!hasActualAttendanceData) {
                                     Daily_Amt = Employee_Daily_Rate;
+                                    OT_Amt = 0;
                                 }
                             }
                             else if (swapDays.length > 0) {
@@ -1112,20 +1113,30 @@ $(document).ready(function() {
                                 // Only add daily amount for swap days if there's no actual attendance data
                                 if (!hasActualAttendanceData) {
                                     Daily_Amt = Employee_Daily_Rate;
+                                    OT_Amt = 0;
                                 }
                             }
                             else if (public_holiday_filyer_data && public_holiday_filyer_data.length == 1) {
                                 cellBackgroundColor = 'style="background-color:yellow"'; // Public holiday
                                 Daily_Amt = Employee_Daily_Rate;
+                                OT_Amt = 0;
                             }
                             else if (weeklyOffs.length > 0) {
                                 cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off
-                                Daily_Amt = Employee_Daily_Rate;
+                                // Only give daily amount if there's no actual attendance (not a swap day)
+                                if (!hasActualAttendanceData) {
+                                    Daily_Amt = Employee_Daily_Rate;
+                                    OT_Amt = 0;
+                                }
                             }
                             else if (all_users_data && all_users_data.Weekly_Off &&
                                     all_users_data.Weekly_Off == date.toLocaleDateString('en-US', { weekday: 'long' })) {
                                 cellBackgroundColor = 'style="background-color:cyan"'; // Weekly off by day name
-                                Daily_Amt = Employee_Daily_Rate;
+                                // Only give daily amount if there's no actual attendance (not a swap day)
+                                if (!hasActualAttendanceData) {
+                                    Daily_Amt = Employee_Daily_Rate;
+                                    OT_Amt = 0;
+                                }
                             }
                             else if (holidayDates.includes(currentDateFormatted)) {
                                 cellBackgroundColor = 'style="background-color:yellow"'; // Holiday date
@@ -1201,28 +1212,52 @@ $(document).ready(function() {
                                 const actualAttendanceData = filteredData.filter(data => data.attandence_Date === currentDateFormatted);
 
                                 actualAttendanceData.forEach(all_att_data => {
-                                    // Calculate actual attendance amount
-                                    let attendanceDaily_Amt = 0;
 
-                                    if (Half_Day_Leave == 1 && all_att_data.Totel_Hours >= all_att_data.Shift_hours / 2) {
-                                        attendanceDaily_Amt = all_att_data.Daily_Rate / 2;
-                                    } else if (all_att_data.Totel_Hours >= all_att_data.Shift_hours) {
-                                        attendanceDaily_Amt = all_att_data.Daily_Rate;
+                                    // Convert overtime minutes to decimal hours
+                                    const overtimeMinutes = parseFloat(all_att_data.Overtime) || 0;
+                                    const overtimeHours = overtimeMinutes / 60;
+
+                                    // Apply rounding logic for OT hours
+                                    let roundedOvertimeHours;
+                                    if (overtimeHours > 0) {
+                                        const decimalPart = overtimeHours % 1;
+                                        if (decimalPart >= 0.75) {
+                                            // If 1.75 or more, round up (1.75 becomes 2.0)
+                                            roundedOvertimeHours = Math.ceil(overtimeHours);
+                                        } else if (decimalPart >= 0.25) {
+                                            // If 1.25 to 1.74, round to nearest 0.5 (1.25 becomes 1.5)
+                                            roundedOvertimeHours = Math.floor(overtimeHours) + 0.5;
+                                        } else {
+                                            // If less than 0.25, round down (1.24 becomes 1.0)
+                                            roundedOvertimeHours = Math.floor(overtimeHours);
+                                        }
                                     } else {
-                                        attendanceDaily_Amt = all_att_data.Daily_Rate;
+                                        roundedOvertimeHours = 0;
                                     }
 
-                                    // Set the daily amount for this record
+                                    const formattedOvertimeHours = roundedOvertimeHours.toFixed(1);
+
+                                    // Calculate attendance daily amount
+                                    let attendanceDaily_Amt = 0;
+                                    if (Half_Day_Leave == 1 && all_att_data.Totel_Hours >= all_att_data.Shift_hours / 2) {
+                                        attendanceDaily_Amt = Daily_Rate / 2;
+                                    } else if (all_att_data.Totel_Hours >= all_att_data.Shift_hours) {
+                                        attendanceDaily_Amt = Daily_Rate;
+                                    } else {
+                                        // Present but less than shift hours - still give daily amount
+                                        attendanceDaily_Amt = Daily_Rate;
+                                    }
+
                                     Daily_Amt = attendanceDaily_Amt;
 
-                                    // Ensure we have a valid overtime rate
-                                    if (all_att_data.Over_Ttime_Rate) {
-                                        Over_Ttime_Rate = parseFloat(all_att_data.Over_Ttime_Rate);
-                                        console.log(`Current Over_Ttime_Rate: ${Over_Ttime_Rate}`);
+                                    // Use correct OT rate from employee data or attendance data
+                                    let currentOTRate = Employee_OT_Rate;
+                                    if (all_att_data.Over_Ttime_Rate && parseFloat(all_att_data.Over_Ttime_Rate) > 0) {
+                                        currentOTRate = parseFloat(all_att_data.Over_Ttime_Rate);
                                     }
 
-                                    // Calculate OT amount
-                                    OT_Amt = all_att_data.Overtime * Over_Ttime_Rate;
+                                    // Calculate OT amount using rounded hours
+                                    OT_Amt = roundedOvertimeHours * currentOTRate;
                                     Total_OT_Amount = Total_OT_Amount + OT_Amt;
 
                                     const formattedTotalHours = parseFloat(all_att_data.Totel_Hours).toFixed(2);
@@ -1233,7 +1268,7 @@ $(document).ready(function() {
                                         <td ${cellBackgroundColor}>${all_att_data.out_time}</td>
                                         <td ${cellBackgroundColor}>${parseFloat(all_att_data.Totel_Hours).toFixed(2)}</td>
                                         <td ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
-                                        <td ${cellBackgroundColor}>${all_att_data.Overtime}</td>
+                                        <td ${cellBackgroundColor}>${formattedOvertimeHours}</td>
                                         <td ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
                                         <td ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>
                                     `;
@@ -1250,21 +1285,22 @@ $(document).ready(function() {
                                         <td class="out_time_p" ${cellBackgroundColor}>${all_att_data.out_time}</td>
                                         <td class="total_hr_p" ${cellBackgroundColor}>${parseFloat(all_att_data.Totel_Hours).toFixed(2)}</td>
                                         <td class="total_min_p" ${cellBackgroundColor}>${all_att_data.Total_Minutes}</td>
-                                        <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.OT_Hr}</td>
-                                        <td class="total_min_p ot" ${cellBackgroundColor}>${all_att_data.Overtime}</td>
+                                        <td class="total_min_p ot" ${cellBackgroundColor}>${(all_att_data.OT_Hr || 0).toFixed(1)}</td>
+                                        <td class="total_min_p ot" ${cellBackgroundColor}>${formattedOvertimeHours}</td>
                                         <td class="total_min_p ot" ${cellBackgroundColor}>${OT_Amt.toFixed(2)}</td>
                                         <td class="total_min_p ot" ${cellBackgroundColor}>${Daily_Amt.toFixed(2)}</td>
                                         <td class="total_min_p ot" ${cellBackgroundColor}>${cumulative_amount.toFixed(2)}</td>
                                     </tr>`;
 
-                                    pop_up_total_hr += parseFloat(all_att_data.Totel_Hours);
-                                    pop_up_total_min += all_att_data.Total_Minutes;
-                                    pop_up_total_ot_hr += all_att_data.OT_Hr;
-                                    pop_up_total_ot_min += all_att_data.Overtime;
-                                    pop_up_total_ot_amount += OT_Amt;
-                                    Work++;
-                                    Over_Time += all_att_data.Overtime;
-                                });
+                                    // Update popup totals
+                                        pop_up_total_hr += parseFloat(all_att_data.Totel_Hours);
+                                        pop_up_total_min += all_att_data.Total_Minutes;
+                                        pop_up_total_ot_hr += (all_att_data.OT_Hr || 0);
+                                        pop_up_total_ot_min += roundedOvertimeHours; // Use rounded value
+                                        pop_up_total_ot_amount += OT_Amt;
+                                        Work++;
+                                        Over_Time += roundedOvertimeHours * 60;
+                                    });
                             }
 
                             pop_up_total_amount += Daily_Amt;
@@ -1290,6 +1326,7 @@ $(document).ready(function() {
                                 </table>
                             </div>`;
 
+                            const overtimeHoursDisplay = (Over_Time / 60).toFixed(1);
                             // Use effective working days for calculations if employee is terminated
                             const calculationWorkingDays = hasTerminationDate ? effectiveWorkingDays : Working_Day;
 
@@ -1316,12 +1353,12 @@ $(document).ready(function() {
 
                             // Add summary columns with termination date consideration but same structure as original
                             table_html_data += `<td>${calculationWorkingDays}</td>
-                                            <td>${calculationWorkingDays - holidayCount}</td>
-                                            <td>${Work}</td>
-                                            <td>${Absent_count}</td>
-                                            <td>${Over_Time}</td>
-                                            <td>${Employee_OT_Rate.toFixed(2)}</td>
-                                            <td>${Math.round(Total_OT_Amount)}</td>`;
+                                <td>${calculationWorkingDays - holidayCount}</td>
+                                <td>${Work}</td>
+                                <td>${Absent_count}</td>
+                                <td>${overtimeHoursDisplay}</td>
+                                <td>${Employee_OT_Rate.toFixed(2)}</td>
+                                <td>${Math.round(Total_OT_Amount)}</td>`;
 
                             // Add advance column exactly as in original
                             table_html_data += `<td id="advance${all_users_data.Employee_id}">`;
@@ -1374,7 +1411,7 @@ $(document).ready(function() {
                                 terminationInfo = `<tr><td colspan="2" style="color:red">Terminated on: ${all_users_data.termination_date}</td><td colspan="8"></td></tr>`;
                             }
 
-                            const overtimeHours = (Over_Time / 60).toFixed(2);
+                            const overtimeHours = (Over_Time / 60).toFixed(1);
 
                             top_table_content = `<tr>
                                 <th colspan='2'>Employee Information</th>
