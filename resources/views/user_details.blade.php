@@ -3389,21 +3389,20 @@ function open_Update_Deduction_form(id) {
         $('#loan_form_submit_btn').on('click', function(event) {
             event.preventDefault();
 
-            // Make sure all required fields are filled
-            if(!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_reason').val()) {
+            // Validate required fields
+            if (!$('#loan_month').val() || !$('#loan_amount').val() || !$('#number_of_loan_installment').val() || !$('#loan_reason').val()) {
                 alert('Please fill all required fields');
                 return;
             }
 
-
-            // Format the month input for the backend as "YYYY-MM-DD"
-            var monthInput = $('#loan_month').val(); // Format: "2025-03"
-            var formattedDate = monthInput + "-01"; // Add day to make it "2025-03-01"
+            // Prepare form data
+            var monthInput = $('#loan_month').val(); // Format: "YYYY-MM"
+            var formattedDate = monthInput + "-01";  // Becomes: "YYYY-MM-01"
 
             var formData = {
                 form_type: "Loan_form",
                 Employee_Id: $('input[name="Employee_Id"]').val(),
-                Month: formattedDate, // Use "2025-03-01" format
+                Month: formattedDate,
                 Amount: $('#loan_amount').val(),
                 Number_of_installment: $('#number_of_loan_installment').val(),
                 Reason: $('#loan_reason').val(),
@@ -3421,18 +3420,23 @@ function open_Update_Deduction_form(id) {
                     'X-CSRF-TOKEN': $('input[name="_token"]').val()
                 },
                 beforeSend: function() {
-                    // Show loading state
-                    $('#loan_form_submit_btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                    $('#loan_form_submit_btn').prop('disabled', true)
+                        .html('<i class="fas fa-spinner fa-spin"></i> Processing...');
                 },
                 success: function(response) {
                     console.log("Success response:", response);
-                    if(response.success) {
+                    if (response.success) {
                         alert(response.message);
                         $('#loanModal').modal('hide');
                         $('#add_loan_form')[0].reset();
                         $("#loanModalLabel").html('<i class="fas fa-money-check-alt mr-1"></i> Add Advance');
-                        // Check if function exists to avoid undefined errors
-                        window.location.reload();
+
+                        if ($.fn.DataTable.isDataTable('#loan_table')) {
+                            $('#loan_table').DataTable().ajax.reload(null, false); // false to keep current pagination
+                        } else {
+                            console.warn('DataTable not initialized!');
+                        }
+
                     } else {
                         alert('Error: ' + response.message);
                     }
@@ -3442,12 +3446,14 @@ function open_Update_Deduction_form(id) {
                     alert('An error occurred. Please try again later.');
                 },
                 complete: function() {
-                    // Re-enable button
-                    $('#loan_form_submit_btn').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Submit');
+                    $('#loan_form_submit_btn').prop('disabled', false)
+                        .html('<i class="fas fa-save mr-1"></i> Submit');
                 }
             });
         });
     });
+
+
 
 
 
